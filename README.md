@@ -1,0 +1,103 @@
+# Maison d'Adoration pour les Nations (M.A.N.)
+
+Site web et API de la Maison d'Adoration pour les Nations, Lubumbashi.
+
+```
+maison-adoration/
+├── backend/    API Node.js (Express) + PostgreSQL
+├── frontend/   Site web SvelteKit + Tailwind
+└── docs/       Contenu prévu pour le site (ministères, extensions…)
+```
+
+## Démarrer en local
+
+Prérequis : Node.js 20 ou plus, PostgreSQL 14 ou plus, Yarn 1.
+
+### 1. API (`backend/`)
+
+```bash
+cd backend
+cp .env.example .env          # puis remplir DATABASE_URL et JWT_SECRET au minimum
+npm install
+npm run db:migrate            # crée les tables
+npm run create-super-admin -- votre@email.com "Votre Nom"
+npm run dev                   # http://localhost:5000
+```
+
+### 2. Site (`frontend/`)
+
+```bash
+cd frontend
+cp .env.example .env          # VITE_API_URL=http://localhost:5000
+yarn install
+yarn dev                      # http://localhost
+```
+
+Pour que le site local puisse appeler l'API, son adresse doit figurer dans `CORS_ORIGINS` du backend.
+
+## Tests
+
+```bash
+cd backend
+npm test                                           # API (base PostgreSQL de test)
+TEST_MONGO_URI=mongodb://127.0.0.1:27017/x npm test  # + test de la migration MongoDB
+```
+
+`TEST_DATABASE_URL` choisit la base de test (par défaut `postgresql://postgres@localhost:5432/man_test`). Elle est **entièrement effacée** à chaque lancement.
+
+## Migrer les données de l'ancien site (MongoDB → PostgreSQL)
+
+À faire une seule fois, après avoir créé la base PostgreSQL de production :
+
+```bash
+cd backend
+MONGO_URI="mongodb+srv://…ancienne base…" DATABASE_URL="postgresql://…" npm run migrate-from-mongo -- --dry-run   # vérification
+MONGO_URI="mongodb+srv://…ancienne base…" DATABASE_URL="postgresql://…" npm run migrate-from-mongo               # migration réelle
+```
+
+- Les inscrits gardent leur mot de passe et leurs contenus achetés.
+- Les identifiants sont conservés : les anciens liens restent valides.
+- Les comptes en double (même e-mail) et les contenus invalides sont signalés et ignorés.
+- Les anciennes données de boutique (commandes, articles…) sont sauvegardées en JSON dans `backend/mongo-backup/` (non versionné : contient des données personnelles).
+- Le script peut être relancé sans créer de doublons.
+
+## Déploiement
+
+**API** (ex. Render, service Web Node) :
+- Dossier racine : `backend`
+- Build : `npm install && npm run db:migrate`
+- Démarrage : `npm start`
+- Variables d'environnement : voir `backend/.env.example` (`NODE_ENV=production`, `DATABASE_SSL=true` pour une base hébergée).
+
+**Site** (site statique) :
+- Dossier racine : `frontend`
+- Build : `yarn install && yarn build` → dossier `build/`
+- Variable : `VITE_API_URL` = adresse publique de l'API.
+
+## Sécurité
+
+- Aucun secret dans le code : tout passe par les variables d'environnement (`.env`, jamais versionné).
+- Les clés présentes dans l'ancien code (Twilio, Cloudinary, Postmark, VAPID, FlexPay, MongoDB, JWT) **doivent être régénérées** chez chaque fournisseur : elles ont circulé dans les anciens dépôts.
+- L'accès aux contenus payants est vérifié par le serveur ; un paiement n'est validé qu'après confirmation directe auprès de FlexPay.
+
+## API — routes principales
+
+| Méthode | Route | Accès |
+|---|---|---|
+| POST | `/auth/register`, `/auth/login` | public |
+| GET | `/auth/me` | connecté |
+| GET | `/settings`, `/stats`, `/health` | public |
+| GET | `/contents?type=&search=&page=` | public (lien caché sans accès) |
+| GET | `/contents/:id`, `/contents/titles` | public |
+| GET | `/contents/mine` | connecté |
+| POST/PUT/DELETE | `/contents…` | admin |
+| GET | `/contents/:id/participants` | admin |
+| POST | `/contents/:id/enrollments` | admin (accès manuel par e-mail) |
+| POST | `/contents/:id/notify` `{channel: email\|sms\|push}` | admin |
+| POST | `/payments/flexpay` | connecté |
+| GET | `/payments/:id` | propriétaire |
+| POST | `/payments/flexpay/callback` | FlexPay (revérifié) |
+| GET/POST | `/users` | admin |
+| PUT | `/users/:id`, `/users/:id/password` | soi-même (ou rôle supérieur) |
+| PUT | `/users/:id/role` | super-admin |
+| POST | `/push-subscriptions` | public |

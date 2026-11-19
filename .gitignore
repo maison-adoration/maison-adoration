@@ -1,0 +1,17 @@
+# Dépendances et builds
+node_modules/
+frontend/build/
+frontend/.svelte-kit/
+frontend/package/
+
+# Secrets : ne jamais enregistrer
+.env
+.env.*
+!.env.example
+
+# Sauvegardes de l'ancienne base (données personnelles)
+backend/mongo-backup/
+
+# Divers
+.DS_Store
+*.log
