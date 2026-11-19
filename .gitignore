@@ -15,3 +15,4 @@ backend/mongo-backup/
 # Divers
 .DS_Store
 *.log
+backend/state.json
