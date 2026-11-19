@@ -2,29 +2,30 @@
   import { onMount } from "svelte";
   import Container from "../../utils/Container.svelte";
 
-  const playVideo = (id) => {
-    let vid = document.getElementById(id);
-    vid.src = `/images/${id}.mp4`;
-    vid.preload = "auto";
-    vid.muted = true;
-    vid.autoplay = true;
-    vid.loop = true;
-    vid.playsinline = true;
-    vid["webkit-playsinline"] = true;
-    vid.play();
-    console.log(vid);
-  };
-
+  // La vidéo n'est chargée que lorsqu'elle devient visible à l'écran
+  // (économise les données mobiles et accélère l'ouverture de la page).
   onMount(() => {
-    playVideo("dons-01");
+    const vid = document.getElementById("dons-01");
+    if (!vid) return;
+    const start = () => {
+      vid.src = "/images/dons-01.mp4";
+      vid.play().catch(() => {});
+    };
+    if (!("IntersectionObserver" in window)) return start();
+    const obs = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        start();
+        obs.disconnect();
+      }
+    }, { rootMargin: "200px" });
+    obs.observe(vid);
+    return () => obs.disconnect();
   });
 </script>
 
 <section class="showcase h-[90vh] sm:h-screen" id="home">
   <div class="video-container">
-    <video id="dons-01" muted autoplay loop playsinline>
-      <source src="/images/dons-01.mp4" type="video/mp4" />
-    </video>
+    <video id="dons-01" muted loop playsinline preload="none" poster="/images/dons-01-poster.jpg"></video>
   </div>
   <div class="content text-gray-300">
     <Container>

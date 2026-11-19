@@ -5,7 +5,7 @@
 
 <div
   class="relative"
-  style="background-image: url(/images/bg-04.jpg); background-size: cover; background-position: center;"
+  style="background-image: url(/images/bg-08.jpg); background-size: cover; background-position: center;"
 >
   <div class="patterns flex items-center text-gray-300 py-12">
     <Container>

@@ -8,32 +8,28 @@
   import config from "../stores/config";
   import { onMount } from "svelte";
   import api, { getToken } from "../utils/api";
-  import Loading from "../components/utils/Loading.svelte";
 
-  let loading = true;
+  // Le site s'affiche tout de suite ; les données de l'API arrivent ensuite.
+  // (Avant, toute la page attendait l'API — très lent quand le serveur se réveille.)
+  onMount(() => {
+    if ($config.currentUser) return;
 
-  onMount(async () => {
-    if ($config.currentUser) {
-      loading = false;
-      return;
+    api.get("/settings")
+      .then((r) => config.update((p) => ({ ...p, settings: r.data })))
+      .catch(() => {});
+    api.get("/stats")
+      .then((r) => config.update((p) => ({ ...p, stats: r.data })))
+      .catch(() => {});
+    api.get("/contents/titles")
+      .then((r) => config.update((p) => ({ ...p, titles: r.data })))
+      .catch(() => {});
+    if (getToken()) {
+      api.get("/auth/me")
+        .then((r) => config.update((p) => ({ ...p, currentUser: r.data, userLoaded: true })))
+        .catch(() => config.update((p) => ({ ...p, userLoaded: true })));
+    } else {
+      config.update((p) => ({ ...p, userLoaded: true }));
     }
-    // Chaque appel est indépendant : si l'un échoue, le site s'affiche quand même.
-    const [settings, me, stats, titles] = await Promise.allSettled([
-      api.get("/settings"),
-      getToken() ? api.get("/auth/me") : Promise.reject(),
-      api.get("/stats"),
-      api.get("/contents/titles"),
-    ]);
-
-    config.update((prev) => ({
-      ...prev,
-      settings: settings.status === "fulfilled" ? settings.value.data : prev.settings,
-      currentUser: me.status === "fulfilled" ? me.value.data : null,
-      stats: stats.status === "fulfilled" ? stats.value.data : null,
-      titles: titles.status === "fulfilled" ? titles.value.data : [],
-    }));
-
-    loading = false;
   });
 </script>
 
@@ -41,15 +37,9 @@
   class={`text-base bg-brand-black text-gray-700 tracking-wide w-full layout`}
   id="home"
 >
-  {#if loading}
-    <div class="h-screen flex items-center justify-center">
-      <Loading text="Veuillez patienter" />
-    </div>
-  {:else}
-    <NavBar />
-    <slot />
-    <Footer />
-  {/if}
+  <NavBar />
+  <slot />
+  <Footer />
 </div>
 
 <!-- For tailwind purge -->

@@ -2,11 +2,9 @@
   import config from "../stores/config";
   import api, { setToken, errorMessage } from "../utils/api";
   import Container from "../components/utils/Container.svelte";
-  import { onMount } from "svelte";
 
-  onMount(() => {
-    if ($config.currentUser) window.location = "/";
-  });
+  // Déjà connecté : retour à l'accueil (dès que le profil est chargé).
+  $: if ($config.currentUser) window.location = "/";
 
   let user = { email: localStorage.getItem("email") || "", password: "" };
   let loading = false;

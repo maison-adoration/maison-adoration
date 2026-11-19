@@ -3,6 +3,7 @@
   import get from "lodash.get";
   import config from "../stores/config";
   import AsAdmin from "../components/index/AsAdmin.svelte";
+  import Loading from "../components/utils/Loading.svelte";
 </script>
 
 <div class="min-h-screen">
@@ -10,6 +11,8 @@
     <Container>
       <AsAdmin />
     </Container>
+  {:else if !$config.userLoaded}
+    <Loading text="Veuillez patienter" />
   {:else}
     <div class="h-screen w-full flex items-center justify-center">
       Accès réservé aux administrateurs

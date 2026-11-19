@@ -6,11 +6,9 @@
   import api, { setToken, errorMessage } from "../utils/api";
   import Container from "../components/utils/Container.svelte";
   import { derivePrefix } from "../utils/functions";
-  import { onMount } from "svelte";
 
-  onMount(() => {
-    if ($config.currentUser) window.location = "/";
-  });
+  // Déjà connecté : retour à l'accueil (dès que le profil est chargé).
+  $: if ($config.currentUser) window.location = "/";
 
   let prefix;
 
