@@ -153,8 +153,7 @@
               >
                 <div
                   class="rounded-full h-[5.75rem] w-[5.75rem] overflow-hidden bg-center bg-cover"
-                  style="background-image: url(/images/israelk-5.jpg);"
-                />
+                  style="background-image: url(/images/israelk-5.jpg);"></div>
               </div>
               <div class="mt-2 font-normal">
                 Prophète Israel Kayembe, Visionaire.

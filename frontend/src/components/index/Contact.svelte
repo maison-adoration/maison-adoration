@@ -66,7 +66,7 @@
               about="_blank"
               class="mt-4 btn btn-aurora !px-12 !py-1 h-[2.75rem] !text-white bg-gradient-to-r to-[#25D366] from-brand-primary"
             >
-              <ion-icon name="logo-whatsapp" class="text-xl mr-2" />
+              <ion-icon name="logo-whatsapp" class="text-xl mr-2"></ion-icon>
               Whatsapp
             </a>
           </div>

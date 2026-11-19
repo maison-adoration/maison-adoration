@@ -3,7 +3,7 @@
   // 1, 6, 8, 12
 </script>
 
-<div class="pb-16 hidden" />
+<div class="pb-16 hidden"></div>
 
 <!-- style="background-image: url(/images/faveur-12.jpg); background-size: cover" -->
 <div

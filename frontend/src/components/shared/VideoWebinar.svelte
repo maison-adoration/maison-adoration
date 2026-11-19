@@ -14,6 +14,7 @@
 
 {#if show}
   <div
+    role="presentation"
     on:click|self={onClose}
     transition:scale
     class="fixed top-0 left-0 md:bottom-0 right-0 h-[130vh] md:h-full w-full z-[999] bg-brand-white"

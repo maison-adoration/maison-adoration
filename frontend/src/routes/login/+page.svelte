@@ -1,7 +1,7 @@
 <script>
-  import config from "../stores/config";
-  import api, { setToken, errorMessage } from "../utils/api";
-  import Container from "../components/utils/Container.svelte";
+  import config from "../../stores/config";
+  import api, { setToken, errorMessage } from "../../utils/api";
+  import Container from "../../components/utils/Container.svelte";
 
   // Déjà connecté : retour à l'accueil (dès que le profil est chargé).
   $: if ($config.currentUser) window.location = "/";
@@ -65,11 +65,11 @@
               on:click={handleLogin}
             >
               Connexion
-              <ion-icon name="lock-open" class="text-xl ml-2" />
+              <ion-icon name="lock-open" class="text-xl ml-2"></ion-icon>
             </button>
           {:else}
             <button class="btn btn-secondary animate-pulse !w-full">
-              <ion-icon name="hourglass-outline" class="text-xl mr-2" />
+              <ion-icon name="hourglass-outline" class="text-xl mr-2"></ion-icon>
               Veuillez Patienter...
             </button>
           {/if}

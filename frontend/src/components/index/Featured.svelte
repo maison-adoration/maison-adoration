@@ -42,7 +42,7 @@
             data-aos-duration="750"
             data-aos-delay="1000"
           >
-            <ion-icon name="logo-youtube" class="translate-y-2" />
+            <ion-icon name="logo-youtube" class="translate-y-2"></ion-icon>
             Suivre MAN TV sur Youtube.
           </h1>
           <p
@@ -65,8 +65,7 @@
               data-aos="fade-right"
               data-aos-anchor-placement="top-bottom"
               data-aos-duration="750"
-              data-aos-delay="1750"
-            />
+              data-aos-delay="1750"></div>
             <!--  -->
             <a
               href="https://www.youtube.com/@mantv6688"
@@ -78,13 +77,12 @@
               data-aos-delay="1500"
             >
               Suivre notre Chaine
-              <ion-icon name="play-circle" class="text-2xl ml-2" />
+              <ion-icon name="play-circle" class="text-2xl ml-2"></ion-icon>
             </a>
           </div>
         </div>
         <div
-          class="w-full pb-12 md:pb-0 md:h-screen lg:w-2/5 flex items-center justify-center lg:justify-end relative z-10"
-        />
+          class="w-full pb-12 md:pb-0 md:h-screen lg:w-2/5 flex items-center justify-center lg:justify-end relative z-10"></div>
       </div>
     </Container>
   </div>

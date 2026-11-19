@@ -1,13 +1,13 @@
 <script>
-  import MyProfileHeading from "./../components/MyProfileHeading.svelte";
+  import MyProfileHeading from "../../components/MyProfileHeading.svelte";
   import Select from "svelte-select";
-  import config from "../stores/config";
-  import api, { errorMessage } from "../utils/api";
+  import config from "../../stores/config";
+  import api, { errorMessage } from "../../utils/api";
   import { onMount } from "svelte";
   import { Circle } from "svelte-loading-spinners";
-  import Container from "../components/utils/Container.svelte";
-  import countries from "../stores/countries";
-  import PushToggle from "../components/shared/PushToggle.svelte";
+  import Container from "../../components/utils/Container.svelte";
+  import countries from "../../stores/countries";
+  import PushToggle from "../../components/shared/PushToggle.svelte";
 
   let loading = true;
   let profile = null;
@@ -96,7 +96,7 @@
             <div class="lg:col-span-2 select-item-1">
               <Select
                 placeholder="Votre Region"
-                bind:selectedValue={profile.country}
+                bind:value={profile.country}
                 items={$countries.map(({ name }) => name)}
               />
             </div>
@@ -165,7 +165,7 @@
           </div>
         {:else}
           <button class="btn btn-aurora" style="width: 100%;">
-            <ion-icon name="checkmark-circle" class="text-xl mr-2" />
+            <ion-icon name="checkmark-circle" class="text-xl mr-2"></ion-icon>
             Sauvegarder
           </button>
         {/if}
@@ -227,7 +227,7 @@
           </div>
         {:else}
           <button class="btn btn-aurora" style="width: 100%;">
-            <ion-icon name="checkmark-circle" class="text-xl mr-2" />
+            <ion-icon name="checkmark-circle" class="text-xl mr-2"></ion-icon>
             Changer mot de passe
           </button>
         {/if}

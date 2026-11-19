@@ -9,7 +9,7 @@
   <div class="relative w-full rounded-xl overflow-hidden shadow-lg bg-black" style="aspect-ratio: 16 / 9;">
     <iframe {src} {title} class="absolute inset-0 w-full h-full" frameborder="0" loading="lazy"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen />
+      allowfullscreen></iframe>
   </div>
 {:else if url}
   <a href={url} target="_blank" rel="noopener" class="btn btn-secondary">

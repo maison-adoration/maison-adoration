@@ -155,7 +155,7 @@
     <label class="text-sm text-gray-500" for="sec-sub">Sous-titre</label>
     <input id="sec-sub" bind:value={editing.subtitle} maxlength="200" />
     <label class="text-sm text-gray-500" for="sec-body">Texte (les retours à la ligne sont conservés)</label>
-    <textarea id="sec-body" bind:value={editing.body} rows="10" maxlength="20000" />
+    <textarea id="sec-body" bind:value={editing.body} rows="10" maxlength="20000"></textarea>
 
     <div class="text-sm text-gray-500">Informations pratiques (adresse, numéro de compte, horaires…)</div>
     {#each editing.details as d, i}

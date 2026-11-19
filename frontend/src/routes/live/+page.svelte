@@ -1,11 +1,11 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import api from "../utils/api";
-  import PageHero from "../components/pages/PageHero.svelte";
-  import Container from "../components/utils/Container.svelte";
-  import Loading from "../components/utils/Loading.svelte";
-  import VideoEmbed from "../components/media/VideoEmbed.svelte";
-  import { formatDate } from "../components/admin/media/upload";
+  import api from "../../utils/api";
+  import PageHero from "../../components/pages/PageHero.svelte";
+  import Container from "../../components/utils/Container.svelte";
+  import Loading from "../../components/utils/Loading.svelte";
+  import VideoEmbed from "../../components/media/VideoEmbed.svelte";
+  import { formatDate } from "../../components/admin/media/upload";
 
   const TYPE = { culte: "Culte", conference: "Conférence", prayer: "Prière", cours: "Cours" };
   let data = null;

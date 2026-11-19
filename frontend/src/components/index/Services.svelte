@@ -54,7 +54,7 @@
   });
 </script>
 
-<div id="services" />
+<div id="services"></div>
 
 <div class="great-container">
   <main class="main flow">
@@ -75,8 +75,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Enterrement de vie de jeune fille (Bridal Shower)
             </li>
@@ -84,8 +83,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Demandes en mariage (Proposals)
             </li>
@@ -93,8 +91,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Fêtes d'anniversaire
             </li>
@@ -102,8 +99,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Mariages
             </li>
@@ -120,8 +116,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Vente des matériaux de déco maison
             </li>
@@ -129,8 +124,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Conseil en arrangement des décos maison
             </li>
@@ -138,8 +132,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Accompagnement dans le choix de couleurs pour votre maison
             </li>
@@ -147,8 +140,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Et bien plus...
             </li>
@@ -165,8 +157,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Jacket safety anti froid
             </li>
@@ -174,8 +165,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Chemise de site pour gestionnaire
             </li>
@@ -183,8 +173,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Chemise de site pour gestionnaire
             </li>
@@ -192,8 +181,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Boots PVC
             </li>
@@ -201,8 +189,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Casque PVC
             </li>
@@ -210,8 +197,7 @@
               <span class="mt-[0.08rem] items-center justify-center">
                 <ion-icon
                   name="checkmark-done-outline"
-                  class="text-lg mr-2 text-gray-400"
-                />
+                  class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
               Et plus...
             </li>
@@ -220,7 +206,7 @@
         </div>
       </div>
 
-      <div class="nouraneOverlay cards__inner" />
+      <div class="nouraneOverlay cards__inner"></div>
     </div>
   </main>
 </div>

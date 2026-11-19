@@ -14,18 +14,18 @@
 >
   <div class="font-bold">{name}</div>
   <div class="flex items-center">
-    <ion-icon name="at-circle" class="text-base text-brand-primary mr-1" />
+    <ion-icon name="at-circle" class="text-base text-brand-primary mr-1"></ion-icon>
     {email}
   </div>
   {#if tel}
     <div class="flex items-center">
-      <ion-icon name="phone-portrait" class="text-base text-brand-primary mr-1" />
+      <ion-icon name="phone-portrait" class="text-base text-brand-primary mr-1"></ion-icon>
       {tel}
     </div>
   {/if}
   {#if country}
     <div class="flex items-center">
-      <ion-icon name="location" class="text-base text-brand-primary mr-1" />
+      <ion-icon name="location" class="text-base text-brand-primary mr-1"></ion-icon>
       {country}
     </div>
   {/if}

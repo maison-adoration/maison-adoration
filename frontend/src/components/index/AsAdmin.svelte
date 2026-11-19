@@ -96,7 +96,7 @@
     <div class="grid grid-cols-1 gap-2">
       <Select
         placeholder="Type"
-        bind:selectedValue={type}
+        bind:value={type}
         items={CONTENT_TYPES}
       />
 
@@ -113,7 +113,7 @@
         <input id="new-price" bind:value={newContent.price} type="number" min="0" step="0.01" />
       {/if}
 
-      <textarea bind:value={newContent.description} placeholder="Description" rows="4" />
+      <textarea bind:value={newContent.description} placeholder="Description" rows="4"></textarea>
 
       <div class="">
         <label
@@ -156,10 +156,10 @@
             class="shadow-sm py-1 px-4 flex items-center justify-start cursor-pointer col-span-2 h-full bg-brand-black-light rounded-md border"
           >
             {#if newContent.pdf}
-              <ion-icon name="checkmark-circle" class="text-2xl mr-2" />
+              <ion-icon name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
               PDF sélectionné
             {:else}
-              <ion-icon name="document-attach" class="text-2xl mr-2" />
+              <ion-icon name="document-attach" class="text-2xl mr-2"></ion-icon>
               PDF
             {/if}
           </label>
@@ -187,14 +187,14 @@
         <!-- else content here -->
         <div class="flex">
           <button class=" !w-full btn btn-third" on:click={handleAdd}>
-            <ion-icon name="checkmark-circle" class="text-2xl mr-2" />
+            <ion-icon name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
             Fait
           </button>
           <button
             class="ml-4 !w-full btn btn-aurora"
             on:click={() => (showAddForm = false)}
           >
-            <ion-icon name="close-circle" class="text-2xl mr-2" />
+            <ion-icon name="close-circle" class="text-2xl mr-2"></ion-icon>
             Fermer
           </button>
         </div>
@@ -203,8 +203,8 @@
   </div>
 </Modal>
 
-<div class="hidden border-gray-100 text-gray-600" />
-<div class="hidden border-brand-primary text-brand-primary" />
+<div class="hidden border-gray-100 text-gray-600"></div>
+<div class="hidden border-brand-primary text-brand-primary"></div>
 
 <div class="mt-8"></div>
 
@@ -215,11 +215,11 @@
     class="btn btn-primary !w-full"
     on:click={() => (showAddForm = true)}
   >
-    <ion-icon name="add-circle" class="text-2xl mr-3" />
+    <ion-icon name="add-circle" class="text-2xl mr-3"></ion-icon>
     Ajouter du Contenu
   </button>
   <button class="btn btn-secondary !w-full" on:click={exportMembers} disabled={exporting}>
-    <ion-icon name="download-outline" class="text-2xl mr-3" />
+    <ion-icon name="download-outline" class="text-2xl mr-3"></ion-icon>
     {exporting ? "Préparation..." : "Exporter les inscrits (Excel)"}
   </button>
 </div>

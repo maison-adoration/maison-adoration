@@ -1,13 +1,13 @@
 <script>
   import { onMount } from "svelte";
-  import api from "../utils/api";
-  import PageHero from "../components/pages/PageHero.svelte";
-  import Container from "../components/utils/Container.svelte";
-  import Loading from "../components/utils/Loading.svelte";
-  import VideoEmbed from "../components/media/VideoEmbed.svelte";
-  import MediaModal from "../components/media/MediaModal.svelte";
-  import { thumbnailFor } from "../components/media/embed";
-  import { formatDate } from "../components/admin/media/upload";
+  import api from "../../utils/api";
+  import PageHero from "../../components/pages/PageHero.svelte";
+  import Container from "../../components/utils/Container.svelte";
+  import Loading from "../../components/utils/Loading.svelte";
+  import VideoEmbed from "../../components/media/VideoEmbed.svelte";
+  import MediaModal from "../../components/media/MediaModal.svelte";
+  import { thumbnailFor } from "../../components/media/embed";
+  import { formatDate } from "../../components/admin/media/upload";
 
   let data = null;
   let seriesFilter = "";
@@ -123,7 +123,7 @@
                 <div class="font-bold text-gray-800">{p.title}</div>
                 <div class="text-xs text-gray-500">Saison {p.season_number}{p.episode_number ? ` · épisode ${p.episode_number}` : ""}</div>
                 {#if p.description}<div class="text-sm text-gray-600 mt-1 line-clamp-2 whitespace-pre-line">{p.description}</div>{/if}
-                <audio controls preload="none" src={p.audio_url} class="w-full mt-2" on:play={() => onPlay(p)} />
+                <audio controls preload="none" src={p.audio_url} class="w-full mt-2" on:play={() => onPlay(p)}></audio>
               </div>
             </div>
           {:else}
@@ -175,7 +175,7 @@
 <MediaModal show={Boolean(sermon)} title={sermon ? sermon.title : ""} on:close={() => (sermon = null)}>
   {#if sermon}
     {#if sermon.video_url}<VideoEmbed url={sermon.video_url} title={sermon.title} />{/if}
-    {#if sermon.audio_url}<audio controls src={sermon.audio_url} class="w-full mt-4" />{/if}
+    {#if sermon.audio_url}<audio controls src={sermon.audio_url} class="w-full mt-4"></audio>{/if}
     <div class="mt-4 text-gray-200 text-sm">
       {formatDate(sermon.sermon_date)}{sermon.preacher ? ` · ${sermon.preacher}` : ""}
     </div>

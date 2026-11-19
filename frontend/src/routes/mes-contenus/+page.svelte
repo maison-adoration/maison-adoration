@@ -1,13 +1,13 @@
 <script>
   import { onMount } from "svelte";
-  import config from "../stores/config";
-  import api, { getToken } from "../utils/api";
-  import Container from "../components/utils/Container.svelte";
-  import Loading from "../components/utils/Loading.svelte";
-  import Empty from "../components/utils/Empty.svelte";
-  import MyProfileHeading from "../components/MyProfileHeading.svelte";
-  import ConferenceCardForUsers from "../components/shared/ConferenceCardForUsers.svelte";
-  import PdfCard from "../components/shared/PDFCard.svelte";
+  import config from "../../stores/config";
+  import api, { getToken } from "../../utils/api";
+  import Container from "../../components/utils/Container.svelte";
+  import Loading from "../../components/utils/Loading.svelte";
+  import Empty from "../../components/utils/Empty.svelte";
+  import MyProfileHeading from "../../components/MyProfileHeading.svelte";
+  import ConferenceCardForUsers from "../../components/shared/ConferenceCardForUsers.svelte";
+  import PdfCard from "../../components/shared/PDFCard.svelte";
 
   let contents = null;
 

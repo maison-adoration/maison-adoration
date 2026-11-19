@@ -3,7 +3,7 @@
   import { createEventDispatcher } from "svelte";
 
   export let show = false;
-  export let title = "";
+  export let title = ""; // titre affiché en haut de la fenêtre (facultatif)
   export let withHeight = false;
 
   const dispatch = createEventDispatcher();
@@ -11,10 +11,14 @@
   const onClose = () => {
     dispatch("modalClose");
   };
+  const onKey = (e) => show && e.key === "Escape" && onClose();
 </script>
+
+<svelte:window on:keydown={onKey} />
 
 {#if show}
   <div
+    role="presentation"
     on:click|self={onClose}
     class="fixed top-0 left-0 bottom-0 right-0 flex items-center justify-center z-[999] bg-black/50"
   >
@@ -23,7 +27,11 @@
       class="w-11/12 md:w-[28rem] bg-brand-black patterns rounded-lg shadow-lg py-4 px-5
       border border-gray-600/50 overflow-auto"
       style={withHeight ? "height: 75vh !important;" : ""}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title || "Fenêtre"}
     >
+      {#if title}<div class="h-font text-xl text-brand-primary mb-3">{title}</div>{/if}
       <div class="mb-4">
         <slot><!-- optional fallback --></slot>
       </div>

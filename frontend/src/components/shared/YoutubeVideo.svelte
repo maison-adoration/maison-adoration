@@ -36,7 +36,6 @@
       class="absolute left-0 top-0 w-full h-[3.5rem] z-30"
     >
       <h1
-        on:click={handleClick}
         class="bg-brand-black text-gray-700 w-full h-full text-sm uppercase tracking-wider flex items-center shadow-md text-center px-2 py-2"
       >
         <ion-icon name="logo-youtube" class="text-xl mr-2"></ion-icon>
@@ -55,17 +54,16 @@
     class="h-[60vh] md:h-[100vh] w-[100vw] overflow-hidden shadow-sm relative z-10"
   >
     <iframe
-      on:click={handleClick}
       on:load={handleOnLoad}
       id={videoID}
-      title="video"
+      {title}
       width="100%"
       height="100%"
-      src={`https://www.youtube.com/embed/${videoID}?rel=0`}
+      src={`https://www.youtube-nocookie.com/embed/${videoID}?rel=0`}
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
-    />
+    ></iframe>
   </div>
 
   <div
@@ -85,9 +83,8 @@
     appuyez sur le bouton play
     <ion-icon
       name="play-circle"
-      class="text-brand-primary text-base translate-y-1"
-    />
+      class="text-brand-primary text-base translate-y-1"></ion-icon>
     pour lancer la video. Pour ouvrir la video en plein ecran, cliquez sur ce bouton
-    <ion-icon name="scan" class="text-brand-primary text-base translate-y-1" />.
+    <ion-icon name="scan" class="text-brand-primary text-base translate-y-1"></ion-icon>.
   </div>
 </div>

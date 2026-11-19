@@ -1,7 +1,7 @@
 <script>
-  import Container from "./../components/utils/Container.svelte";
-  import DonateVideo from "./../components/index/sub/DonateVideo.svelte";
-  import SectionsList from "../components/pages/SectionsList.svelte";
+  import Container from "../../components/utils/Container.svelte";
+  import DonateVideo from "../../components/index/sub/DonateVideo.svelte";
+  import SectionsList from "../../components/pages/SectionsList.svelte";
 </script>
 
 <svelte:head>

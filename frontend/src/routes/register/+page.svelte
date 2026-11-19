@@ -1,11 +1,11 @@
 <script>
   import get from "lodash.get";
   import Select from "svelte-select";
-  import countries from "../stores/countries";
-  import config from "../stores/config";
-  import api, { setToken, errorMessage } from "../utils/api";
-  import Container from "../components/utils/Container.svelte";
-  import { derivePrefix } from "../utils/functions";
+  import countries from "../../stores/countries";
+  import config from "../../stores/config";
+  import api, { setToken, errorMessage } from "../../utils/api";
+  import Container from "../../components/utils/Container.svelte";
+  import { derivePrefix } from "../../utils/functions";
 
   // Déjà connecté : retour à l'accueil (dès que le profil est chargé).
   $: if ($config.currentUser) window.location = "/";
@@ -91,7 +91,7 @@
             <div class="grid grid-cols-1 gap-3 select-item-1">
               <Select
                 placeholder="Pays"
-                bind:selectedValue={user.country}
+                bind:value={user.country}
                 items={$countries.map(({ name }) => name)}
               />
             </div>
@@ -138,14 +138,14 @@
                 on:click={handleSubmit}
               >
                 Créer Votre Compte
-                <ion-icon name="paper-plane" class="text-xl ml-2" />
+                <ion-icon name="paper-plane" class="text-xl ml-2"></ion-icon>
               </button>
             {:else}
               <button
                 class="btn btn-secondary animate-pulse"
                 style="width: 100%;"
               >
-                <ion-icon name="hourglass-outline" class="text-xl mr-2" />
+                <ion-icon name="hourglass-outline" class="text-xl mr-2"></ion-icon>
                 Veuillez Patienter...
               </button>
             {/if}

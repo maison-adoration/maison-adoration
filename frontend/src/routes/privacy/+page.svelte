@@ -1,5 +1,5 @@
 <script>
-  import Container from "./../components/utils/Container.svelte";
+  import Container from "../../components/utils/Container.svelte";
   let appName = "M.A.N. - Maison D'Adoration Pour les Nations";
 </script>
 

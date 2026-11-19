@@ -1,7 +1,7 @@
 <script>
   /* STYLES IMPORTS */
   import "../styles/app.css";
-  import "../styles/tailwind-output.css";
+  import "../styles/tailwind.css";
   /* JS IMPORTS */
   import NavBar from "../components/layout/NavBar.svelte";
   import Footer from "../components/layout/Footer.svelte";
@@ -43,7 +43,7 @@
 </div>
 
 <!-- For tailwind purge -->
-<div class="scroll-smooth" />
+<div class="scroll-smooth"></div>
 
 <style>
   .layout {

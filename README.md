@@ -5,13 +5,16 @@ Site web et API de la Maison d'Adoration pour les Nations, Lubumbashi.
 ```
 maison-adoration/
 ├── backend/    API Node.js (Express) + PostgreSQL
-├── frontend/   Site web SvelteKit + Tailwind
+├── frontend/   Site web SvelteKit 2 + Svelte 5 + Tailwind (site statique)
 └── docs/       Contenu prévu pour le site, correspondance ancien → nouveau
 ```
 
 ## Démarrer en local
 
 Prérequis : Node.js 20 ou plus, PostgreSQL 14 ou plus, Yarn 1.
+
+Après une mise à jour du dépôt (`git pull`), relancer `npm install` dans `backend` et `yarn install` dans `frontend`
+si leurs fichiers `package.json` ont changé, puis `npm run db:migrate` dans `backend`.
 
 ### 1. API (`backend/`)
 
@@ -31,6 +34,7 @@ cd frontend
 cp .env.example .env          # VITE_API_URL=http://localhost:5000
 yarn install
 yarn dev                      # http://localhost
+yarn build && yarn preview    # version de production, http://localhost:4173
 ```
 
 Pour que le site local puisse appeler l'API, son adresse doit figurer dans `CORS_ORIGINS` du backend.

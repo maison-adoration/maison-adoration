@@ -121,6 +121,7 @@
           <button
             on:click={() => (showSideMenu = true)}
             class="nav-link flex items-center justify-center"
+            aria-label="Ouvrir le menu"
           >
             <ion-icon
               name="menu-outline"
@@ -137,6 +138,7 @@
 {#if showSideMenu}
   <div
     class="fixed top-0 left-0 right-0 bottom-0 h-screen w-screen bg-black/25 z-[3000]"
+    role="presentation"
     on:click={() => (showSideMenu = false)}
     transition:fly={{ duration: 100, x: 500 }}
   >
@@ -278,22 +280,24 @@
       >
         <img src="/images/man-gold.png" class="w-10" alt="home" />
         <div class="flex items-center">
-          <div class="h-[1px] w-[2.5rem] sm:w-[7rem]" />
+          <div class="h-[1px] w-[2.5rem] sm:w-[7rem]"></div>
         </div>
-        <a target="blank" href="https://www.youtube.com/@mantv6688">
-          <ion-icon name="logo-youtube" class="text-xl" />
+        <a target="_blank" rel="noopener" href="https://www.youtube.com/@mantv6688" aria-label="Chaîne YouTube MAN TV">
+          <ion-icon name="logo-youtube" class="text-xl"></ion-icon>
         </a>
-        <a target="blank" href="https://coachisraelkayembe.com">
-          <ion-icon name="logo-twitter" class="text-xl" />
+        <a target="_blank" rel="noopener" href="https://coachisraelkayembe.com" aria-label="Site du Prophète Israel Kayembe">
+          <ion-icon name="globe-outline" class="text-xl"></ion-icon>
         </a>
-        <a target="blank" href="https://www.instagram.com/maisondadoration_man">
-          <ion-icon name="logo-instagram" class="text-xl" />
+        <a target="_blank" rel="noopener" href="https://www.instagram.com/maisondadoration_man" aria-label="Instagram">
+          <ion-icon name="logo-instagram" class="text-xl"></ion-icon>
         </a>
         <a
-          target="blank"
+          target="_blank"
+          rel="noopener"
           href="https://web.facebook.com/Maisondadorationpourlesnations"
+          aria-label="Facebook"
         >
-          <ion-icon name="logo-facebook" class="text-xl" />
+          <ion-icon name="logo-facebook" class="text-xl"></ion-icon>
         </a>
       </div>
     </div>

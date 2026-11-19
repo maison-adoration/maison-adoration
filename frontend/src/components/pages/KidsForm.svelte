@@ -59,7 +59,7 @@
       <input bind:value={form.parentPhone} type="tel" placeholder="Téléphone du parent *" />
       <input bind:value={form.parentEmail} type="email" placeholder="E-mail du parent (facultatif)" class="sm:col-span-2" />
       <textarea bind:value={form.notes} rows="3" maxlength="1000" class="sm:col-span-2"
-        placeholder="Informations utiles (allergies, besoins particuliers…) — facultatif" />
+        placeholder="Informations utiles (allergies, besoins particuliers…) — facultatif"></textarea>
       <div class="sm:col-span-2 flex gap-3">
         <button type="submit" class="btn btn-secondary !w-full" disabled={sending}>
           {sending ? "Envoi..." : "Envoyer la demande"}

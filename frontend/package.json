@@ -2,39 +2,28 @@
   "name": "maison-adoration-frontend",
   "version": "2.0.0",
   "scripts": {
-    "predev": "yarn run tailwind:build",
-    "dev:only": "svelte-kit dev --host 0.0.0.0 --port 80",
-    "build:only": "svelte-kit build",
-    "preview": "svelte-kit preview",
-    "tailwind:watch": "cross-env TAILWIND_MODE=watch cross-env NODE_ENV=development postcss src/styles/tailwind.css -o src/styles/tailwind-output.css -w",
-    "tailwind:build": "cross-env TAILWIND_MODE=build cross-env NODE_ENV=production  postcss src/styles/tailwind.css -o src/styles/tailwind-output.css",
-    "dev": "concurrently \"yarn run dev:only\" \"yarn run tailwind:watch\"",
-    "build": "yarn run tailwind:build && yarn run build:only",
-    "serve": "serve build -p 80",
-    "tailwind:onchange": "onchange \"src/**/*.*\" -- yarn run tailwind:build",
-    "dev:watch": "concurrently \"yarn run dev:only\" \"yarn run tailwind:onchange\""
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "@sveltejs/adapter-static": "^1.0.0-next.26",
-    "@sveltejs/kit": "next.239",
-    "@tailwindcss/forms": "^0.4.0",
-    "@tailwindcss/line-clamp": "^0.3.1",
-    "autoprefixer": "^10.2.6",
-    "concurrently": "^6.2.0",
-    "cross-env": "^7.0.3",
-    "onchange": "^7.1.0",
-    "postcss-cli": "^9.1.0",
-    "svelte": "^3.44.0",
-    "tailwindcss": "^3.0.15"
+    "@sveltejs/adapter-static": "^3.0.8",
+    "@sveltejs/kit": "^2",
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "svelte": "^5.55.7",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.4.4"
   },
   "dependencies": {
-    "@beyonk/svelte-carousel": "^2.8.0",
-    "axios": "^0.21.0",
-    "get-video-id": "^3.6.4",
+    "axios": "^1.9.0",
+    "get-video-id": "^4.1.7",
     "lodash.get": "^4.4.2",
-    "svelte-loading-spinners": "^0.1.1",
-    "svelte-scrollto": "^0.2.0",
-    "svelte-select": "^3.11.1"
+    "svelte-loading-spinners": "^0.3.6",
+    "svelte-select": "^5.8.3"
   },
-  "type": "module"
+  "type": "module",
+  "private": true
 }

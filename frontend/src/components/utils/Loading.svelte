@@ -9,4 +9,6 @@
     <img src="/images/man-gold.png" class="w-[10rem]" alt="gold" />
   </div>
   <BarLoader size="100" unit="px" color="#222" />
+  {#if text}<div class="mt-3 text-sm text-gray-500" role="status">{text}</div>{/if}
+  {#if desc}<div class="mt-1 text-xs text-gray-400">{desc}</div>{/if}
 </div>

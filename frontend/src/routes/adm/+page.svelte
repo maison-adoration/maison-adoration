@@ -1,13 +1,13 @@
 <script>
-  import Container from "./../components/utils/Container.svelte";
+  import Container from "../../components/utils/Container.svelte";
   import get from "lodash.get";
-  import config from "../stores/config";
-  import AsAdmin from "../components/index/AsAdmin.svelte";
-  import SectionsAdmin from "../components/admin/SectionsAdmin.svelte";
-  import KidsAdmin from "../components/admin/KidsAdmin.svelte";
-  import UsersAdmin from "../components/admin/UsersAdmin.svelte";
-  import MediaAdmin from "../components/admin/media/MediaAdmin.svelte";
-  import Loading from "../components/utils/Loading.svelte";
+  import config from "../../stores/config";
+  import AsAdmin from "../../components/index/AsAdmin.svelte";
+  import SectionsAdmin from "../../components/admin/SectionsAdmin.svelte";
+  import KidsAdmin from "../../components/admin/KidsAdmin.svelte";
+  import UsersAdmin from "../../components/admin/UsersAdmin.svelte";
+  import MediaAdmin from "../../components/admin/media/MediaAdmin.svelte";
+  import Loading from "../../components/utils/Loading.svelte";
 
   const ALL_TABS = [
     { id: "contenus", label: "Contenus", icon: "albums-outline", roles: ["admin", "super-admin"] },

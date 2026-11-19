@@ -7,7 +7,7 @@
     class="mb-6 text-gray-500 flex items-center text-xl uppercase tracking-widest"
   >
     <span class="flex items-center">
-      <ion-icon name="alert-circle" class="text-3xl text-brand-primary mr-2" />
+      <ion-icon name="alert-circle" class="text-3xl text-brand-primary mr-2"></ion-icon>
     </span>
     {text}
   </h1>

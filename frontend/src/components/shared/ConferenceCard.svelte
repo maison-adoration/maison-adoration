@@ -132,7 +132,7 @@
 <!-- Modification -->
 <Modal show={showEditForm} on:modalClose={() => (showEditForm = false)}>
   <div class="grid grid-cols-1 gap-2">
-    <Select placeholder="Type" bind:selectedValue={editType} items={CONTENT_TYPES} />
+    <Select placeholder="Type" bind:value={editType} items={CONTENT_TYPES} />
 
     {#if type == "video" || type == "podcast"}
       <input bind:value={edit.url} type="url" placeholder="Lien YouTube" />
@@ -145,7 +145,7 @@
     </label>
     <input id="price-{id}" bind:value={edit.price} type="number" min="0" step="0.01" />
 
-    <textarea bind:value={edit.description} placeholder="Description" rows="4" />
+    <textarea bind:value={edit.description} placeholder="Description" rows="4"></textarea>
 
     {#if editLoading}
       <div class="btn btn-primary !w-full">
@@ -154,7 +154,7 @@
       </div>
     {:else}
       <button class="!w-full btn btn-third" on:click={handleUpdate}>
-        <ion-icon name="checkmark-circle" class="text-2xl mr-2" />
+        <ion-icon name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
         Enregistrer
       </button>
     {/if}
@@ -205,7 +205,7 @@
         class="btn btn-green !w-full !py-[0.4rem] !text-xs"
         title="Voir les acheteurs"
       >
-        <ion-icon name="wallet" class="text-base mr-2" />
+        <ion-icon name="wallet" class="text-base mr-2"></ion-icon>
         Acheteurs
       </button>
       <button
@@ -213,7 +213,7 @@
         class="btn btn-green !w-full !py-[0.4rem] !text-xs"
         title="Donner l'accès à quelqu'un via son e-mail"
       >
-        <ion-icon name="add-circle" class="text-base mr-2" />
+        <ion-icon name="add-circle" class="text-base mr-2"></ion-icon>
         Donner l'accès
       </button>
     </div>
@@ -224,14 +224,14 @@
       on:click={openEdit}
       class="btn bg-brand-black !text-gray-800 border border-gray-500/25 !w-full !py-[0.4rem] !text-xs"
     >
-      <ion-icon name="pencil" class="text-base mr-2" />
+      <ion-icon name="pencil" class="text-base mr-2"></ion-icon>
       Modifier
     </button>
     <button
       on:click={handleDelete}
       class="btn bg-brand-black !text-gray-800 border border-gray-500/25 !w-full !py-[0.4rem] !text-xs"
     >
-      <ion-icon name="close-circle" class="text-base mr-2" />
+      <ion-icon name="close-circle" class="text-base mr-2"></ion-icon>
       Supprimer
     </button>
   </div>
@@ -270,7 +270,7 @@
     {#if newPoster}
       <button on:click={handleEditPoster} class="btn btn-secondary !w-full !py-[0.4rem] !text-xs">
         {posterLoading ? "Veuillez patienter..." : "Enregistrer"}
-        <ion-icon name="send" class="ml-2 text-xl" />
+        <ion-icon name="send" class="ml-2 text-xl"></ion-icon>
       </button>
     {/if}
   </div>

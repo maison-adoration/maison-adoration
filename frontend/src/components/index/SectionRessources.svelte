@@ -86,7 +86,7 @@
         placeholder="Terme de recherche"
         on:keydown={(e) => e.key === "Enter" && fetchContents()}
       />
-      <button class="ml-1 btn btn-secondary !px-3" on:click={fetchContents}>
+      <button class="ml-1 btn btn-secondary !px-3" on:click={fetchContents} aria-label="Rechercher">
         <ion-icon name="search-outline" class="text-xl"></ion-icon>
       </button>
     </div>

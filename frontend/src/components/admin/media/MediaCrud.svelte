@@ -124,7 +124,7 @@
       {:else}
         <label class="text-sm text-gray-500" for="mf-{f.key}">{f.label}{f.required ? " *" : ""}</label>
         {#if f.type === "textarea"}
-          <textarea id="mf-{f.key}" rows={f.rows || 6} bind:value={editing.values[f.key]} />
+          <textarea id="mf-{f.key}" rows={f.rows || 6} bind:value={editing.values[f.key]}></textarea>
         {:else if f.type === "select"}
           <select id="mf-{f.key}" bind:value={editing.values[f.key]}>
             {#each f.options() as o}<option value={o.value}>{o.label}</option>{/each}
@@ -143,7 +143,7 @@
           </div>
           {#if uploading[f.key]}<div class="text-xs text-brand-primary animate-pulse">Envoi du fichier…</div>{/if}
           {#if f.kind === "image" && editing.values[f.key]}<img src={editing.values[f.key]} alt="" class="h-20 rounded object-cover" />{/if}
-          {#if f.kind === "audio" && editing.values[f.key]}<audio controls src={editing.values[f.key]} class="w-full" />{/if}
+          {#if f.kind === "audio" && editing.values[f.key]}<audio controls src={editing.values[f.key]} class="w-full"></audio>{/if}
         {:else if f.type === "url"}
           <input id="mf-{f.key}" type="url" bind:value={editing.values[f.key]} placeholder={f.placeholder || ""} />
         {:else}

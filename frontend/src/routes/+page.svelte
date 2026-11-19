@@ -6,14 +6,16 @@
   import SectionAbout from "./../components/index/SectionAbout.svelte";
   import Hero from "./../components/index/Hero.svelte";
   import { onMount } from "svelte";
-  import * as animateScroll from "svelte-scrollto";
   import Contact from "../components/index/Contact.svelte";
   import get from "lodash.get";
   import config from "../stores/config";
 
   onMount(async () => {
     if (window.location.hash.toLowerCase().includes("#webinars")) {
-      setTimeout(() => animateScroll.scrollTo({ element: "#webinars" }), 200);
+      setTimeout(() => {
+        const el = document.getElementById("webinars");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 200);
     }
   });
 </script>

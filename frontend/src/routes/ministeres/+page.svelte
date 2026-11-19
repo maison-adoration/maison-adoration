@@ -1,7 +1,7 @@
 <script>
-  import PageHero from "../components/pages/PageHero.svelte";
-  import SectionsList from "../components/pages/SectionsList.svelte";
-  import KidsForm from "../components/pages/KidsForm.svelte";
+  import PageHero from "../../components/pages/PageHero.svelte";
+  import SectionsList from "../../components/pages/SectionsList.svelte";
+  import KidsForm from "../../components/pages/KidsForm.svelte";
 </script>
 
 <svelte:head>

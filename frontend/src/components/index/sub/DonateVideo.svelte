@@ -66,13 +66,12 @@
               data-aos-delay="1500"
             >
               Comment Procéder
-              <ion-icon name="heart-circle-outline" class="text-2xl ml-2" />
+              <ion-icon name="heart-circle-outline" class="text-2xl ml-2"></ion-icon>
             </a>
           </div>
         </div>
         <div
-          class="w-full pb-12 md:pb-0 md:h-screen lg:w-2/5 flex items-center justify-center lg:justify-end relative z-10"
-        />
+          class="w-full pb-12 md:pb-0 md:h-screen lg:w-2/5 flex items-center justify-center lg:justify-end relative z-10"></div>
       </div>
     </Container>
   </div>

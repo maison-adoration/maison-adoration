@@ -4,7 +4,7 @@
 // rgb(16, 185, 129)
 
 module.exports = {
-  content: ['./src/**/*.svelte'],
+  content: ['./src/**/*.{svelte,js,html}'],
   theme: {
     extend: {
       colors: {
@@ -33,5 +33,5 @@ module.exports = {
   // variants: {
   //   extend: {},
   // },
-  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/line-clamp')],
+  plugins: [require('@tailwindcss/forms')], // line-clamp est inclus dans Tailwind 3.3+
 }
