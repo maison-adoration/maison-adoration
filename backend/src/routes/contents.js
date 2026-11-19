@@ -146,12 +146,19 @@ router.delete(
 );
 
 /* Création (admin) : multipart/form-data avec « poster » (image) et, pour un PDF, « pdf » */
-const createSchema = z.object({
+// Champs d'un contenu, sans valeur par défaut (réutilisés pour la modification partielle).
+const contentFields = {
   type: z.enum(TYPES),
   title: z.string().trim().min(2).max(200),
-  description: z.string().trim().max(5000).default(''),
-  price: z.coerce.number().min(0).max(100000).default(0),
+  description: z.string().trim().max(5000),
+  price: z.coerce.number().min(0).max(100000),
   url: z.string().trim().url('Lien invalide').max(500).optional().or(z.literal('').transform(() => undefined)),
+};
+
+const createSchema = z.object({
+  ...contentFields,
+  description: contentFields.description.default(''),
+  price: contentFields.price.default(0),
 });
 
 router.post(
@@ -183,7 +190,7 @@ router.post(
 );
 
 /* Modification des informations (admin) */
-const updateSchema = createSchema.partial().strict();
+const updateSchema = z.object(contentFields).partial().strict();
 
 router.put(
   '/:id',

@@ -147,6 +147,15 @@ test('création de contenus (admin) et validation', async () => {
   freeId = free.body.id;
 });
 
+test('modification partielle : les autres champs ne changent pas', async () => {
+  const res = await request(app).put(`/contents/${paidId}`).set(auth(adminToken)).send({ title: 'Séminaire de la Vie Intérieure (Jour 1)' });
+  assert.equal(res.status, 200);
+  assert.equal(res.body.title, 'Séminaire de la Vie Intérieure (Jour 1)');
+  assert.equal(res.body.price, 5);
+  assert.equal(res.body.url, 'https://www.youtube.com/watch?v=qBNkq_SKLY0');
+  assert.equal((await request(app).put(`/contents/${paidId}`).set(auth(adminToken)).send({ role: 'x' })).status, 400);
+});
+
 test('le lien d\'un contenu payant est caché sans accès', async () => {
   const anon = await request(app).get('/contents');
   const p = anon.body.find((c) => c.id === paidId);
