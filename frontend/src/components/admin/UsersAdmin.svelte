@@ -48,6 +48,17 @@
     }
   };
 
+  // Mot de passe provisoire pour un membre qui n'a plus accès à son e-mail
+  const temporaryPassword = async (u) => {
+    if (!confirm(`Créer un mot de passe provisoire pour ${u.name} ? Son mot de passe actuel ne marchera plus.`)) return;
+    try {
+      const res = await api.post(`/users/${u.id}/temporary-password`);
+      prompt(`Mot de passe provisoire de ${u.name} (à lui transmettre ; il pourra le changer dans son profil) :`, res.data.password);
+    } catch (err) {
+      alert(errorMessage(err));
+    }
+  };
+
   // Création de compte
   let showCreate = false;
   let creating = false;
@@ -120,6 +131,9 @@
               {#if u.role != "admin"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => changeRole(u, "admin")}>Rendre admin</button>{/if}
               {#if u.role != "user"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => changeRole(u, "user")}>Rendre membre</button>{/if}
               {#if u.role != "super-admin"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => changeRole(u, "super-admin")}>Rendre super-admin</button>{/if}
+            {/if}
+            {#if isSuper ? u.role != "super-admin" : u.role == "user" || u.role == "media"}
+              <button class="btn btn-aurora !py-1 !text-xs" on:click={() => temporaryPassword(u)}>Mot de passe provisoire</button>
             {/if}
             {#if u.role != "super-admin" && (isSuper || u.role == "user" || u.role == "media")}
               <button class="btn btn-aurora !py-1 !text-xs" on:click={() => remove(u)}>Supprimer</button>

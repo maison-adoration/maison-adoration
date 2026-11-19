@@ -112,7 +112,9 @@ test('profil : impossible de changer son rôle ou ses accès, ni le profil des a
 test('mot de passe : seulement le sien, avec le mot de passe actuel', async () => {
   assert.equal((await request(app).put(`/users/${user2.id}/password`).set(auth(userToken)).send({ currentPassword: 'motdepasse1', newPassword: 'nouveau-mdp-1' })).status, 403);
   assert.equal((await request(app).put(`/users/${user.id}/password`).set(auth(userToken)).send({ currentPassword: 'faux', newPassword: 'nouveau-mdp-1' })).status, 400);
-  assert.equal((await request(app).put(`/users/${user.id}/password`).set(auth(userToken)).send({ currentPassword: 'motdepasse1', newPassword: 'nouveau-mdp-1' })).status, 200);
+  const changed = await request(app).put(`/users/${user.id}/password`).set(auth(userToken)).send({ currentPassword: 'motdepasse1', newPassword: 'nouveau-mdp-1' });
+  assert.equal(changed.status, 200);
+  userToken = changed.body.token; // la session d'avant le changement n'est plus valable
   assert.equal((await request(app).post('/auth/login').send({ email: 'fidele1@man.test', password: 'nouveau-mdp-1' })).status, 200);
 });
 

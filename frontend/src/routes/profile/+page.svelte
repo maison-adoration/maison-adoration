@@ -2,7 +2,7 @@
   import MyProfileHeading from "../../components/MyProfileHeading.svelte";
   import Select from "svelte-select";
   import config from "../../stores/config";
-  import api, { errorMessage } from "../../utils/api";
+  import api, { errorMessage, setToken } from "../../utils/api";
   import { onMount } from "svelte";
   import { Circle } from "svelte-loading-spinners";
   import Container from "../../components/utils/Container.svelte";
@@ -61,8 +61,9 @@
     }
     uploadingPwd = true;
     try {
-      await api.put(`/users/${profile.id}/password`, { currentPassword, newPassword });
-      alert("✅ Mot de passe changé !");
+      const res = await api.put(`/users/${profile.id}/password`, { currentPassword, newPassword });
+      setToken(res.data.token); // cet appareil reste connecté ; les autres sont déconnectés
+      alert("✅ Mot de passe changé ! Vos autres appareils ont été déconnectés.");
       window.location.reload();
     } catch (err) {
       uploadingPwd = false;

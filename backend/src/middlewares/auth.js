@@ -24,7 +24,11 @@ async function loadUser(req) {
   }
   if (!payload || typeof payload.sub !== 'string') return null;
   const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [payload.sub]);
-  return rows[0] || null;
+  const user = rows[0];
+  if (!user) return null;
+  // Un changement de mot de passe déconnecte les sessions ouvertes avant lui.
+  if (user.password_changed_at && payload.iat * 1000 < new Date(user.password_changed_at).getTime() - 1000) return null;
+  return user;
 }
 
 /** Connexion facultative : req.user est rempli si le jeton est valide. */

@@ -8,6 +8,8 @@ const { signToken, requireAuth } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
 const { asyncHandler, HttpError } = require('../utils/http-error');
 const { userOut } = require('../utils/serializers');
+const crypto = require('crypto');
+const notifier = require('../services/notifier');
 
 const router = express.Router();
 
@@ -74,5 +76,70 @@ router.post(
 );
 
 router.get('/me', requireAuth, (req, res) => res.json(userOut(req.user)));
+
+// ---------------------------------------------------------------------------
+// Mot de passe oublié
+// ---------------------------------------------------------------------------
+
+const resetLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: config.env === 'test' ? 1000 : 5,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Trop de demandes. Réessayez dans une heure.' },
+});
+const sha256 = (t) => crypto.createHash('sha256').update(t).digest('hex');
+const RESET_TTL_MIN = 60;
+
+router.post(
+  '/forgot-password',
+  resetLimiter,
+  validate({ body: z.object({ email }) }),
+  asyncHandler(async (req, res) => {
+    // Réponse identique que le compte existe ou non : on ne révèle pas qui est inscrit.
+    const answer = { ok: true, emailEnabled: config.smtp.enabled };
+    if (!config.smtp.enabled) return res.json(answer);
+    const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [req.body.email]);
+    const user = rows[0];
+    if (user) {
+      const token = crypto.randomBytes(32).toString('hex');
+      await db.query(
+        `INSERT INTO password_resets (user_id, token_hash, expires_at)
+         VALUES ($1, $2, now() + make_interval(mins => $3))`,
+        [user.id, sha256(token), RESET_TTL_MIN],
+      );
+      const link = `${config.siteUrl}/mot-de-passe?token=${token}`;
+      notifier.sendPasswordReset(user, link).catch((err) => {
+        if (config.env !== 'test') console.error('Envoi du lien de réinitialisation impossible :', err.message);
+      });
+    }
+    res.json(answer);
+  }),
+);
+
+router.post(
+  '/reset-password',
+  resetLimiter,
+  validate({ body: z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'Lien invalide'), password }) }),
+  asyncHandler(async (req, res) => {
+    const user = await db.transaction(async (client) => {
+      const { rows } = await client.query(
+        `SELECT * FROM password_resets WHERE token_hash = $1 AND used_at IS NULL AND expires_at > now() FOR UPDATE`,
+        [sha256(req.body.token)],
+      );
+      if (!rows[0]) throw HttpError.badRequest('Ce lien a expiré ou a déjà servi. Faites une nouvelle demande.');
+      const { rows: updated } = await client.query(
+        'UPDATE users SET password_hash = $1, password_changed_at = now() WHERE id = $2 RETURNING *',
+        [await bcrypt.hash(req.body.password, 12), rows[0].user_id],
+      );
+      // Ce lien et tous les autres liens en attente de ce compte deviennent inutilisables.
+      await client.query('UPDATE password_resets SET used_at = now() WHERE user_id = $1 AND used_at IS NULL', [
+        rows[0].user_id,
+      ]);
+      return updated[0];
+    });
+    res.json({ token: signToken(user), user: userOut(user) });
+  }),
+);
 
 module.exports = router;

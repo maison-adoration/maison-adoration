@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 const { z } = require('zod');
 const db = require('../db');
 const config = require('../config');
-const { requireAuth, requireAdmin, requireSuperAdmin, ROLE_LEVEL } = require('../middlewares/auth');
+const crypto = require('crypto');
+const { requireAuth, requireAdmin, requireSuperAdmin, ROLE_LEVEL, signToken } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
 const { asyncHandler, HttpError } = require('../utils/http-error');
 const { userOut } = require('../utils/serializers');
@@ -179,11 +180,38 @@ router.put(
     if (!(await bcrypt.compare(req.body.currentPassword, req.user.password_hash))) {
       throw HttpError.badRequest('Le mot de passe actuel est incorrect');
     }
-    await db.query('UPDATE users SET password_hash = $1 WHERE id = $2', [
+    await db.query('UPDATE users SET password_hash = $1, password_changed_at = now() WHERE id = $2', [
       await bcrypt.hash(req.body.newPassword, 12),
       req.user.id,
     ]);
-    res.json({ ok: true });
+    // Nouveau jeton : cet appareil reste connecté, les autres sont déconnectés.
+    const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [req.user.id]);
+    res.json({ ok: true, token: signToken(rows[0]) });
+  }),
+);
+
+/*
+ * Mot de passe provisoire (admin) : pour un membre qui n'a plus accès à son e-mail.
+ * Le mot de passe n'est montré qu'une fois, à l'admin, qui le transmet au membre.
+ */
+router.post(
+  '/:id/temporary-password',
+  requireAdmin,
+  validate({ params: idParam }),
+  asyncHandler(async (req, res) => {
+    const target = await findUser(req.params.id);
+    if (target.id === req.user.id || ROLE_LEVEL[req.user.role] <= ROLE_LEVEL[target.role]) {
+      throw HttpError.forbidden('Vous ne pouvez pas réinitialiser ce compte');
+    }
+    // 12 caractères sans lettres ambiguës (0/O, 1/l/I)
+    const alphabet = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const password = Array.from(crypto.randomBytes(12), (b) => alphabet[b % alphabet.length]).join('');
+    await db.query('UPDATE users SET password_hash = $1, password_changed_at = now() WHERE id = $2', [
+      await bcrypt.hash(password, 12),
+      target.id,
+    ]);
+    await db.query('UPDATE password_resets SET used_at = now() WHERE user_id = $1 AND used_at IS NULL', [target.id]);
+    res.json({ password });
   }),
 );
 

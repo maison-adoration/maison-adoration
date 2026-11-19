@@ -74,6 +74,10 @@
             </button>
           {/if}
 
+          <a href="/mot-de-passe" class="!w-full text-center text-sm text-gray-500 underline">
+            Mot de passe oublié ?
+          </a>
+
           <a
             href="/register"
             class="!w-full mt-2 text-center text-brand-primary underline decoration-brand-primary/40 text-xs tracking-wider"

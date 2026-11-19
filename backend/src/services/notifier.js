@@ -106,4 +106,23 @@ async function pushMessage(message) {
   return { enabled: true, recipients: rows.length, ...result, removedExpired: expired.length };
 }
 
-module.exports = { emailNewContent, smsNewContent, pushNewContent, pushMessage, escapeHtml };
+/** Lien de réinitialisation du mot de passe. Renvoie false si l'e-mail n'est pas configuré. */
+async function sendPasswordReset(user, link) {
+  if (!transporter) return false;
+  await transporter.sendMail({
+    from: config.smtp.from,
+    to: user.email,
+    subject: 'Réinitialisation de votre mot de passe',
+    html: `
+    <div style="font-family: Arial, sans-serif; max-width: 560px; margin: auto;">
+      <p>Bonjour ${escapeHtml(user.name)},</p>
+      <p>Vous avez demandé à changer votre mot de passe sur le site de la Maison d'Adoration pour les Nations.</p>
+      <p><a href="${link}" style="display:inline-block;padding:10px 18px;background:#c68101;color:#fff;border-radius:6px;text-decoration:none;">Choisir un nouveau mot de passe</a></p>
+      <p style="font-size:.85rem;color:#666;">Ce lien est valable 1 heure et ne peut servir qu'une fois.
+        Si vous n'avez rien demandé, ignorez cet e-mail : votre mot de passe ne change pas.</p>
+    </div>`,
+  });
+  return true;
+}
+
+module.exports = { emailNewContent, smsNewContent, pushNewContent, pushMessage, sendPasswordReset, escapeHtml };
