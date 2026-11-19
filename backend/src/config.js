@@ -59,7 +59,9 @@ const schema = z.object({
   VAPID_SUBJECT: z.string().default('mailto:maisondadoration@gmail.com'),
 });
 
-const parsed = schema.safeParse(process.env);
+// Une variable présente mais vide (ex. « FLEXPAY_PAYMENT_URL= ») compte comme absente.
+const rawEnv = Object.fromEntries(Object.entries(process.env).filter(([, v]) => v !== undefined && v.trim() !== ''));
+const parsed = schema.safeParse(rawEnv);
 if (!parsed.success) {
   const issues = parsed.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`).join('\n');
   // eslint-disable-next-line no-console

@@ -64,6 +64,25 @@
     }
   };
 
+  let exporting = false;
+
+  // Téléchargement de la liste des inscrits (fichier CSV, s'ouvre dans Excel).
+  const exportMembers = async () => {
+    exporting = true;
+    try {
+      const res = await api.get("/users/export.csv", { responseType: "blob" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(res.data);
+      link.download = `inscrits-man-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+      alert(errorMessage(err));
+    } finally {
+      exporting = false;
+    }
+  };
+
   onMount(fetchContents);
 </script>
 
@@ -198,6 +217,10 @@
   >
     <ion-icon name="add-circle" class="text-2xl mr-3" />
     Ajouter du Contenu
+  </button>
+  <button class="btn btn-secondary !w-full" on:click={exportMembers} disabled={exporting}>
+    <ion-icon name="download-outline" class="text-2xl mr-3" />
+    {exporting ? "Préparation..." : "Exporter les inscrits (Excel)"}
   </button>
 </div>
 

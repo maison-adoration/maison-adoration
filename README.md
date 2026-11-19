@@ -6,7 +6,7 @@ Site web et API de la Maison d'Adoration pour les Nations, Lubumbashi.
 maison-adoration/
 ├── backend/    API Node.js (Express) + PostgreSQL
 ├── frontend/   Site web SvelteKit + Tailwind
-└── docs/       Contenu prévu pour le site (ministères, extensions…)
+└── docs/       Contenu prévu pour le site, correspondance ancien → nouveau
 ```
 
 ## Démarrer en local
@@ -98,6 +98,7 @@ MONGO_URI="mongodb+srv://…ancienne base…" DATABASE_URL="postgresql://…" np
 | GET | `/payments/:id` | propriétaire |
 | POST | `/payments/flexpay/callback` | FlexPay (revérifié) |
 | GET/POST | `/users` | admin |
+| GET | `/users/export.csv` | admin |
 | PUT | `/users/:id`, `/users/:id/password` | soi-même (ou rôle supérieur) |
 | PUT | `/users/:id/role` | super-admin |
 | POST | `/push-subscriptions` | public |

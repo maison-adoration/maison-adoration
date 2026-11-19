@@ -47,6 +47,32 @@ router.get(
   }),
 );
 
+/* Export CSV de tous les inscrits (admin) — remplace l'ancienne route publique /users/781227 */
+router.get(
+  '/export.csv',
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { rows } = await db.query(
+      `SELECT u.created_at, u.name, u.email, u.tel, u.country, u.role,
+              (SELECT count(*) FROM enrollments e WHERE e.user_id = u.id)::int AS contents
+       FROM users u ORDER BY u.created_at DESC`,
+    );
+    // Échappement CSV + protection contre l'injection de formules dans Excel.
+    const cell = (v) => {
+      let t = v === null || v === undefined ? '' : v instanceof Date ? v.toISOString().slice(0, 10) : String(v);
+      if (/^[=+\-@\t\r]/.test(t)) t = `'${t}`;
+      return `"${t.replace(/"/g, '""')}"`;
+    };
+    const header = ['Inscrit le', 'Nom', 'E-mail', 'Téléphone', 'Pays', 'Rôle', 'Contenus'];
+    const lines = rows.map((r) =>
+      [r.created_at, r.name, r.email, r.tel, r.country, r.role, r.contents].map(cell).join(';'),
+    );
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="inscrits-man.csv"');
+    res.send(`\uFEFF${[header.map(cell).join(';'), ...lines].join('\r\n')}`);
+  }),
+);
+
 router.get(
   '/:id',
   requireAdmin,

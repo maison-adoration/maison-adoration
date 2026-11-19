@@ -124,6 +124,17 @@ test('liste des utilisateurs réservée aux admins', async () => {
   assert.equal(res.body.length, 2);
 });
 
+test('export CSV des inscrits réservé aux admins', async () => {
+  assert.equal((await request(app).get('/users/export.csv')).status, 401);
+  assert.equal((await request(app).get('/users/export.csv').set(auth(userToken))).status, 403);
+  const res = await request(app).get('/users/export.csv').set(auth(adminToken));
+  assert.equal(res.status, 200);
+  assert.match(res.headers['content-type'], /text\/csv/);
+  assert.ok(res.text.includes('fidele1@man.test'));
+  assert.ok(res.text.includes('"\'+243970000001"'), 'protection contre les formules');
+  assert.equal(res.text.includes('$2'), false);
+});
+
 test('création de contenus (admin) et validation', async () => {
   assert.equal((await request(app).post('/contents').set(auth(userToken)).field('type', 'video').field('title', 'X')).status, 403);
   const noPoster = await request(app).post('/contents').set(auth(adminToken)).field('type', 'video').field('title', 'Sans affiche').field('url', 'https://youtu.be/abc');
