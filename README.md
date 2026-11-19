@@ -67,16 +67,22 @@ MONGO_URI="mongodb+srv://…ancienne base…" DATABASE_URL="postgresql://…" np
 
 ## Déploiement
 
-**API** (ex. Render, service Web Node) :
-- Dossier racine : `backend`
-- Build : `npm install && npm run db:migrate`
-- Démarrage : `npm start`
-- Variables d'environnement : voir `backend/.env.example` (`NODE_ENV=production`, `DATABASE_SSL=true` pour une base hébergée).
+Le fichier `render.yaml` décrit toute l'installation sur Render : base PostgreSQL, API et site statique.
+Dans Render : **Blueprints → New Blueprint Instance**, choisir ce dépôt, puis remplir les valeurs demandées
+(adresses du site et de l'API, Cloudinary, FlexPay, Gmail, Twilio, clés VAPID). Vérifier avant de valider les
+offres choisies (`plan`) et la région : la base gratuite de Render a une durée de vie limitée.
 
-**Site** (site statique) :
-- Dossier racine : `frontend`
-- Build : `yarn install && yarn build` → dossier `build/`
-- Variable : `VITE_API_URL` = adresse publique de l'API.
+Ordre conseillé :
+1. Créer le Blueprint ; noter les adresses de `man-api` et `man-site`.
+2. Renseigner `VITE_API_URL` (site) = adresse de l'API, puis `CORS_ORIGINS`, `SITE_URL`, `API_PUBLIC_URL` (API).
+3. Migrer les anciennes données : `MONGO_URI=… DATABASE_URL=<External Database URL de man-db> DATABASE_SSL=true npm run migrate-from-mongo` (depuis `backend/`, d'abord avec `-- --dry-run`).
+4. Créer le super-admin avec la même `DATABASE_URL` : `npm run create-super-admin -- email "Nom"`.
+5. Pointer le nom de domaine vers `man-site`.
+
+Hébergement manuel (autre que Render) :
+- **API** : dossier `backend`, build `npm ci`, démarrage `npm run db:migrate && npm start`, variables de `backend/.env.example`.
+- **Site** : dossier `frontend`, build `yarn install && yarn build`, publier le dossier `build/`, variable `VITE_API_URL`.
+  Chaque page est un fichier `.html` (`/maison` → `maison.html`) : l'hébergeur doit servir ces fichiers sans l'extension.
 
 ## Sécurité
 

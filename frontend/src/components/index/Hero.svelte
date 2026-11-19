@@ -58,8 +58,7 @@
           <div class="wrd-container mt-5 flex items-center justify-center">
             <span>
               <a
-                href="https://www.youtube.com/@mantv6688"
-                target="_blank"
+                href="/live"
                 class="btn btn-secondary h-font !text-xl !px-10 tracking-widest"
               >
                 Voir En Direct

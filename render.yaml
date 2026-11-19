@@ -1,0 +1,141 @@
+# Déploiement sur Render (Blueprint) : base PostgreSQL + API + site statique.
+# Dashboard Render → Blueprints → New Blueprint Instance → choisir ce dépôt.
+# Les valeurs marquées « sync: false » sont demandées par Render à la création.
+# À vérifier avant de lancer : plans et région (tarifs Render en vigueur),
+# et la durée de vie de la base gratuite, limitée chez Render.
+
+databases:
+  - name: man-db
+    databaseName: maison_adoration
+    user: man
+    plan: free # passer à une offre payante pour garder les données sans limite de durée
+    region: frankfurt
+
+services:
+  # ---------------------------------------------------------------- API
+  - type: web
+    name: man-api
+    runtime: node
+    rootDir: backend
+    plan: free # l'offre gratuite se met en veille après 15 min sans visite
+    region: frankfurt
+    buildCommand: npm ci
+    # Les migrations s'appliquent à chaque démarrage (sans effet si la base est à jour).
+    startCommand: npm run db:migrate && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: man-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS # ex. https://man-site.onrender.com,https://www.maison-adoration.net
+        sync: false
+      - key: SITE_URL # adresse publique du site
+        sync: false
+      - key: API_PUBLIC_URL # adresse publique de cette API (confirmation FlexPay)
+        sync: false
+      - key: CURRENCY
+        value: USD
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: FLEXPAY_MERCHANT
+        sync: false
+      - key: FLEXPAY_TOKEN
+        sync: false
+      - key: FLEXPAY_PAYMENT_URL
+        sync: false
+      - key: FLEXPAY_CHECK_URL
+        sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS # mot de passe d'application Gmail
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_MESSAGING_SERVICE_SID
+        sync: false
+      - key: VAPID_PUBLIC_KEY # npx web-push generate-vapid-keys
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+
+  # -------------------------------------------------------- Site statique
+  - type: web
+    name: man-site
+    runtime: static
+    rootDir: frontend
+    buildCommand: yarn install --frozen-lockfile && yarn build
+    staticPublishPath: build
+    envVars:
+      - key: VITE_API_URL # adresse publique de l'API, ex. https://man-api.onrender.com
+        sync: false
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+    # Chaque page est un fichier .html : /maison → /maison.html
+    routes:
+      - type: rewrite
+        source: /about
+        destination: /about.html
+      - type: rewrite
+        source: /adm
+        destination: /adm.html
+      - type: rewrite
+        source: /donate
+        destination: /donate.html
+      - type: rewrite
+        source: /extensions
+        destination: /extensions.html
+      - type: rewrite
+        source: /live
+        destination: /live.html
+      - type: rewrite
+        source: /login
+        destination: /login.html
+      - type: rewrite
+        source: /maison
+        destination: /maison.html
+      - type: rewrite
+        source: /mediatheque
+        destination: /mediatheque.html
+      - type: rewrite
+        source: /mes-contenus
+        destination: /mes-contenus.html
+      - type: rewrite
+        source: /ministeres
+        destination: /ministeres.html
+      - type: rewrite
+        source: /mot-de-passe
+        destination: /mot-de-passe.html
+      - type: rewrite
+        source: /privacy
+        destination: /privacy.html
+      - type: rewrite
+        source: /profile
+        destination: /profile.html
+      - type: rewrite
+        source: /register
+        destination: /register.html
