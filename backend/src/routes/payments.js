@@ -12,7 +12,7 @@ const crypto = require('crypto');
 const { z } = require('zod');
 const db = require('../db');
 const config = require('../config');
-const { requireAuth } = require('../middlewares/auth');
+const { requireAuth, requireAdmin } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
 const { asyncHandler, HttpError } = require('../utils/http-error');
 const { paymentOut } = require('../utils/serializers');
@@ -21,27 +21,31 @@ const flexpay = require('../services/flexpay');
 const router = express.Router();
 
 /**
- * Revérifie un paiement en attente auprès de FlexPay et, s'il a réussi,
- * donne l'accès — le tout dans une seule transaction, sans double traitement.
+ * Revérifie un paiement en attente auprès de FlexPay et, s'il a réussi, donne l'accès.
+ * L'appel à FlexPay se fait SANS verrou ni connexion à la base ouverte (il peut durer
+ * jusqu'à 30 s) ; l'enregistrement se fait ensuite dans une transaction courte qui
+ * revérifie que le paiement est toujours en attente (pas de double traitement).
  */
 async function settle(paymentId) {
+  const { rows } = await db.query('SELECT * FROM payments WHERE id = $1', [paymentId]);
+  const payment = rows[0];
+  if (!payment || payment.status !== 'pending' || !payment.order_number) return payment;
+
+  const status = await flexpay.checkPayment(payment.order_number);
+  if (status === 'pending') return payment;
+
   return db.transaction(async (client) => {
-    const { rows } = await client.query('SELECT * FROM payments WHERE id = $1 FOR UPDATE', [paymentId]);
-    const payment = rows[0];
-    if (!payment || payment.status !== 'pending' || !payment.order_number) return payment;
-
-    const status = await flexpay.checkPayment(payment.order_number);
-    if (status === 'pending') return payment;
-
     const { rows: updated } = await client.query(
-      'UPDATE payments SET status = $1 WHERE id = $2 RETURNING *',
+      "UPDATE payments SET status = $1 WHERE id = $2 AND status = 'pending' RETURNING *",
       [status, payment.id],
     );
-    if (status === 'success') {
+    // Déjà traité entre-temps (rappel FlexPay et interrogation du site en même temps)
+    if (!updated[0]) return (await client.query('SELECT * FROM payments WHERE id = $1', [payment.id])).rows[0];
+    if (status === 'success' && updated[0].user_id) {
       await client.query(
         `INSERT INTO enrollments (user_id, content_id, source, payment_id)
          VALUES ($1, $2, 'purchase', $3) ON CONFLICT (user_id, content_id) DO NOTHING`,
-        [payment.user_id, payment.content_id, payment.id],
+        [updated[0].user_id, updated[0].content_id, updated[0].id],
       );
     }
     return updated[0];
@@ -77,9 +81,9 @@ router.post(
 
     const reference = `MAN-${req.user.number}-${content.number}-${crypto.randomBytes(4).toString('hex')}`;
     const { rows: created } = await db.query(
-      `INSERT INTO payments (user_id, content_id, amount, currency, phone, reference)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [req.user.id, content.id, content.price, config.currency, flexpay.normalizePhone(req.body.phone), reference],
+      `INSERT INTO payments (user_id, payer_email, content_id, amount, currency, phone, reference)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [req.user.id, req.user.email, content.id, content.price, config.currency, flexpay.normalizePhone(req.body.phone), reference],
     );
     let payment = created[0];
 
@@ -121,6 +125,63 @@ router.post(
     if (rows[0]) await settle(rows[0].id);
     // Réponse identique dans tous les cas : rien à apprendre pour un tiers.
     res.json({ received: true });
+  }),
+);
+
+/* Suivi des paiements (admin) : ?status=&search=&from=AAAA-MM-JJ&to=AAAA-MM-JJ[&format=csv] */
+const listQuery = z.object({
+  status: z.enum(['pending', 'success', 'failed']).optional(),
+  search: z.string().trim().max(100).default(''),
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  format: z.enum(['json', 'csv']).default('json'),
+});
+
+router.get(
+  '/',
+  requireAdmin,
+  validate({ query: listQuery }),
+  asyncHandler(async (req, res) => {
+    const q = req.validQuery;
+    const where = `WHERE ($1::payment_status IS NULL OR p.status = $1)
+        AND ($2::date IS NULL OR p.created_at >= $2::date)
+        AND ($3::date IS NULL OR p.created_at < $3::date + 1)
+        AND (coalesce(p.payer_email, '') ILIKE $4 OR coalesce(u.name, '') ILIKE $4 OR c.title ILIKE $4 OR p.phone ILIKE $4)`;
+    const params = [q.status ?? null, q.from ?? null, q.to ?? null, `%${q.search.replace(/[%_\\]/g, '\\$&')}%`];
+    const { rows } = await db.query(
+      `SELECT p.id, p.created_at, p.status, p.amount, p.currency, p.phone, p.reference, p.order_number, p.message,
+              p.payer_email, u.name AS payer_name, c.title AS content_title
+       FROM payments p LEFT JOIN users u ON u.id = p.user_id JOIN contents c ON c.id = p.content_id
+       ${where} ORDER BY p.created_at DESC LIMIT 1000`,
+      params,
+    );
+    if (q.format === 'csv') {
+      const cell = (v) => {
+        let t = v === null || v === undefined ? '' : v instanceof Date ? v.toISOString().replace('T', ' ').slice(0, 16) : String(v);
+        if (/^[=+\-@\t\r]/.test(t)) t = `'${t}`;
+        return `"${t.replace(/"/g, '""')}"`;
+      };
+      const STATUS = { pending: 'En attente', success: 'Réussi', failed: 'Échoué' };
+      const lines = rows.map((r) =>
+        [r.created_at, STATUS[r.status], r.amount, r.currency, r.payer_name, r.payer_email, r.phone, r.content_title, r.reference]
+          .map(cell)
+          .join(';'),
+      );
+      const header = ['Date', 'Statut', 'Montant', 'Devise', 'Nom', 'E-mail', 'Téléphone', 'Contenu', 'Référence'];
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="paiements-man.csv"');
+      return res.send(`\uFEFF${[header.map(cell).join(';'), ...lines].join('\r\n')}`);
+    }
+    const { rows: totals } = await db.query(
+      `SELECT p.currency, count(*) FILTER (WHERE p.status = 'success')::int AS successes,
+              coalesce(sum(p.amount) FILTER (WHERE p.status = 'success'), 0) AS total,
+              count(*) FILTER (WHERE p.status = 'pending')::int AS pending,
+              count(*) FILTER (WHERE p.status = 'failed')::int AS failed
+       FROM payments p LEFT JOIN users u ON u.id = p.user_id JOIN contents c ON c.id = p.content_id
+       ${where} GROUP BY p.currency`,
+      params,
+    );
+    res.json({ payments: rows, totals });
   }),
 );
 

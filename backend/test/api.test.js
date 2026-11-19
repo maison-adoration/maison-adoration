@@ -250,6 +250,53 @@ test('un contenu déjà vendu ne peut pas être supprimé ; un gratuit oui', asy
   assert.equal((await request(app).delete(`/contents/${freeId}`).set(auth(adminToken))).status, 200);
 });
 
+test('confirmations simultanées : un seul accès, un seul traitement', async () => {
+  let calls = 0;
+  flexpay.startPayment = async () => ({ accepted: true, orderNumber: 'ORD-RACE', message: 'ok' });
+  flexpay.checkPayment = async () => {
+    calls++;
+    await new Promise((r) => setTimeout(r, 50));
+    return 'success';
+  };
+  const r = await request(app).post('/auth/register').send({ name: 'Fidèle Quatre', email: 'f4@man.test', password: 'motdepasse4' });
+  const start = await request(app).post('/payments/flexpay').set(auth(r.body.token)).send({ contentId: paidId, phone: '243970000004' });
+  assert.equal(start.status, 201);
+  await Promise.all([
+    request(app).post('/payments/flexpay/callback').send({ orderNumber: 'ORD-RACE' }),
+    request(app).post('/payments/flexpay/callback').send({ orderNumber: 'ORD-RACE' }),
+    request(app).get(`/payments/${start.body.id}`).set(auth(r.body.token)),
+  ]);
+  const { rows } = await db.query('SELECT count(*)::int AS n FROM enrollments WHERE payment_id = $1', [start.body.id]);
+  assert.equal(rows[0].n, 1);
+  assert.equal((await request(app).get(`/payments/${start.body.id}`).set(auth(r.body.token))).body.status, 'success');
+  assert.ok(calls >= 1);
+});
+
+test('suivi des paiements réservé aux admins, avec totaux et export', async () => {
+  assert.equal((await request(app).get('/payments').set(auth(userToken))).status, 403);
+  const res = await request(app).get('/payments').set(auth(adminToken));
+  assert.equal(res.status, 200);
+  assert.ok(res.body.payments.length >= 3);
+  const usd = res.body.totals.find((t) => t.currency === 'USD');
+  assert.equal(usd.successes, 2);
+  assert.equal(usd.total, 10);
+  const ok = await request(app).get('/payments?status=success').set(auth(adminToken));
+  assert.ok(ok.body.payments.every((p) => p.status === 'success'));
+  const csv = await request(app).get('/payments?format=csv').set(auth(adminToken));
+  assert.match(csv.headers['content-type'], /text\/csv/);
+  assert.ok(csv.text.includes('Réussi'));
+});
+
+test('supprimer un compte garde son historique de paiement', async () => {
+  const { rows: before } = await db.query("SELECT id FROM users WHERE email = 'f4@man.test'");
+  await request(app).delete(`/users/${before[0].id}`).set(auth(adminToken)).expect(200);
+  const { rows } = await db.query("SELECT user_id, payer_email, status FROM payments WHERE order_number = 'ORD-RACE'");
+  assert.equal(rows.length, 1, 'paiement conservé');
+  assert.equal(rows[0].user_id, null);
+  assert.equal(rows[0].payer_email, 'f4@man.test');
+  assert.equal(rows[0].status, 'success');
+});
+
 test('suppression de comptes : règles de rôles', async () => {
   assert.equal((await request(app).delete(`/users/${user2.id}`).set(auth(userToken))).status, 403);
   const { rows } = await db.query("SELECT id FROM users WHERE role = 'super-admin'");

@@ -7,12 +7,14 @@
   import KidsAdmin from "../../components/admin/KidsAdmin.svelte";
   import UsersAdmin from "../../components/admin/UsersAdmin.svelte";
   import MediaAdmin from "../../components/admin/media/MediaAdmin.svelte";
+  import PaymentsAdmin from "../../components/admin/PaymentsAdmin.svelte";
   import Loading from "../../components/utils/Loading.svelte";
 
   const ALL_TABS = [
     { id: "contenus", label: "Contenus", icon: "albums-outline", roles: ["admin", "super-admin"] },
     { id: "pages", label: "Pages du site", icon: "document-text-outline", roles: ["admin", "super-admin"] },
     { id: "media", label: "Médias", icon: "videocam-outline", roles: ["media", "admin", "super-admin"] },
+    { id: "payments", label: "Paiements", icon: "wallet-outline", roles: ["admin", "super-admin"] },
     { id: "kids", label: "Man Kids", icon: "happy-outline", roles: ["admin", "super-admin"] },
     { id: "users", label: "Utilisateurs", icon: "people-outline", roles: ["admin", "super-admin"] },
   ];
@@ -56,6 +58,8 @@
         <SectionsAdmin />
       {:else if tab == "media"}
         <MediaAdmin />
+      {:else if tab == "payments"}
+        <PaymentsAdmin />
       {:else if tab == "kids"}
         <KidsAdmin />
       {:else if tab == "users"}

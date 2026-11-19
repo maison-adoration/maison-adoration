@@ -106,6 +106,7 @@ Hébergement manuel (autre que Render) :
 | POST | `/contents/:id/notify` `{channel: email\|sms\|push}` | admin |
 | POST | `/payments/flexpay` | connecté |
 | GET | `/payments/:id` | propriétaire |
+| GET | `/payments?status=&search=&from=&to=&format=csv` | admin (suivi et export) |
 | POST | `/payments/flexpay/callback` | FlexPay (revérifié) |
 | GET/POST | `/users` | admin |
 | GET | `/users/export.csv` | admin |
