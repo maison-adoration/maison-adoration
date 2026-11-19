@@ -7,6 +7,7 @@
   import { Circle } from "svelte-loading-spinners";
   import Container from "../components/utils/Container.svelte";
   import countries from "../stores/countries";
+  import PushToggle from "../components/shared/PushToggle.svelte";
 
   let loading = true;
   let profile = null;
@@ -149,6 +150,8 @@
             Recevoir les annonces par SMS
           </label>
         </div>
+
+        <PushToggle />
 
         {#if uploading}
           <div class="grid grid-cols-1 gap-8">

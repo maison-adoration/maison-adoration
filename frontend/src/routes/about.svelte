@@ -1,3 +1,5 @@
-<div class="text-4xl flex items-center justify-center min-h-screen">
-  About Time!
-</div>
+<script>
+  import { onMount } from "svelte";
+  // L'ancienne page « À propos » est remplacée par la page Maison.
+  onMount(() => window.location.replace("/maison"));
+</script>

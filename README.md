@@ -102,3 +102,14 @@ MONGO_URI="mongodb+srv://…ancienne base…" DATABASE_URL="postgresql://…" np
 | PUT | `/users/:id`, `/users/:id/password` | soi-même (ou rôle supérieur) |
 | PUT | `/users/:id/role` | super-admin |
 | POST | `/push-subscriptions` | public |
+| GET | `/sections?page=maison\|ministeres\|extensions\|dons` | public (publiées) / admin (toutes) |
+| POST/PUT/DELETE | `/sections…` | admin |
+| POST | `/kids-registrations` | public (formulaire Man Kids) |
+| GET/PUT/DELETE | `/kids-registrations…` | admin |
+
+## Pages du site modifiables sans code
+
+Les pages **Maison**, **Ministères**, **Extensions** et **Dons** sont composées de sections modifiables dans
+**Administration → Pages du site** : titre, texte, image, informations pratiques (adresse, numéros…), ordre,
+publication. Les sections encore vides (Notre culture, Nos croyances, Jeunesse, Les sœurs, Man Worship, MAN Kolwezi,
+coordonnées de dons…) sont créées en brouillon : elles n'apparaissent sur le site qu'une fois remplies et publiées.

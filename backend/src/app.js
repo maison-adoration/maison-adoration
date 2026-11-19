@@ -39,6 +39,8 @@ app.use('/auth', require('./routes/auth'));
 app.use('/users', require('./routes/users'));
 app.use('/contents', require('./routes/contents'));
 app.use('/payments', require('./routes/payments'));
+app.use('/sections', require('./routes/sections'));
+app.use('/kids-registrations', require('./routes/kids'));
 
 app.use(notFound);
 app.use(errorHandler);

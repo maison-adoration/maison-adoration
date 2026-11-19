@@ -1,15 +1,20 @@
 {
-  "name": "M.A.N. - Maison D'Adoration Pour les Nations",
-  "short_name": "M.A.N. - Maison D'Adoration Pour les Nations",
+  "name": "M.A.N. - Maison d'Adoration pour les Nations",
+  "short_name": "M.A.N.",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#FCFCFC",
+  "theme_color": "#C68101",
   "background_color": "#FCFCFC",
-  "description": "Inspirer et développer une nouvelle génération de Chrétiens",
-  "orientation": "portrait",
+  "description": "Ramener les Nations à genoux à la croix par l'Enseignement de la Parole et la Puissance du Saint-Esprit.",
+  "lang": "fr",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

@@ -1,12 +1,16 @@
 <script>
-  import Container from "../components/utils/Container.svelte";
-  import MaisonVideo from "../components/index/sub/MaisonVideo.svelte";
+  import PageHero from "../components/pages/PageHero.svelte";
+  import SectionsList from "../components/pages/SectionsList.svelte";
 </script>
 
 <svelte:head>
-  <title>A Propos - M.A.N. - Maison D'Adoration Pour les Nations</title>
+  <title>La Maison - M.A.N. - Maison D'Adoration Pour les Nations</title>
 </svelte:head>
 
-<MaisonVideo />
+<PageHero
+  title="Notre Maison"
+  subtitle="« Ramener les Nations à genoux à la croix par l'Enseignement de la Parole et la Puissance du Saint-Esprit. » — Ésaïe 2 : 2-3"
+  image="/images/israelk-1.jpg"
+/>
 
-<div class="-mt-4 min-h-screen bg-[#fff]"></div>
+<SectionsList page="maison" showNav />

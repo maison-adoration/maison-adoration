@@ -108,9 +108,9 @@
 
       <div class="hidden lg:flex">
         <a class="nav-link mr-6" href="/#home">Accueil</a>
-        <a class="nav-link mr-6" href="/#about">Maison</a>
-        <!-- <a class="nav-link mr-6" href="/#ministries">Ministères</a> -->
-        <a class="nav-link mr-6" href="/#about">Extensions</a>
+        <a class="nav-link mr-6" href="/maison">Maison</a>
+        <a class="nav-link mr-6" href="/ministeres">Ministères</a>
+        <a class="nav-link mr-6" href="/extensions">Extensions</a>
         <a class="nav-link mr-6" href="/#events">Nos événements</a>
         <a class="nav-link mr-6" href="/donate">Don en ligne</a>
       </div>
@@ -151,6 +151,16 @@
           <ion-icon name="information-circle-outline" class="text-xl mr-2"
           ></ion-icon>
           Maison
+        </a>
+
+        <a class="nav-link side-btn" href="/ministeres">
+          <ion-icon name="people-outline" class="text-xl mr-2"></ion-icon>
+          Ministères
+        </a>
+
+        <a class="nav-link side-btn" href="/extensions">
+          <ion-icon name="location-outline" class="text-xl mr-2"></ion-icon>
+          Extensions
         </a>
 
         <a class="nav-link side-btn" href="/#contact">
@@ -224,10 +234,14 @@
           </a>
         {/if}
         {#if get($config, "currentUser.id")}
+          <a class="nav-link side-btn" href="/mes-contenus">
+            <ion-icon name="library-outline" class="text-xl mr-2"></ion-icon>
+            Mes contenus
+          </a>
           <a class="nav-link side-btn" href="/profile">
             <ion-icon name="person-circle-outline" class="text-xl mr-2"
             ></ion-icon>
-            Profile
+            Profil
           </a>
           <button on:click={handleLogout} class="nav-link side-btn">
             <ion-icon name="log-out-outline" class="text-xl mr-2"></ion-icon>

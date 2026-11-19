@@ -13,15 +13,17 @@
       <div class="h-font mb-4 text-4xl text-brand-primary">Map du Site</div>
       <div class={`grid gap-3 grid-cols-2 md:grid-cols-3 text-sm`}>
         <a class="nav-link" href="/#home">Accueil</a>
-        <a class="nav-link" href="/#about">A Propos</a>
+        <a class="nav-link" href="/maison">La Maison</a>
+        <a class="nav-link" href="/ministeres">Ministères</a>
+        <a class="nav-link" href="/extensions">Extensions</a>
         <a class="nav-link" href="/#ressources">Activités</a>
         <a class="nav-link" href="/#contact">Contact</a>
-        <a class="nav-link" href="/#donate">Dons</a>
-        <a class="nav-link capitalize" href="/#team">équipe</a>
+        <a class="nav-link" href="/donate">Dons</a>
+        <a class="nav-link" href="/maison#presentation-pasteurs">Pasteurs</a>
 
         {#if get($config, "currentUser.id")}
-          <a class="nav-link" href="/profile">Profile</a>
-          <a class="nav-link" href="/#about">Programme</a>
+          <a class="nav-link" href="/profile">Profil</a>
+          <a class="nav-link" href="/mes-contenus">Mes contenus</a>
         {:else}
           <a class="nav-link" href="/login">Connexion</a>
           <a class="nav-link" href="/register">Inscription</a>
