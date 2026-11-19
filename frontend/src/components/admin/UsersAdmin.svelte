@@ -7,7 +7,7 @@
   import Empty from "../utils/Empty.svelte";
   import Modal from "../utils/Modal.svelte";
 
-  const ROLE_LABEL = { user: "Membre", admin: "Admin", "super-admin": "Super-admin" };
+  const ROLE_LABEL = { user: "Membre", media: "Équipe média", admin: "Admin", "super-admin": "Super-admin" };
 
   let users = null;
   let search = "";
@@ -81,6 +81,7 @@
     {#if isSuper}
       <select bind:value={form.role}>
         <option value="user">Membre</option>
+        <option value="media">Équipe média</option>
         <option value="admin">Admin</option>
       </select>
     {/if}
@@ -93,6 +94,7 @@
   <select bind:value={role} on:change={() => ((page = 1), load())}>
     <option value="">Tous les rôles</option>
     <option value="user">Membres</option>
+    <option value="media">Équipe média</option>
     <option value="admin">Admins</option>
     <option value="super-admin">Super-admins</option>
   </select>
@@ -114,11 +116,12 @@
         {#if u.id != me.id}
           <div class="flex flex-wrap gap-2">
             {#if isSuper}
+              {#if u.role != "media"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => changeRole(u, "media")}>Équipe média</button>{/if}
               {#if u.role != "admin"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => changeRole(u, "admin")}>Rendre admin</button>{/if}
               {#if u.role != "user"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => changeRole(u, "user")}>Rendre membre</button>{/if}
               {#if u.role != "super-admin"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => changeRole(u, "super-admin")}>Rendre super-admin</button>{/if}
             {/if}
-            {#if u.role != "super-admin" && (isSuper || u.role == "user")}
+            {#if u.role != "super-admin" && (isSuper || u.role == "user" || u.role == "media")}
               <button class="btn btn-aurora !py-1 !text-xs" on:click={() => remove(u)}>Supprimer</button>
             {/if}
           </div>

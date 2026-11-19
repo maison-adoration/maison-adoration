@@ -17,6 +17,8 @@
         <a class="nav-link" href="/ministeres">Ministères</a>
         <a class="nav-link" href="/extensions">Extensions</a>
         <a class="nav-link" href="/#ressources">Activités</a>
+        <a class="nav-link" href="/mediatheque">Médiathèque</a>
+        <a class="nav-link" href="/live">Direct</a>
         <a class="nav-link" href="/#contact">Contact</a>
         <a class="nav-link" href="/donate">Dons</a>
         <a class="nav-link" href="/maison#presentation-pasteurs">Pasteurs</a>

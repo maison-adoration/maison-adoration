@@ -30,7 +30,7 @@ router.get(
     query: z.object({
       page: z.coerce.number().int().min(1).default(1),
       search: z.string().trim().max(100).default(''),
-      role: z.enum(['user', 'admin', 'super-admin']).optional(),
+      role: z.enum(['user', 'media', 'admin', 'super-admin']).optional(),
     }),
   }),
   asyncHandler(async (req, res) => {
@@ -87,7 +87,7 @@ const createSchema = z.object({
   password: z.string().min(8).max(128),
   tel: z.string().trim().max(30).optional().default(''),
   country: z.string().trim().max(80).optional().default(''),
-  role: z.enum(['user', 'admin']).default('user'),
+  role: z.enum(['user', 'media', 'admin']).default('user'),
 });
 
 router.post(
@@ -96,8 +96,8 @@ router.post(
   validate({ body: createSchema }),
   asyncHandler(async (req, res) => {
     const b = req.body;
-    if (b.role === 'admin' && req.user.role !== 'super-admin') {
-      throw HttpError.forbidden('Seul un super-admin peut créer un admin');
+    if (b.role !== 'user' && req.user.role !== 'super-admin') {
+      throw HttpError.forbidden('Seul un super-admin peut créer un compte admin ou média');
     }
     try {
       const { rows } = await db.query(
@@ -117,7 +117,7 @@ router.post(
 router.put(
   '/:id/role',
   requireSuperAdmin,
-  validate({ params: idParam, body: z.object({ role: z.enum(['user', 'admin', 'super-admin']) }) }),
+  validate({ params: idParam, body: z.object({ role: z.enum(['user', 'media', 'admin', 'super-admin']) }) }),
   asyncHandler(async (req, res) => {
     const target = await findUser(req.params.id);
     if (target.id === req.user.id) throw HttpError.badRequest('Vous ne pouvez pas changer votre propre rôle');

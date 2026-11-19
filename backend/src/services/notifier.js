@@ -81,13 +81,18 @@ async function smsNewContent(content) {
 }
 
 async function pushNewContent(content) {
-  if (!config.vapid.enabled) return { enabled: false };
-  const { rows } = await db.query('SELECT id, endpoint, keys FROM push_subscriptions');
-  const payload = JSON.stringify({
+  return pushMessage({
     title: `Nouveau : ${content.title}`,
     body: "Disponible sur le site de la Maison d'Adoration pour les Nations",
     url: '/#ressources',
   });
+}
+
+/** Notification push à tous les abonnés : { title, body, url }. */
+async function pushMessage(message) {
+  if (!config.vapid.enabled) return { enabled: false };
+  const { rows } = await db.query('SELECT id, endpoint, keys FROM push_subscriptions');
+  const payload = JSON.stringify(message);
   const expired = [];
   const result = await inBatches(rows, 20, async (s) => {
     try {
@@ -101,4 +106,4 @@ async function pushNewContent(content) {
   return { enabled: true, recipients: rows.length, ...result, removedExpired: expired.length };
 }
 
-module.exports = { emailNewContent, smsNewContent, pushNewContent, escapeHtml };
+module.exports = { emailNewContent, smsNewContent, pushNewContent, pushMessage, escapeHtml };

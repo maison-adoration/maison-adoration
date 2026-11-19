@@ -6,17 +6,21 @@
   import SectionsAdmin from "../components/admin/SectionsAdmin.svelte";
   import KidsAdmin from "../components/admin/KidsAdmin.svelte";
   import UsersAdmin from "../components/admin/UsersAdmin.svelte";
+  import MediaAdmin from "../components/admin/media/MediaAdmin.svelte";
   import Loading from "../components/utils/Loading.svelte";
 
-  const TABS = [
-    { id: "contenus", label: "Contenus", icon: "albums-outline" },
-    { id: "pages", label: "Pages du site", icon: "document-text-outline" },
-    { id: "kids", label: "Man Kids", icon: "happy-outline" },
-    { id: "users", label: "Utilisateurs", icon: "people-outline" },
+  const ALL_TABS = [
+    { id: "contenus", label: "Contenus", icon: "albums-outline", roles: ["admin", "super-admin"] },
+    { id: "pages", label: "Pages du site", icon: "document-text-outline", roles: ["admin", "super-admin"] },
+    { id: "media", label: "Médias", icon: "videocam-outline", roles: ["media", "admin", "super-admin"] },
+    { id: "kids", label: "Man Kids", icon: "happy-outline", roles: ["admin", "super-admin"] },
+    { id: "users", label: "Utilisateurs", icon: "people-outline", roles: ["admin", "super-admin"] },
   ];
 
+  $: role = get($config, "currentUser.role");
+  $: TABS = ALL_TABS.filter((t) => t.roles.includes(role));
   let tab = (typeof location !== "undefined" && location.hash.slice(1)) || "contenus";
-  $: if (!TABS.some((t) => t.id == tab)) tab = "contenus";
+  $: if (TABS.length && !TABS.some((t) => t.id == tab)) tab = TABS[0].id;
   const select = (id) => {
     tab = id;
     history.replaceState(null, "", `#${id}`);
@@ -28,9 +32,9 @@
 </svelte:head>
 
 <div class="min-h-screen pt-20 pb-10">
-  {#if ["admin", "super-admin"].includes(get($config, "currentUser.role"))}
+  {#if ["media", "admin", "super-admin"].includes(role)}
     <Container>
-      <h1 class="h-font text-4xl text-brand-primary mb-4">Administration</h1>
+      <h1 class="h-font text-4xl text-brand-primary mb-4">{role == "media" ? "Espace média" : "Administration"}</h1>
       <div class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3">
         {#each TABS as t}
           <button
@@ -50,6 +54,8 @@
         <AsAdmin />
       {:else if tab == "pages"}
         <SectionsAdmin />
+      {:else if tab == "media"}
+        <MediaAdmin />
       {:else if tab == "kids"}
         <KidsAdmin />
       {:else if tab == "users"}

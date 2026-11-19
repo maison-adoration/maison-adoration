@@ -3,6 +3,9 @@ const config = require('./config');
 
 // Les colonnes numeric (prix) arrivent en texte : on les convertit en nombre.
 types.setTypeParser(types.builtins.NUMERIC, (v) => (v === null ? null : Number(v)));
+// Les dates sans heure (date d'un sermon, d'un événement) restent « AAAA-MM-JJ » :
+// converties en Date JavaScript, elles reculeraient d'un jour selon le fuseau du serveur.
+types.setTypeParser(types.builtins.DATE, (v) => v);
 
 const pool = new Pool({
   connectionString: config.databaseUrl,

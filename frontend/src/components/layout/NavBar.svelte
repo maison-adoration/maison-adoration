@@ -111,7 +111,8 @@
         <a class="nav-link mr-6" href="/maison">Maison</a>
         <a class="nav-link mr-6" href="/ministeres">Ministères</a>
         <a class="nav-link mr-6" href="/extensions">Extensions</a>
-        <a class="nav-link mr-6" href="/#events">Nos événements</a>
+        <a class="nav-link mr-6" href="/mediatheque">Médiathèque</a>
+        <a class="nav-link mr-6" href="/live">Direct</a>
         <a class="nav-link mr-6" href="/donate">Don en ligne</a>
       </div>
 
@@ -161,6 +162,16 @@
         <a class="nav-link side-btn" href="/extensions">
           <ion-icon name="location-outline" class="text-xl mr-2"></ion-icon>
           Extensions
+        </a>
+
+        <a class="nav-link side-btn" href="/mediatheque">
+          <ion-icon name="play-circle-outline" class="text-xl mr-2"></ion-icon>
+          Médiathèque
+        </a>
+
+        <a class="nav-link side-btn" href="/live">
+          <ion-icon name="radio-outline" class="text-xl mr-2"></ion-icon>
+          Direct
         </a>
 
         <a class="nav-link side-btn" href="/#contact">
@@ -224,7 +235,7 @@
           </a>
         </div>
 
-        {#if ["admin", "super-admin"].includes(get($config, "currentUser.role"))}
+        {#if ["media", "admin", "super-admin"].includes(get($config, "currentUser.role"))}
           <a
             class="nav-link side-btn col-span-full !bg-brand-primary"
             href="/adm"

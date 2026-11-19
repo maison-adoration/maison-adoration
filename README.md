@@ -106,6 +106,15 @@ MONGO_URI="mongodb+srv://…ancienne base…" DATABASE_URL="postgresql://…" np
 | POST/PUT/DELETE | `/sections…` | admin |
 | POST | `/kids-registrations` | public (formulaire Man Kids) |
 | GET/PUT/DELETE | `/kids-registrations…` | admin |
+| GET/POST/PUT/DELETE | `/media/…` (sermons, series, gallery, photos, podcasts, press, streams, uploads, dashboard) | équipe média, admin, super-admin |
+| GET/POST | `/media/public/…` (overview, albums/:id, press/:id, compteurs de vues) | public (publié uniquement) |
+
+## Équipe média
+
+Le rôle **« Équipe média »** (donné par un super-admin dans Administration → Utilisateurs) ouvre l'onglet **Médias** :
+tableau de bord, sermons et séries, galerie photo, podcasts, communiqués de presse et directs YouTube/Facebook
+(programmer, lancer, terminer, ajouter la rediffusion). Les visiteurs les retrouvent sur `/mediatheque` et `/live`.
+Module réécrit d'après le rôle « média » du projet MAN Platform ; le studio et les cours en direct (LiveKit) n'y sont pas repris.
 
 ## Pages du site modifiables sans code
 

@@ -16,6 +16,8 @@ if (config.cloudinary.enabled) {
 
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const PDF_TYPES = ['application/pdf'];
+const AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/ogg', 'audio/wav', 'audio/x-wav', 'audio/webm'];
+const TYPES_BY_KIND = { image: IMAGE_TYPES, pdf: PDF_TYPES, audio: AUDIO_TYPES };
 
 /** Fichiers gardés en mémoire (10 Mo max) puis envoyés à Cloudinary. */
 const upload = multer({
@@ -25,6 +27,24 @@ const upload = multer({
     const allowed = file.fieldname === 'pdf' ? PDF_TYPES : IMAGE_TYPES;
     if (!allowed.includes(file.mimetype)) {
       return cb(HttpError.badRequest(`Type de fichier non accepté pour « ${file.fieldname} » : ${file.mimetype}`));
+    }
+    cb(null, true);
+  },
+});
+
+/**
+ * Envoi d'un fichier par l'équipe média : champ « file », type donné par ?kind=image|audio|pdf.
+ * Audio jusqu'à 60 Mo (prédications), le reste 10 Mo.
+ */
+const uploadMedia = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 60 * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, cb) => {
+    const kind = req.query.kind;
+    const allowed = TYPES_BY_KIND[kind];
+    if (!allowed) return cb(HttpError.badRequest('Paramètre kind attendu : image, audio ou pdf'));
+    if (!allowed.includes(file.mimetype)) {
+      return cb(HttpError.badRequest(`Type de fichier non accepté pour « ${kind} » : ${file.mimetype}`));
     }
     cb(null, true);
   },
@@ -40,7 +60,8 @@ function uploadFile(file, kind) {
       {
         folder: `${config.cloudinary.folder}/${kind}`,
         public_id: `${kind}-${Date.now()}-${crypto.randomUUID()}`,
-        resource_type: kind === 'pdf' ? 'raw' : 'image',
+        // Cloudinary range l'audio dans les ressources « video ».
+        resource_type: kind === 'pdf' ? 'raw' : kind === 'audio' ? 'video' : 'image',
       },
       (err, result) => (err ? reject(err) : resolve(result.secure_url)),
     );
@@ -49,4 +70,4 @@ function uploadFile(file, kind) {
 }
 
 // Remplaçable dans les tests.
-module.exports = { upload, storage: { uploadFile } };
+module.exports = { upload, uploadMedia, storage: { uploadFile } };

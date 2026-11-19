@@ -3,7 +3,10 @@ const config = require('../config');
 const db = require('../db');
 const { HttpError } = require('../utils/http-error');
 
-const ROLE_LEVEL = { user: 0, admin: 1, 'super-admin': 2 };
+// Niveau hiérarchique. « media » = membre de l'équipe média : même niveau qu'un membre
+// pour la gestion des comptes, mais accès à l'espace média (voir requireMedia).
+const ROLE_LEVEL = { user: 0, media: 0, admin: 1, 'super-admin': 2 };
+const MEDIA_ROLES = ['media', 'admin', 'super-admin'];
 
 const signToken = (user) =>
   jwt.sign({ sub: user.id }, config.jwt.secret, { expiresIn: config.jwt.expiresIn, algorithm: 'HS256' });
@@ -47,6 +50,19 @@ const requireRole = (minRole = 'user') => async (req, res, next) => {
   }
 };
 
+/** Exige un utilisateur connecté dont le rôle fait partie de la liste. */
+const requireAnyRole = (roles) => async (req, res, next) => {
+  try {
+    const user = await loadUser(req);
+    if (!user) return next(HttpError.unauthorized());
+    if (!roles.includes(user.role)) return next(HttpError.forbidden());
+    req.user = user;
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
 const isAdminRole = (role) => ROLE_LEVEL[role] >= ROLE_LEVEL.admin;
 
 module.exports = {
@@ -55,6 +71,7 @@ module.exports = {
   requireAuth: requireRole('user'),
   requireAdmin: requireRole('admin'),
   requireSuperAdmin: requireRole('super-admin'),
+  requireMedia: requireAnyRole(MEDIA_ROLES),
   isAdminRole,
   ROLE_LEVEL,
 };

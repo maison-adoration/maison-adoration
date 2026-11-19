@@ -41,6 +41,7 @@ app.use('/contents', require('./routes/contents'));
 app.use('/payments', require('./routes/payments'));
 app.use('/sections', require('./routes/sections'));
 app.use('/kids-registrations', require('./routes/kids'));
+app.use('/media', require('./routes/media'));
 
 app.use(notFound);
 app.use(errorHandler);
