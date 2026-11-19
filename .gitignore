@@ -16,3 +16,6 @@ backend/mongo-backup/
 .DS_Store
 *.log
 backend/state.json
+
+# Généré automatiquement par Tailwind (yarn dev / yarn build)
+frontend/src/styles/tailwind-output.css
