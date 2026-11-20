@@ -2,7 +2,7 @@
   import MyProfileHeading from "../../components/MyProfileHeading.svelte";
   import Select from "svelte-select";
   import config from "../../stores/config";
-  import api, { errorMessage, setToken } from "../../utils/api";
+  import api, { errorMessage, setToken, getToken } from "../../utils/api";
   import { onMount } from "svelte";
   import { Circle } from "svelte-loading-spinners";
   import Container from "../../components/utils/Container.svelte";
@@ -71,7 +71,14 @@
     }
   };
 
-  onMount(loadProfile);
+  onMount(() => {
+    // Sans jeton, inutile d'interroger l'API : direction la connexion.
+    if (!getToken()) {
+      window.location = "/login";
+      return;
+    }
+    loadProfile();
+  });
 </script>
 
 <svelte:head>

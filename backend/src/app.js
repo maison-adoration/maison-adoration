@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const config = require('./config');
 const { notFound, errorHandler } = require('./middlewares/error');
@@ -19,8 +20,13 @@ app.use(
       if (!origin || config.corsOrigins.includes(origin)) return cb(null, true);
       return cb(new Error(`CORS : origine non autorisée (${origin})`));
     },
+    // Le navigateur garde la réponse « preflight » 24 h au lieu de refaire
+    // une requête OPTIONS avant chaque appel authentifié (un aller-retour de moins).
+    maxAge: 86400,
   }),
 );
+// Réponses JSON compressées (gzip) : listes et pages 3 à 8 fois plus légères.
+app.use(compression());
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,

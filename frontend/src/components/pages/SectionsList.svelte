@@ -1,6 +1,7 @@
 <script>
+  import { cdn } from "../../utils/cdn.js";
   // Affiche les sections publiées d'une page (modifiables dans l'espace admin).
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import api from "../../utils/api";
   import Container from "../utils/Container.svelte";
   import Loading from "../utils/Loading.svelte";
@@ -19,6 +20,12 @@
     } catch (err) {
       sections = [];
     }
+    // Lien vers une section (/maison#presentation-pasteurs) : la section n'existait
+    // pas encore quand le navigateur a cherché l'ancre, on y va une fois affichée.
+    await tick();
+    const id = decodeURIComponent(location.hash.slice(1));
+    const el = id && document.getElementById(id);
+    if (el) el.scrollIntoView();
   });
 </script>
 
@@ -43,7 +50,7 @@
         {#each sections as s, i (s.id)}
           <section id={s.slug} class="scroll-mt-24 flex flex-col gap-6 md:items-start" class:md:flex-row={i % 2 == 0} class:md:flex-row-reverse={i % 2 == 1}>
             {#if s.imageUrl}
-              <img src={s.imageUrl} alt={s.title} loading="lazy" class="w-full md:w-2/5 rounded-xl shadow-md object-cover max-h-[26rem]" />
+              <img src={cdn(s.imageUrl, 700)} alt={s.title} loading="lazy" class="w-full md:w-2/5 rounded-xl shadow-md object-cover max-h-[26rem]" />
             {/if}
             <div class="w-full" class:md:w-3-5={s.imageUrl}>
               <h2 class="h-font text-4xl text-brand-primary uppercase">{s.title}</h2>

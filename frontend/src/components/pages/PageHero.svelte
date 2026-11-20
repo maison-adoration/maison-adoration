@@ -23,7 +23,7 @@
         <div class="w-full md:w-2/5">
           <div
             class="h-[40vh] md:h-[60vh] w-full rounded-xl shadow-lg"
-            style="background-image: url({image}); background-size: cover; background-position: top;"></div>
+            style="background-image: url('{image}'); background-size: cover; background-position: top;"></div>
         </div>
       {/if}
     </div>

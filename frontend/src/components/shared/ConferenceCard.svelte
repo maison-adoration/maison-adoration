@@ -1,4 +1,5 @@
 <script>
+  import { cdn } from "../../utils/cdn.js";
   // Carte d'un contenu dans l'espace admin : modifier, supprimer, affiche,
   // acheteurs, accès manuel, annonces (e-mail / SMS / push).
   import Select from "svelte-select";
@@ -261,7 +262,7 @@
           <ion-icon name="checkmark-circle-outline" class="mr-2 text-xl"></ion-icon>
           Affiche sélectionnée
         {:else}
-          <img class="w-10 h-8 object-cover mr-2" src={posterUrl} alt="affiche" />
+          <img class="w-10 h-8 object-cover mr-2" src={cdn(posterUrl, 80)} alt="affiche" />
           Changer l'affiche
         {/if}
       </label>

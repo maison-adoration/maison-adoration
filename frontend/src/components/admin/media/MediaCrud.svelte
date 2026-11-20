@@ -1,4 +1,5 @@
 <script>
+  import { cdn } from "../../../utils/cdn.js";
   // Liste + formulaire générique pour un type de contenu média.
   // `fields` décrit le formulaire : { key, col, label, type, required, options, kind, help }
   //   type : text | textarea | date | datetime | url | upload | select | number | checkbox | tags
@@ -166,7 +167,7 @@
   <div class="grid grid-cols-1 gap-2">
     {#each items as it (it.id)}
       <div class="flex flex-col md:flex-row md:items-center gap-3 bg-white rounded-lg border border-gray-200 px-3 py-2 text-sm">
-        {#if itemImage(it)}<img src={itemImage(it)} alt="" class="w-20 h-12 rounded object-cover" loading="lazy" />{/if}
+        {#if itemImage(it)}<img src={cdn(itemImage(it), 120)} alt="" class="w-20 h-12 rounded object-cover" loading="lazy" />{/if}
         <div class="flex-1">
           <div class="font-bold text-gray-800">{itemTitle(it)}</div>
           <div class="text-xs text-gray-500">

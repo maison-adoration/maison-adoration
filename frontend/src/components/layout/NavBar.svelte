@@ -1,86 +1,17 @@
 <script>
   import Container from "./../utils/Container.svelte";
-  import { onMount } from "svelte";
   import get from "lodash.get";
   import config from "../../stores/config";
   import { setToken } from "../../utils/api";
   import { slide, fly } from "svelte/transition";
 
-  let PWAInstallBtn;
-  let is_chrome = !!window.chrome;
-  let clickListener;
   let showSideMenu = false;
 
-  $: {
-    if (PWAInstallBtn) {
-      /*
-        Attach the click event listener to the install button when it is shown,
-        as on page load it's still hidden and waiting for the PWA to be ready. 
-        The button will be rendered as soon as we have caught the beforeinstallprompt event.
-        The event prompt will have to be manually triggered with the click of the button. 
-        The beforeinstallprompt event will only trigger after the worker is installed, activated & ready.
-        Otherwise it'll throw an exception and won't trigger.
-      */
-      PWAInstallBtn.addEventListener("click", clickListener);
-    }
-  }
-
-  onMount(() => {
-    window.onscroll = (e) => {
-      scrollFunction();
-    };
-
-    const scrollFunction = () => {
-      // let innerHeader = document.getElementById("inner-header");
-      let header = document.getElementById("header");
-      let sideMenu = document.getElementById("side-menu");
-
-      if (
-        document.body.scrollTop > 40 ||
-        document.documentElement.scrollTop > 40
-      ) {
-        // innerHeader.classList.replace("h-16", "h-12");
-        // header.classList.add("shadow-sm");
-        header.classList.add("bg-brand-black");
-        header.classList.replace("text-gray-400", "text-gray-600");
-        sideMenu.classList.replace("text-gray-100", "text-gray-600");
-      } else {
-        // innerHeader.classList.replace("h-12", "h-16");
-        // header.classList.remove("shadow-sm");
-        header.classList.remove("bg-brand-black");
-        header.classList.replace("text-gray-600", "text-gray-400");
-        sideMenu.classList.replace("text-gray-600", "text-gray-100");
-      }
-    };
-
-    let deferredPrompt;
-
-    window.addEventListener("beforeinstallprompt", (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      deferredPrompt = e;
-      // Update UI notify the user they can install the PWA
-      // showInstallPromotion();
-      // Show button when app can be installed, it can now be installed
-      is_chrome = !!window.chrome;
-    });
-
-    clickListener = (e) => {
-      // Hide the app provided install promotion on click
-      // hideMyInstallPromotion();
-      // Show the install prompt
-      deferredPrompt.prompt();
-      // Wait for the user to respond to the prompt
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === "accepted") {
-          console.log("User accepted the install prompt!");
-        } else {
-          console.log("User dismissed the install prompt!");
-        }
-      });
-    };
-  });
+  // Fond de la barre une fois la page défilée : un simple booléen, qui ne
+  // touche au DOM que lorsqu'il change (avant : recherche des éléments et
+  // réécriture des classes à chaque événement de défilement).
+  let scrollY = 0;
+  $: scrolled = scrollY > 40;
 
   const handleLogout = () => {
     setToken(null);
@@ -92,10 +23,11 @@
   };
 </script>
 
+<svelte:window bind:scrollY />
+
 <div
   id="header"
-  class="navbar text-gray-400 text-sm fixed top-0 left-0 w-full z-50 transition-all
-    duration-250"
+  class={`navbar ${scrolled ? "bg-brand-black text-gray-600" : "text-gray-400"} text-sm fixed top-0 left-0 w-full z-50 transition-all duration-250`}
 >
   <Container overflowHidden={false}>
     <div
@@ -126,7 +58,7 @@
             <ion-icon
               name="menu-outline"
               id="side-menu"
-              class="text-gray-100 text-3xl"
+              class={`${scrolled ? "text-gray-600" : "text-gray-100"} text-3xl`}
             ></ion-icon>
           </button>
         </div>

@@ -1,4 +1,5 @@
 <script>
+  import { cdn } from "../../../utils/cdn.js";
   // Photos d'un album : envoi multiple, légende, suppression.
   import { onMount, createEventDispatcher } from "svelte";
   import api, { errorMessage } from "../../../utils/api";
@@ -80,7 +81,7 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
       {#each album.photos as p (p.id)}
         <div class="rounded-lg overflow-hidden border border-gray-200">
-          <img src={p.url} alt={p.caption} class="w-full h-32 object-cover" loading="lazy" />
+          <img src={cdn(p.url, 250)} alt={p.caption} class="w-full h-32 object-cover" loading="lazy" />
           <div class="p-2 text-xs text-gray-600 truncate">{p.caption || "—"}</div>
           <div class="flex gap-1 p-2 pt-0">
             <button class="btn btn-aurora !py-1 !text-xs !w-full" on:click={() => caption(p)}>Légende</button>

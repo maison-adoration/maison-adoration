@@ -15,15 +15,21 @@ const router = express.Router();
 const TYPES = ['activity', 'podcast', 'video', 'pdf'];
 const idParam = z.object({ id: z.string().trim().min(1).max(64) });
 
-/** Ensemble des contenus auxquels l'utilisateur a accès. */
-async function accessSet(user) {
-  if (!user) return new Set();
-  const { rows } = await db.query('SELECT content_id FROM enrollments WHERE user_id = $1', [user.id]);
+/** Parmi les contenus listés, ceux auxquels l'utilisateur a accès (une seule requête). */
+async function accessSet(user, ids) {
+  if (!user || !ids.length) return new Set();
+  const { rows } = await db.query('SELECT content_id FROM enrollments WHERE user_id = $1 AND content_id = ANY($2)', [
+    user.id,
+    ids,
+  ]);
   return new Set(rows.map((r) => r.content_id));
 }
 
 async function present(rows, user) {
-  const access = await accessSet(user);
+  const access = await accessSet(
+    user,
+    rows.map((c) => c.id),
+  );
   const isAdmin = Boolean(user && isAdminRole(user.role));
   return rows.map((c) => contentOut(c, { hasAccess: access.has(c.id), isAdmin }));
 }

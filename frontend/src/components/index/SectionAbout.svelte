@@ -1,5 +1,5 @@
 <script>
-  import SectionEvents from "./SectionEvents.svelte";
+  import { lazyBg } from "../../utils/lazy.js";
   import Container from "../utils/Container.svelte";
   import SectionHeading from "../utils/SectionHeading.svelte";
 </script>
@@ -67,7 +67,8 @@
         <!--  -->
         <div
           class="h-[45vh] md:h-[90vh] w-full rounded-xl"
-          style="background-image: url(/images/israelk-1.jpg); background-size: cover; background-position: top;"
+          use:lazyBg={"/images/israelk-1.jpg"}
+          style="background-size: cover; background-position: top;"
         >
           <!--  -->
         </div>
@@ -153,7 +154,7 @@
               >
                 <div
                   class="rounded-full h-[5.75rem] w-[5.75rem] overflow-hidden bg-center bg-cover"
-                  style="background-image: url(/images/israelk-5.jpg);"></div>
+                  use:lazyBg={"/images/israelk-5-avatar.jpg"}></div>
               </div>
               <div class="mt-2 font-normal">
                 Prophète Israel Kayembe, Visionaire.

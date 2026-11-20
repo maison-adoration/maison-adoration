@@ -628,10 +628,35 @@ router.delete(
 // Public : uniquement le contenu publié
 // ---------------------------------------------------------------------------
 
+/** Direct en cours, prochains directs et rediffusions (page Direct et médiathèque). */
+async function liveData() {
+  const [live, upcoming, replays] = await Promise.all([
+    db.query('SELECT * FROM live_streams WHERE is_live ORDER BY started_at DESC LIMIT 1'),
+    db.query(
+      `SELECT * FROM live_streams WHERE NOT is_live AND ended_at IS NULL AND scheduled_at >= now()
+       ORDER BY scheduled_at ASC LIMIT 6`,
+    ),
+    db.query(
+      `SELECT * FROM live_streams WHERE ended_at IS NOT NULL AND coalesce(recording_url, '') <> ''
+       ORDER BY ended_at DESC LIMIT 12`,
+    ),
+  ]);
+  const clean = (rows) => rows.map(({ created_by_id, ...r }) => r);
+  return { live: clean(live.rows)[0] || null, upcoming: clean(upcoming.rows), replays: clean(replays.rows) };
+}
+
+/* Page Direct : uniquement les directs (interrogée chaque minute, donc légère). */
+router.get(
+  '/public/live',
+  asyncHandler(async (req, res) => {
+    res.json(await liveData());
+  }),
+);
+
 router.get(
   '/public/overview',
   asyncHandler(async (req, res) => {
-    const [sermons, series, podcasts, albums, press, live, upcoming, replays] = await Promise.all([
+    const [sermons, series, podcasts, albums, press, lives] = await Promise.all([
       db.query(
         `SELECT s.id, s.title, s.description, s.preacher, s.sermon_date, s.video_url, s.audio_url, s.pdf_url,
                 s.thumbnail_url, s.series_id, s.is_featured, s.views_count, ss.name AS series_name
@@ -652,17 +677,8 @@ router.get(
         `SELECT id, title, excerpt, cover_image_url, tags, published_at FROM press_releases
          WHERE is_published ORDER BY published_at DESC LIMIT 50`,
       ),
-      db.query('SELECT * FROM live_streams WHERE is_live ORDER BY started_at DESC LIMIT 1'),
-      db.query(
-        `SELECT * FROM live_streams WHERE NOT is_live AND ended_at IS NULL AND scheduled_at >= now()
-         ORDER BY scheduled_at ASC LIMIT 6`,
-      ),
-      db.query(
-        `SELECT * FROM live_streams WHERE ended_at IS NOT NULL AND coalesce(recording_url, '') <> ''
-         ORDER BY ended_at DESC LIMIT 12`,
-      ),
+      liveData(),
     ]);
-    const clean = (rows) => rows.map(({ created_by_id, ...r }) => r);
     const albumRows = albums.rows.map(({ created_by_id, ...a }) => a);
     res.json({
       sermons: sermons.rows,
@@ -670,9 +686,7 @@ router.get(
       podcasts: podcasts.rows,
       albums: albumRows,
       press: press.rows,
-      live: clean(live.rows)[0] || null,
-      upcoming: clean(upcoming.rows),
-      replays: clean(replays.rows),
+      ...lives,
     });
   }),
 );

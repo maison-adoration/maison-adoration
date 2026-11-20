@@ -8,6 +8,7 @@
     const vid = document.getElementById("trailer");
     if (!vid) return;
     const start = () => {
+      vid.poster = "/images/trailer-poster.jpg";
       vid.src = "/images/trailer.mp4";
       vid.play().catch(() => {});
     };
@@ -25,7 +26,7 @@
 
 <section class="showcase" id="home">
   <div class="video-container">
-    <video id="trailer" muted loop playsinline preload="none" poster="/images/trailer-poster.jpg"></video>
+    <video id="trailer" muted loop playsinline preload="none"></video>
   </div>
   <div class="content text-gray-300">
     <Container>

@@ -145,6 +145,10 @@ test('directs : programmation, lancement, fin, rediffusion', async () => {
   ov = await request(app).get('/media/public/overview');
   assert.equal(ov.body.live.title, 'Culte dominical');
   assert.equal(ov.body.upcoming.length, 0);
+  const light = await request(app).get('/media/public/live');
+  assert.equal(light.body.live.title, 'Culte dominical', 'endpoint léger de la page Direct');
+  assert.equal(light.body.sermons, undefined, 'sans le reste de la médiathèque');
+  assert.equal(light.body.live.created_by_id, undefined);
   await request(app).post(`/media/streams/${st.body.id}/end`).set(auth(mediaToken)).expect(200);
   await request(app).put(`/media/streams/${st.body.id}`).set(auth(mediaToken)).send({ recordingUrl: 'https://www.youtube.com/watch?v=abc' }).expect(200);
   ov = await request(app).get('/media/public/overview');

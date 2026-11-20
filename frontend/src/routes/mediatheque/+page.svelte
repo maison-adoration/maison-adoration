@@ -1,4 +1,5 @@
 <script>
+  import { cdn } from "../../utils/cdn.js";
   import { onMount } from "svelte";
   import api from "../../utils/api";
   import PageHero from "../../components/pages/PageHero.svelte";
@@ -96,7 +97,7 @@
           {#each sermons as s (s.id)}
             <button class="text-left rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition bg-brand-black-light" on:click={() => openSermon(s)}>
               <div class="relative" style="aspect-ratio: 16 / 9;">
-                <img src={image(s)} alt={s.title} class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                <img src={cdn(image(s), 450)} alt={s.title} class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                 {#if s.is_featured}<span class="absolute top-2 left-2 text-xs bg-brand-primary text-white px-2 py-1 rounded">À la une</span>{/if}
               </div>
               <div class="p-3">
@@ -118,7 +119,7 @@
         <div class="grid grid-cols-1 gap-3">
           {#each data.podcasts as p (p.id)}
             <div class="flex flex-col sm:flex-row gap-3 sm:items-center rounded-xl border border-gray-200 p-3">
-              {#if p.thumbnail_url}<img src={p.thumbnail_url} alt="" class="w-20 h-20 rounded object-cover" loading="lazy" />{/if}
+              {#if p.thumbnail_url}<img src={cdn(p.thumbnail_url, 100)} alt="" class="w-20 h-20 rounded object-cover" loading="lazy" />{/if}
               <div class="flex-1">
                 <div class="font-bold text-gray-800">{p.title}</div>
                 <div class="text-xs text-gray-500">Saison {p.season_number}{p.episode_number ? ` · épisode ${p.episode_number}` : ""}</div>
@@ -138,7 +139,7 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {#each data.albums as a (a.id)}
             <button class="text-left rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition" on:click={() => openAlbum(a)}>
-              <img src={a.cover || "/images/man-tv.jpg"} alt={a.title} class="w-full h-36 object-cover" loading="lazy" />
+              <img src={cdn(a.cover, 450) || "/images/man-tv.jpg"} alt={a.title} class="w-full h-36 object-cover" loading="lazy" />
               <div class="p-2">
                 <div class="font-bold text-sm text-gray-800">{a.title}</div>
                 <div class="text-xs text-gray-500">{a.event_date ? formatDate(a.event_date) + " · " : ""}{a.photos_count} photo(s)</div>
@@ -156,7 +157,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           {#each data.press as p (p.id)}
             <button class="text-left rounded-xl border border-gray-200 p-4 hover:shadow-md transition flex gap-3" on:click={() => openPress(p)}>
-              {#if p.cover_image_url}<img src={p.cover_image_url} alt="" class="w-24 h-24 rounded object-cover" loading="lazy" />{/if}
+              {#if p.cover_image_url}<img src={cdn(p.cover_image_url, 120)} alt="" class="w-24 h-24 rounded object-cover" loading="lazy" />{/if}
               <div>
                 <div class="text-xs text-gray-500">{formatDate(p.published_at)}</div>
                 <div class="font-bold text-gray-800">{p.title}</div>
@@ -192,7 +193,7 @@
     {#if album.photos == null}
       <p class="text-gray-300">Chargement…</p>
     {:else if photoIndex !== null}
-      <img src={album.photos[photoIndex].url} alt={album.photos[photoIndex].caption} class="w-full rounded-xl" />
+      <img src={cdn(album.photos[photoIndex].url, 1200)} alt={album.photos[photoIndex].caption} class="w-full rounded-xl" />
       <div class="flex items-center justify-between mt-3 text-white">
         <button class="btn btn-aurora" disabled={photoIndex == 0} on:click={() => (photoIndex -= 1)}>←</button>
         <span class="text-sm">{album.photos[photoIndex].caption || ""} ({photoIndex + 1}/{album.photos.length})</span>
@@ -203,7 +204,7 @@
       <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
         {#each album.photos as ph, i (ph.id)}
           <button on:click={() => (photoIndex = i)}>
-            <img src={ph.url} alt={ph.caption} class="w-full h-40 object-cover rounded" loading="lazy" />
+            <img src={cdn(ph.url, 300)} alt={ph.caption} class="w-full h-40 object-cover rounded" loading="lazy" />
           </button>
         {/each}
       </div>
@@ -214,7 +215,7 @@
 <MediaModal show={Boolean(press)} title={press ? press.title : ""} on:close={() => (press = null)}>
   {#if press}
     <div class="bg-white rounded-xl p-5 text-gray-800">
-      {#if press.cover_image_url}<img src={press.cover_image_url} alt="" class="w-full max-h-80 object-cover rounded mb-4" />{/if}
+      {#if press.cover_image_url}<img src={cdn(press.cover_image_url, 900)} alt="" class="w-full max-h-80 object-cover rounded mb-4" />{/if}
       <div class="text-xs text-gray-500 mb-3">{formatDate(press.published_at)}</div>
       {#if press.content == null}<p>Chargement…</p>{:else}<div class="whitespace-pre-line leading-relaxed">{press.content}</div>{/if}
     </div>

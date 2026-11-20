@@ -1,7 +1,7 @@
 <script>
   import { Circle } from "svelte-loading-spinners";
   import { fly } from "svelte/transition";
-  import getVideoId from "get-video-id";
+  import { embedUrl } from "../media/embed.js";
 
   export let videoURL = "https://youtu.be/L6k0bI5KlDw";
   export let title;
@@ -10,7 +10,8 @@
   let showTitle = true;
   let loaded = false;
 
-  let videoID = getVideoId(videoURL).id;
+  // YouTube, Vimeo ou Facebook ; null si le lien ne peut pas être intégré.
+  $: src = embedUrl(videoURL);
 
   const handleOnLoad = () => {
     loaded = true;
@@ -49,17 +50,22 @@
     </div>
   {/if}
 
+  {#if !src}
+    <div class="h-[60vh] w-full flex flex-col items-center justify-center pt-12 bg-brand-black-light text-gray-400 text-center px-4">
+      Cette vidéo ne peut pas être lue ici.
+      <a class="btn btn-third mt-4" href={videoURL} target="_blank" rel="noopener noreferrer">Ouvrir la vidéo</a>
+    </div>
+  {:else}
   <div
     class:hidden={!loaded}
     class="h-[60vh] md:h-[100vh] w-[100vw] overflow-hidden shadow-sm relative z-10"
   >
     <iframe
       on:load={handleOnLoad}
-      id={videoID}
       {title}
       width="100%"
       height="100%"
-      src={`https://www.youtube-nocookie.com/embed/${videoID}?rel=0`}
+      {src}
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
@@ -72,6 +78,7 @@
   >
     <Circle size="50" color="#3695cb" unit="px" />
   </div>
+  {/if}
 
   <div
     class="mx-3 text-brand-primary text-xl my-4 pb-3 border-b border-brand-primary border-dotted"

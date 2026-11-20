@@ -1,4 +1,6 @@
 <script>
+  import { cdn } from "../../utils/cdn.js";
+  import { lazyBg } from "../../utils/lazy.js";
   import YoutubeVideo from "./YoutubeVideo.svelte";
   import VideoWebinar from "./VideoWebinar.svelte";
   import PayModal from "./PayModal.svelte";
@@ -24,7 +26,8 @@
 <div class="">
   <div class="bg-brand-black-light rounded-xl shadow-lg overflow-hidden">
     <div
-      style={`background-image: url(${posterUrl}); background-size: cover; background-position: center;`}
+      use:lazyBg={cdn(posterUrl, 500)}
+      style="background-size: cover; background-position: center;"
     >
       <div
         class="px-3 pt-4 no-h-[12.5rem] aspect-[16/9] flex flex-col justify-between overlay-thin"

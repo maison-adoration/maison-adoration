@@ -1,56 +1,64 @@
 <script>
   import { onMount } from "svelte";
 
-  onMount(async () => {
-    // console.clear();
-
+  // Effet « lumière » qui suit le pointeur au-dessus des cartes.
+  // Les variables CSS ne sont posées que sur la couche d'effet (et une fois
+  // par image affichée), pour ne pas redessiner toute la section à chaque mouvement.
+  onMount(() => {
     const cardsContainer = document.querySelector(".nouraneCards");
-    const cardsContainerInner = document.querySelector(".cards__inner");
-    const nouraneCards = Array.from(document.querySelectorAll(".nouraneCard"));
+    const nouraneCards = Array.from(document.querySelectorAll(".nouraneCards > .cards__inner:not(.nouraneOverlay) > .nouraneCard"));
     const nouraneOverlay = document.querySelector(".nouraneOverlay");
+    const section = document.querySelector(".great-container");
+    if (!cardsContainer || !nouraneOverlay || !section) return;
 
-    const applyOverlayMask = (e) => {
-      const overlayEl = e.currentTarget;
-      const x = e.pageX - cardsContainer.offsetLeft;
-      const y = e.pageY - cardsContainer.offsetTop;
-
-      overlayEl.style = `--opacity: 1; --x: ${x}px; --y:${y}px;`;
+    let frame = 0;
+    let lastEvent = null;
+    const paint = () => {
+      frame = 0;
+      const rect = cardsContainer.getBoundingClientRect();
+      const x = lastEvent.clientX - rect.left;
+      const y = lastEvent.clientY - rect.top;
+      nouraneOverlay.style.setProperty("--opacity", "1");
+      nouraneOverlay.style.setProperty("--x", `${x}px`);
+      nouraneOverlay.style.setProperty("--y", `${y}px`);
     };
-
-    const createOverlayCta = (overlayCard, ctaEl) => {
-      const overlayCta = document.createElement("div");
-      overlayCta.classList.add("nouraneCta");
-      overlayCta.textContent = ctaEl.textContent;
-      overlayCta.setAttribute("aria-hidden", true);
-      overlayCard.append(overlayCta);
+    const onMove = (e) => {
+      lastEvent = e;
+      if (!frame) frame = requestAnimationFrame(paint);
     };
+    const onLeave = () => nouraneOverlay.style.setProperty("--opacity", "0");
 
     const observer = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
-        const cardIndex = nouraneCards.indexOf(entry.target);
-        let width = entry.borderBoxSize[0].inlineSize;
-        let height = entry.borderBoxSize[0].blockSize;
-
-        if (cardIndex >= 0) {
-          nouraneOverlay.children[cardIndex].style.width = `${width}px`;
-          nouraneOverlay.children[cardIndex].style.height = `${height}px`;
-        }
+        const i = nouraneCards.indexOf(entry.target);
+        const box = entry.borderBoxSize && entry.borderBoxSize[0];
+        if (i < 0 || !box || !nouraneOverlay.children[i]) return;
+        nouraneOverlay.children[i].style.width = `${box.inlineSize}px`;
+        nouraneOverlay.children[i].style.height = `${box.blockSize}px`;
       });
     });
 
-    const initOverlayCard = (cardEl) => {
+    nouraneOverlay.replaceChildren();
+    nouraneCards.forEach((cardEl) => {
       const overlayCard = document.createElement("div");
       overlayCard.classList.add("nouraneCard");
-      createOverlayCta(overlayCard, cardEl.lastElementChild);
+      const cta = document.createElement("div");
+      cta.classList.add("nouraneCta");
+      cta.textContent = cardEl.lastElementChild ? cardEl.lastElementChild.textContent : "";
+      cta.setAttribute("aria-hidden", "true");
+      overlayCard.append(cta);
       nouraneOverlay.append(overlayCard);
       observer.observe(cardEl);
+    });
+
+    section.addEventListener("pointermove", onMove, { passive: true });
+    section.addEventListener("pointerleave", onLeave);
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+      section.removeEventListener("pointermove", onMove);
+      section.removeEventListener("pointerleave", onLeave);
     };
-
-    nouraneCards.forEach(initOverlayCard);
-
-    document
-      .querySelector(".great-container")
-      .addEventListener("pointermove", applyOverlayMask);
   });
 </script>
 

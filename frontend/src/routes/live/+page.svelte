@@ -13,7 +13,7 @@
 
   const load = async () => {
     try {
-      data = (await api.get("/media/public/overview")).data;
+      data = (await api.get("/media/public/live")).data;
     } catch (e) {
       data = data || { live: null, upcoming: [], replays: [] };
     }
@@ -21,7 +21,10 @@
 
   onMount(() => {
     load();
-    timer = setInterval(load, 60000); // le direct apparaît sans recharger la page
+    // Le direct apparaît sans recharger la page (pas de requête si l'onglet est en arrière-plan).
+    timer = setInterval(() => {
+      if (!document.hidden) load();
+    }, 60000);
   });
   onDestroy(() => clearInterval(timer));
 </script>

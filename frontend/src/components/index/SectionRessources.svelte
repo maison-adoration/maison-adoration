@@ -21,18 +21,34 @@
     .filter((t) => !sType || t.type == sType)
     .map((t) => t.title);
 
+  // Numéro de la dernière recherche : une réponse plus ancienne qui arriverait
+  // après une plus récente (réseau lent) n'écrase pas les bons résultats.
+  let lastRequest = 0;
   const fetchContents = async () => {
+    const n = ++lastRequest;
     try {
       const res = await api.get("/contents", {
         params: { search: searchkey || "", ...(sType ? { type: sType } : {}) },
       });
-      contents = res.data;
+      if (n === lastRequest) contents = res.data;
     } catch (err) {
-      contents = [];
+      if (n === lastRequest) contents = [];
     }
   };
 
-  onMount(fetchContents);
+  // Les titres ne servent qu'à cette recherche : chargés ici, une seule fois,
+  // plutôt que sur toutes les pages du site.
+  const fetchTitles = () => {
+    if ($config.titles?.length) return;
+    api.get("/contents/titles")
+      .then((r) => config.update((p) => ({ ...p, titles: r.data })))
+      .catch(() => {});
+  };
+
+  onMount(() => {
+    fetchContents();
+    fetchTitles();
+  });
 </script>
 
 <div id="ressources"></div>
