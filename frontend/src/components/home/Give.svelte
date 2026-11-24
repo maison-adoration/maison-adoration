@@ -1,4 +1,5 @@
 <script>
+  import { reveal, slidePill } from "../../utils/motion";
   // Don par Mobile Money (FlexPay), sans compte. Le statut est suivi avec un jeton
   // propre à ce don, jusqu'à la confirmation sur le téléphone.
   import { onDestroy } from "svelte";
@@ -68,7 +69,7 @@
   <div aria-hidden="true" class="absolute -right-40 -top-40 w-[560px] h-[560px] rounded-full" style="background: radial-gradient(circle, rgba(228,190,5,.16) 0%, rgba(228,190,5,0) 65%)"></div>
   <div class="relative max-w-[1240px] mx-auto px-5 md:px-10 py-20 md:py-28 grid md:grid-cols-[1fr_1.1fr] gap-10 md:gap-16 items-start">
     <div>
-      <h2 class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,68px)] leading-none">Semer dans la Maison.</h2>
+      <h2 use:reveal class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,68px)] leading-none">Semer dans la Maison.</h2>
       <p class="mt-5 text-lg leading-relaxed text-man-doux max-w-[440px]">
         Votre dîme et vos offrandes soutiennent les cultes, les écoles et la construction du sanctuaire. Le paiement se confirme sur votre téléphone.
       </p>
@@ -106,22 +107,22 @@
         <form on:submit|preventDefault={submit} novalidate class="flex flex-col gap-5">
           <fieldset>
             <legend class="text-sm font-bold text-man-doux mb-3">Je donne pour</legend>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2" use:slidePill={kind}>
               {#each KINDS as k}
                 <label class="press cursor-pointer">
                   <input type="radio" name="kind" value={k.key} bind:group={kind} class="sr-only peer" />
-                  <span class="inline-flex items-center min-h-[44px] px-4 rounded-full border-[1.5px] font-bold transition-colors duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-man-ciel {kind === k.key ? 'border-man-or bg-man-or text-man-nuit' : 'border-man-trait'}">{k.label}</span>
+                  <span data-on={kind === k.key} class="inline-flex items-center min-h-[44px] px-4 rounded-full border-[1.5px] font-bold transition-colors duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-man-ciel {kind === k.key ? 'border-man-or bg-man-or text-man-nuit' : 'border-man-trait'}">{k.label}</span>
                 </label>
               {/each}
             </div>
           </fieldset>
           <fieldset>
             <legend class="text-sm font-bold text-man-doux mb-3">Montant (USD)</legend>
-            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" use:slidePill={preset}>
               {#each [...AMOUNTS, "autre"] as a}
                 <label class="press cursor-pointer">
                   <input type="radio" name="amount" value={a} bind:group={preset} class="sr-only peer" />
-                  <span class="flex items-center justify-center h-12 rounded-2xl border-[1.5px] font-bold transition-colors duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-man-ciel {preset === a ? 'border-man-or bg-man-or text-man-nuit' : 'border-man-trait'}">{a === "autre" ? "Autre" : `${a} $`}</span>
+                  <span data-on={preset === a} class="flex items-center justify-center h-12 rounded-2xl border-[1.5px] font-bold transition-colors duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-man-ciel {preset === a ? 'border-man-or bg-man-or text-man-nuit' : 'border-man-trait'}">{a === "autre" ? "Autre" : `${a} $`}</span>
                 </label>
               {/each}
             </div>

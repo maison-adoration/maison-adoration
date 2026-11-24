@@ -1,4 +1,5 @@
 <script>
+  import { reveal } from "../../utils/motion";
   import { cdn } from "../../utils/cdn.js";
   import { onMount } from "svelte";
   import api from "../../utils/api";
@@ -87,7 +88,7 @@
 
       <!-- SERMONS -->
       <section id="sermons" class="scroll-mt-24 mb-14">
-        <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Sermons</h2>
+        <h2 use:reveal class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Sermons</h2>
         {#if data.series.length}
           <div class="flex flex-wrap gap-2 mb-4 text-sm">
             <button class="px-3 py-1 rounded-full border" class:bg-brand-primary={!seriesFilter} class:text-white={!seriesFilter} on:click={() => (seriesFilter = "")}>Tous</button>
@@ -119,7 +120,7 @@
 
       <!-- PODCASTS -->
       <section id="podcasts" class="scroll-mt-24 mb-14">
-        <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Podcasts</h2>
+        <h2 use:reveal class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Podcasts</h2>
         <div class="grid grid-cols-1 gap-3">
           {#each data.podcasts as p (p.id)}
             <div class="flex flex-col sm:flex-row gap-3 sm:items-center rounded-xl border border-gray-200 p-3">
@@ -139,7 +140,7 @@
 
       <!-- GALERIE -->
       <section id="galerie" class="scroll-mt-24 mb-14">
-        <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Galerie</h2>
+        <h2 use:reveal class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Galerie</h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {#each data.albums as a (a.id)}
             <button class="text-left rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition" on:click={() => openAlbum(a)}>
@@ -157,7 +158,7 @@
 
       <!-- COMMUNIQUÉS -->
       <section id="communiques" class="scroll-mt-24">
-        <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Communiqués</h2>
+        <h2 use:reveal class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Communiqués</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           {#each data.press as p (p.id)}
             <button class="text-left rounded-xl border border-gray-200 p-4 hover:shadow-md transition flex gap-3" on:click={() => openPress(p)}>

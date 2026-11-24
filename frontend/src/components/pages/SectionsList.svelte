@@ -1,4 +1,5 @@
 <script>
+  import { reveal } from "../../utils/motion";
   import { cdn } from "../../utils/cdn.js";
   // Affiche les sections publiées d'une page (modifiables dans l'espace admin).
   import { onMount, tick } from "svelte";
@@ -53,7 +54,7 @@
               <img src={cdn(s.imageUrl, 700)} alt={s.title} loading="lazy" class="w-full md:w-2/5 rounded-[26px] object-cover max-h-[28rem]" />
             {/if}
             <div class="w-full" class:md:w-3-5={s.imageUrl}>
-              <h2 class="font-slab font-bold text-[34px] md:text-[44px] leading-tight text-man-nuit">{s.title}</h2>
+              <h2 use:reveal class="font-slab font-bold text-[34px] md:text-[44px] leading-tight text-man-nuit">{s.title}</h2>
               {#if s.subtitle}
                 <div class="mt-1 font-bold text-man-ortexte">{s.subtitle}</div>
               {/if}

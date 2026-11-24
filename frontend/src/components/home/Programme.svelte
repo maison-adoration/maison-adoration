@@ -1,4 +1,5 @@
 <script>
+  import { reveal } from "../../utils/motion";
   // Programme de la semaine : les rendez-vous défilent seuls, le visiteur peut choisir.
   import { createEventDispatcher } from "svelte";
   import { createAutoplay, swipe } from "../../utils/autoplay";
@@ -36,7 +37,7 @@
   <div aria-hidden="true" class="absolute inset-0" style="background: linear-gradient(90deg, rgba(10,27,51,.8) 0%, rgba(10,27,51,.25) 60%, rgba(10,27,51,0) 100%), linear-gradient(0deg, rgba(10,27,51,.85) 0%, rgba(10,27,51,0) 50%)"></div>
 
   <div class="relative w-full max-w-[1320px] mx-auto px-5 md:px-10 pt-28 pb-14 md:py-28 flex flex-col gap-6 md:gap-8">
-    <h2 class="font-slab font-bold text-[22px] md:text-[26px] text-man-or">Chaque semaine</h2>
+    <h2 use:reveal class="font-slab font-bold text-[22px] md:text-[26px] text-man-or">Chaque semaine</h2>
     {#key day.key}
       <div class="man-swap flex flex-col gap-2 max-w-[760px]" aria-live={$ap.live}>
         <span class="font-slab font-bold text-[84px] md:text-[clamp(80px,11vw,150px)] leading-[.85]" style="text-shadow: 0 4px 40px rgba(10,27,51,.5)">{day.hour}</span>

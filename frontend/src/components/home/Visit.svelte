@@ -1,4 +1,5 @@
 <script>
+  import { reveal, slidePill } from "../../utils/motion";
   // Première visite : prénom + jour choisi, enregistré pour l'équipe d'accueil.
   import api, { errorMessage } from "../../utils/api";
   import { SERVICES } from "../../utils/schedule";
@@ -39,7 +40,7 @@
 
   <div class="relative max-w-[1240px] mx-auto px-5 md:px-10 py-20 md:py-28 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
     <div>
-      <h2 class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,68px)] leading-none">Venez tel que vous êtes.</h2>
+      <h2 use:reveal class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,68px)] leading-none">Venez tel que vous êtes.</h2>
       <p class="mt-5 text-lg leading-relaxed text-man-doux max-w-[460px]">
         Dites-nous quand vous passez : quelqu'un vous attendra à l'entrée pour vous installer et répondre à vos questions.
       </p>
@@ -59,11 +60,11 @@
         <form on:submit|preventDefault={submit} novalidate class="flex flex-col gap-5">
           <fieldset>
             <legend class="text-sm font-bold text-man-doux mb-3">Je viens</legend>
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-3 gap-2" use:slidePill={day}>
               {#each DAYS as d}
                 <label class="press cursor-pointer">
                   <input type="radio" name="day" value={d.key} bind:group={day} class="sr-only peer" />
-                  <span class="flex flex-col items-center justify-center rounded-2xl border-[1.5px] py-3 transition-colors duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-man-ciel {day === d.key ? 'border-man-or bg-man-or text-man-nuit' : 'border-man-trait text-white'}">
+                  <span data-on={day === d.key} class="flex flex-col items-center justify-center rounded-2xl border-[1.5px] py-3 transition-colors duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-man-ciel {day === d.key ? 'border-man-or bg-man-or text-man-nuit' : 'border-man-trait text-white'}">
                     <span class="font-bold">{d.dayName}</span>
                     <span class="text-sm opacity-80">{d.hour}</span>
                   </span>

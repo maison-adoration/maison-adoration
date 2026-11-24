@@ -1,4 +1,5 @@
 <script>
+  import { reveal } from "../../utils/motion";
   import Select from "svelte-select";
   import config from "../../stores/config";
   import Loading from "../utils/Loading.svelte";
@@ -55,7 +56,7 @@
 
 <Container>
   <div class="max-w-[60rem] mx-auto pt-16 md:pt-24 pb-6 text-man-nuit">
-    <h2 class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,64px)] leading-none">Ressources et activités</h2>
+    <h2 use:reveal class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,64px)] leading-none">Ressources et activités</h2>
     <p class="mt-4 text-lg leading-relaxed text-[#3D5578] max-w-[560px]">
       Programmes, enseignements audio, livres et vidéos de la Maison, à suivre à votre rythme.
     </p>

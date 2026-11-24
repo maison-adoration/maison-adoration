@@ -4,7 +4,8 @@
   import { page } from "$app/stores";
   import { fly, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { tick } from "svelte";
+  import { tick, onMount } from "svelte";
+  import { nextService } from "../../utils/schedule";
   import get from "lodash.get";
   import config from "../../stores/config";
   import { setToken } from "../../utils/api";
@@ -25,6 +26,15 @@
   $: isStaff = ["media", "admin", "super-admin"].includes(get($config, "currentUser.role"));
 
   // Ordre conventionnel : accueil, présentation, activités, contenus, contact.
+  // Culte en cours : un point doré pulse à côté de « Direct ».
+  let live = false;
+  onMount(() => {
+    const check = () => (live = nextService().live);
+    check();
+    const t = setInterval(check, 30000);
+    return () => clearInterval(t);
+  });
+
   const LINKS = [
     { href: "/", label: "Accueil" },
     { href: "/maison", label: "À propos" },
@@ -85,7 +95,7 @@
 <a href="#contenu" class="skip-link">Aller au contenu</a>
 
 <header
-  class="fixed top-0 inset-x-0 z-50 text-white transition-colors duration-300"
+  class="man-vt-header fixed top-0 inset-x-0 z-50 text-white transition-colors duration-300"
   class:bg-man-nuit={solid}
   class:shadow-header={solid}
 >
@@ -97,7 +107,9 @@
 
     <nav aria-label="Navigation principale" class="hidden lg:flex items-center gap-4 xl:gap-6 text-[14px] xl:text-[15px] font-semibold whitespace-nowrap">
       {#each LINKS as l}
-        <a href={l.href} class="nav-u text-man-texte hover:text-white" aria-current={current(l.href)}>{l.label}</a>
+        <a href={l.href} class="nav-u text-man-texte hover:text-white inline-flex items-center gap-1.5" aria-current={current(l.href)}>
+          {#if l.href === "/live" && live}<span class="man-live w-2 h-2 rounded-full bg-man-lumiere" aria-hidden="true"></span>{/if}{l.label}{#if l.href === "/live" && live}<span class="sr-only"> (en cours)</span>{/if}
+        </a>
       {/each}
     </nav>
 
@@ -126,7 +138,7 @@
 <!-- Barre d'onglets (téléphone) -->
 <nav
   aria-label="Navigation rapide"
-  class="md:hidden fixed bottom-0 inset-x-0 z-50 h-[74px] pb-[env(safe-area-inset-bottom)] bg-man-nuit/95 backdrop-blur-md border-t border-man-trait grid grid-cols-5 px-1.5"
+  class="man-vt-tabs md:hidden fixed bottom-0 inset-x-0 z-50 h-[74px] pb-[env(safe-area-inset-bottom)] bg-man-nuit/95 backdrop-blur-md border-t border-man-trait grid grid-cols-5 px-1.5"
 >
   {#if tabIndex >= 0}
     <span aria-hidden="true" class="man-ind absolute top-0 left-1.5 h-[3px] flex justify-center" style="width: calc((100% - 12px) / 5); transform: translateX({tabIndex * 100}%)">
@@ -140,8 +152,11 @@
       style="color: {activeTab === t.key ? '#E4BE05' : '#B9C9DD'}"
       aria-current={activeTab === t.key ? "page" : undefined}
     >
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={t.icon} /></svg>
-      {t.label}
+      <span class="relative">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={t.icon} /></svg>
+        {#if t.key === "live" && live}<span class="man-live absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-man-lumiere" aria-hidden="true"></span>{/if}
+      </span>
+      {t.label}{#if t.key === "live" && live}<span class="sr-only"> (en cours)</span>{/if}
     </a>
   {/each}
 </nav>

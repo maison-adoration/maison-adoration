@@ -17,9 +17,23 @@
   import Footer from "../components/layout/Footer.svelte";
   import config from "../stores/config";
   import { onMount } from "svelte";
+  import { onNavigate } from "$app/navigation";
   import api, { getToken } from "../utils/api";
 
   setupIcons();
+
+  // Fondu entre les pages (navigateurs compatibles ; sinon changement direct).
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (navigation.from?.url.pathname === navigation.to?.url.pathname) return; // simple ancre
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve();
+        await navigation.complete;
+      });
+    });
+  });
 
   // Le site s'affiche tout de suite ; les données de l'API arrivent ensuite.
   // (Avant, toute la page attendait l'API — très lent quand le serveur se réveille.)

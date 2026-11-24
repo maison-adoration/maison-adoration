@@ -12,7 +12,7 @@
       alt=""
       aria-hidden="true"
       fetchpriority="high"
-      class="absolute inset-0 w-full h-full object-cover opacity-[.42]"
+      class="man-settle absolute inset-0 w-full h-full object-cover opacity-[.42]"
       style="object-position: 30% 40%"
     />
   </picture>

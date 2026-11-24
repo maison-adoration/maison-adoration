@@ -30,7 +30,7 @@
       {:else}
         {#each cd.parts as p}
           <div aria-hidden="true" class="flex flex-col items-center min-w-[54px]">
-            <span class="font-slab text-[34px] md:text-[40px] font-bold tabular-nums">{p.v}</span>
+            <span class="font-slab text-[34px] md:text-[40px] font-bold tabular-nums">{#key p.v}<span class="man-tick">{p.v}</span>{/key}</span>
             <span class="text-[13px] text-[#B9C9DD]">{p.l}</span>
           </div>
         {/each}

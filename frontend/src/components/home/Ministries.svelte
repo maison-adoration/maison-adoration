@@ -1,4 +1,5 @@
 <script>
+  import { reveal } from "../../utils/motion";
   // Ministères : galerie dont la vignette ouverte avance seule ; survol, clic ou
   // glissement donnent la main au visiteur. Sur téléphone : rangée qu'on glisse au doigt.
   import { createAutoplay, swipe } from "../../utils/autoplay";
@@ -43,7 +44,7 @@
   </div>
   <div class="relative max-w-[1240px] mx-auto">
     <div class="flex justify-between items-end gap-5 mb-8">
-      <h2 class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,72px)] leading-none">Grandir, servir, être formé.</h2>
+      <h2 use:reveal class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,72px)] leading-none">Grandir, servir, être formé.</h2>
       <AutoplayControls {ap} dots={false} />
     </div>
 

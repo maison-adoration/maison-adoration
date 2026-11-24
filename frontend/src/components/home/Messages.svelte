@@ -1,4 +1,5 @@
 <script>
+  import { reveal } from "../../utils/motion";
   // Derniers messages (sermons publiés dans la médiathèque), en diaporama contrôlable.
   import { onMount } from "svelte";
   import api from "../../utils/api";
@@ -48,7 +49,7 @@
 
 <section class="bg-man-nuit text-white py-20 md:py-28" aria-labelledby="titre-messages">
   <div class="max-w-[1320px] mx-auto px-5 md:px-10 flex flex-wrap justify-between items-end gap-5 mb-8">
-    <h2 id="titre-messages" class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,72px)] leading-none">La Parole, où que vous soyez.</h2>
+    <h2 use:reveal id="titre-messages" class="font-slab font-bold text-[38px] md:text-[clamp(42px,5vw,72px)] leading-none">La Parole, où que vous soyez.</h2>
     <a href="/mediatheque" class="btn-ghost">Toute la médiathèque</a>
   </div>
 
