@@ -304,6 +304,39 @@ test('suppression de comptes : règles de rôles', async () => {
   assert.equal((await request(app).delete(`/users/${user2.id}`).set(auth(adminToken))).status, 200);
 });
 
+test('don en ligne sans compte : jeton de suivi, montant contrôlé, visible par les admins', async () => {
+  flexpay.startPayment = async ({ amount }) => ({ accepted: true, orderNumber: `ORD-DON-${amount}`, message: 'ok' });
+  let check = 'pending';
+  flexpay.checkPayment = async () => check;
+  assert.equal((await request(app).post('/payments/donation').send({ kind: 'offrande', amount: 0, phone: '243970000010' })).status, 400);
+  assert.equal((await request(app).post('/payments/donation').send({ kind: 'autre', amount: 5, phone: '243970000010' })).status, 400);
+  const res = await request(app).post('/payments/donation').send({ kind: 'dime', amount: 25, phone: '+243 970 000 010', name: 'Fidèle' });
+  assert.equal(res.status, 201);
+  assert.equal(res.body.donationKind, 'dime');
+  assert.match(res.body.token, /^[a-f0-9]{48}$/);
+  assert.equal((await request(app).get(`/payments/donation/${res.body.id}?token=${'0'.repeat(48)}`)).status, 404, 'mauvais jeton');
+  check = 'success';
+  const st = await request(app).get(`/payments/donation/${res.body.id}?token=${res.body.token}`);
+  assert.equal(st.body.status, 'success');
+  const { rows } = await db.query('SELECT status_token_hash FROM payments WHERE id = $1', [res.body.id]);
+  assert.notEqual(rows[0].status_token_hash, res.body.token, 'seule une empreinte est stockée');
+  const adm = await request(app).get('/payments?purpose=donation').set(auth(adminToken));
+  assert.equal(adm.status, 200);
+  assert.ok(adm.body.payments.some((p) => p.content_title === 'Don : dîme' && p.payer_name === 'Fidèle'));
+  assert.ok((await request(app).get('/payments?purpose=content').set(auth(adminToken))).body.payments.every((p) => !p.donation_kind));
+});
+
+test('demande de première visite : publique, suivie par les admins', async () => {
+  assert.equal((await request(app).post('/visits').send({ name: 'A', day: 'dim' })).status, 400);
+  assert.equal((await request(app).post('/visits').send({ name: 'Grâce', day: 'lun' })).status, 400);
+  assert.equal((await request(app).post('/visits').send({ name: 'Grâce', day: 'dim' })).status, 201);
+  assert.equal((await request(app).get('/visits')).status, 401);
+  const list = await request(app).get('/visits').set(auth(adminToken));
+  assert.equal(list.body[0].name, 'Grâce');
+  const up = await request(app).put(`/visits/${list.body[0].id}`).set(auth(adminToken)).send({ status: 'welcomed' });
+  assert.equal(up.body.status, 'welcomed');
+});
+
 test('statistiques, santé et route inconnue', async () => {
   const s = await request(app).get('/stats');
   assert.equal(s.body.nUsers, 3);

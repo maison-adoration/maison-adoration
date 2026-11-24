@@ -3,6 +3,9 @@
   // Polices auto-hébergées (sous-ensemble latin) : plus de requête bloquante vers Google Fonts
   import "@fontsource-variable/manrope/index.css";
   import "@fontsource/bebas-neue/latin-400.css";
+  import "@fontsource/zilla-slab/latin-500.css";
+  import "@fontsource/zilla-slab/latin-600.css";
+  import "@fontsource/zilla-slab/latin-700.css";
   import "@fontsource/oswald/latin-300.css";
   import "@fontsource/oswald/latin-400.css";
   import "@fontsource/oswald/latin-500.css";
@@ -36,12 +39,11 @@
   });
 </script>
 
-<div
-  class={`text-base bg-brand-black text-gray-700 tracking-wide w-full layout`}
-  id="home"
->
+<div class="text-base bg-brand-black text-gray-700 w-full layout pb-[74px] md:pb-0" id="home">
   <NavBar />
-  <slot />
+  <main id="contenu">
+    <slot />
+  </main>
   <Footer />
 </div>
 

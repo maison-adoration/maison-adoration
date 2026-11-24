@@ -10,7 +10,7 @@
 <PageHero
   title="Notre Maison"
   subtitle="« Ramener les Nations à genoux à la croix par l'Enseignement de la Parole et la Puissance du Saint-Esprit. » — Ésaïe 2 : 2-3"
-  image="/images/israelk-1.jpg"
+  image="/images/design/prophete.jpg"
 />
 
 <SectionsList page="maison" showNav />

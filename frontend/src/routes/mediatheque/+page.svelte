@@ -23,6 +23,10 @@
     } catch (e) {
       data = { sermons: [], series: [], podcasts: [], albums: [], press: [], live: null, upcoming: [], replays: [] };
     }
+    // Lien direct vers un message (depuis l'accueil) : /mediatheque?message=<id>
+    const wanted = new URLSearchParams(location.search).get("message");
+    const found = wanted && data.sermons.find((s) => String(s.id) === wanted);
+    if (found) openSermon(found);
   });
 
   $: sermons = data ? data.sermons.filter((s) => !seriesFilter || s.series_id == seriesFilter) : [];
@@ -60,13 +64,13 @@
   <title>Médiathèque - M.A.N. - Maison D'Adoration Pour les Nations</title>
 </svelte:head>
 
-<PageHero title="Médiathèque" subtitle="Prédications, podcasts, photos et communiqués de la Maison d'Adoration pour les Nations.">
-  <nav class="mt-6 flex flex-wrap gap-2 text-sm">
-    <a class="px-3 py-1 rounded-full border border-gray-500 hover:border-brand-primary" href="#sermons">Sermons</a>
-    <a class="px-3 py-1 rounded-full border border-gray-500 hover:border-brand-primary" href="#podcasts">Podcasts</a>
-    <a class="px-3 py-1 rounded-full border border-gray-500 hover:border-brand-primary" href="#galerie">Galerie</a>
-    <a class="px-3 py-1 rounded-full border border-gray-500 hover:border-brand-primary" href="#communiques">Communiqués</a>
-    <a class="px-3 py-1 rounded-full bg-brand-primary text-white" href="/live">Directs</a>
+<PageHero image="/images/design/predication.jpg" title="Médiathèque" subtitle="Prédications, podcasts, photos et communiqués de la Maison d'Adoration pour les Nations.">
+  <nav class="mt-8 flex flex-wrap gap-2 text-[15px]" aria-label="Rubriques">
+    <a class="press inline-flex items-center min-h-[44px] px-4 rounded-full border-[1.5px] border-man-bord/60 font-bold hover:border-man-ciel transition-colors duration-200" href="#sermons">Sermons</a>
+    <a class="press inline-flex items-center min-h-[44px] px-4 rounded-full border-[1.5px] border-man-bord/60 font-bold hover:border-man-ciel transition-colors duration-200" href="#podcasts">Podcasts</a>
+    <a class="press inline-flex items-center min-h-[44px] px-4 rounded-full border-[1.5px] border-man-bord/60 font-bold hover:border-man-ciel transition-colors duration-200" href="#galerie">Galerie</a>
+    <a class="press inline-flex items-center min-h-[44px] px-4 rounded-full border-[1.5px] border-man-bord/60 font-bold hover:border-man-ciel transition-colors duration-200" href="#communiques">Communiqués</a>
+    <a class="btn-or !min-h-[44px]" href="/live">Directs</a>
   </nav>
 </PageHero>
 
@@ -83,7 +87,7 @@
 
       <!-- SERMONS -->
       <section id="sermons" class="scroll-mt-24 mb-14">
-        <h2 class="h-font text-4xl text-brand-primary uppercase mb-4">Sermons</h2>
+        <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Sermons</h2>
         {#if data.series.length}
           <div class="flex flex-wrap gap-2 mb-4 text-sm">
             <button class="px-3 py-1 rounded-full border" class:bg-brand-primary={!seriesFilter} class:text-white={!seriesFilter} on:click={() => (seriesFilter = "")}>Tous</button>
@@ -115,7 +119,7 @@
 
       <!-- PODCASTS -->
       <section id="podcasts" class="scroll-mt-24 mb-14">
-        <h2 class="h-font text-4xl text-brand-primary uppercase mb-4">Podcasts</h2>
+        <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Podcasts</h2>
         <div class="grid grid-cols-1 gap-3">
           {#each data.podcasts as p (p.id)}
             <div class="flex flex-col sm:flex-row gap-3 sm:items-center rounded-xl border border-gray-200 p-3">
@@ -135,7 +139,7 @@
 
       <!-- GALERIE -->
       <section id="galerie" class="scroll-mt-24 mb-14">
-        <h2 class="h-font text-4xl text-brand-primary uppercase mb-4">Galerie</h2>
+        <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Galerie</h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {#each data.albums as a (a.id)}
             <button class="text-left rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition" on:click={() => openAlbum(a)}>
@@ -153,7 +157,7 @@
 
       <!-- COMMUNIQUÉS -->
       <section id="communiques" class="scroll-mt-24">
-        <h2 class="h-font text-4xl text-brand-primary uppercase mb-4">Communiqués</h2>
+        <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-5">Communiqués</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           {#each data.press as p (p.id)}
             <button class="text-left rounded-xl border border-gray-200 p-4 hover:shadow-md transition flex gap-3" on:click={() => openPress(p)}>

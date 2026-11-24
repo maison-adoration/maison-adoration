@@ -51,6 +51,7 @@ const contentOut = (c, { hasAccess = false, isAdmin = false } = {}) => {
 const paymentOut = (p) => ({
   id: p.id,
   contentId: p.content_id,
+  donationKind: p.donation_kind ?? null,
   amount: Number(p.amount),
   currency: p.currency,
   status: p.status,

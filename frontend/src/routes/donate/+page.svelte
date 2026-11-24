@@ -1,6 +1,7 @@
 <script>
   import Container from "../../components/utils/Container.svelte";
-  import DonateVideo from "../../components/index/sub/DonateVideo.svelte";
+  import PageHero from "../../components/pages/PageHero.svelte";
+  import Give from "../../components/home/Give.svelte";
   import SectionsList from "../../components/pages/SectionsList.svelte";
 </script>
 
@@ -8,26 +9,24 @@
   <title>Dons En Ligne - M.A.N. - Maison D'Adoration Pour les Nations</title>
 </svelte:head>
 
-<DonateVideo />
+<PageHero
+  image="/images/design/adoration.jpg"
+  title="Dons en ligne"
+  subtitle="Merci de votre générosité : c'est grâce à votre fidélité que des vies sont transformées en Christ."
+/>
 
-<div id="how"></div>
-
-<div class="-mt-6 text-center max-w-2xl mx-auto relative z-30">
-  Merci de votre générosité. C'est grâce à votre fidélité que nous pouvons voir
-  des vies transformées en Christ.
-</div>
+<Give />
 
 <SectionsList
   page="dons"
-  emptyText="Les coordonnées pour les dons (banque et Mobile Money) seront bientôt affichées ici. En attendant, écrivez-nous à l'adresse ci-dessous."
+  emptyText="Les coordonnées bancaires seront bientôt affichées ici."
 />
 
 <Container>
-  <div class="text-center pb-10">
-    Veuillez envoyer un e-mail à
-    <span class="text-brand-primary"> dons@maison-adoration.net </span>
-    pour toute question ou préoccupation.
-  </div>
+  <p class="pb-14 text-[#2B3F5C]">
+    Une question sur un don ? Écrivez à
+    <a class="font-bold text-man-marine underline" href="mailto:dons@maison-adoration.net">dons@maison-adoration.net</a>.
+  </p>
 </Container>
 
 

@@ -43,7 +43,7 @@
       {#if data.live}
         <div class="mb-12">
           <div class="text-red-600 font-bold mb-2">● EN DIRECT · {TYPE[data.live.type] || ""}</div>
-          <h2 class="h-font text-4xl text-gray-800 mb-4">{data.live.title}</h2>
+          <h2 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-4">{data.live.title}</h2>
           <VideoEmbed url={data.live.stream_url} title={data.live.title} />
           {#if data.live.description}<p class="mt-4 text-gray-600 whitespace-pre-line">{data.live.description}</p>{/if}
         </div>
@@ -56,7 +56,7 @@
         </div>
       {/if}
 
-      <h2 class="h-font text-3xl text-brand-primary uppercase mb-3">Prochains directs</h2>
+      <h2 class="font-slab font-bold text-[30px] md:text-[36px] leading-tight text-man-nuit mb-4">Prochains directs</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-12">
         {#each data.upcoming as s (s.id)}
           <div class="rounded-xl border border-gray-200 p-4">
@@ -70,7 +70,7 @@
       </div>
 
       {#if data.replays.length}
-        <h2 class="h-font text-3xl text-brand-primary uppercase mb-3">Rediffusions</h2>
+        <h2 class="font-slab font-bold text-[30px] md:text-[36px] leading-tight text-man-nuit mb-4">Rediffusions</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           {#each data.replays as s (s.id)}
             <div>

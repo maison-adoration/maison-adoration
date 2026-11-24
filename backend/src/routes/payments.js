@@ -10,9 +10,10 @@
 const express = require('express');
 const crypto = require('crypto');
 const { z } = require('zod');
+const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const config = require('../config');
-const { requireAuth, requireAdmin } = require('../middlewares/auth');
+const { requireAuth, requireAdmin, optionalAuth } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
 const { asyncHandler, HttpError } = require('../utils/http-error');
 const { paymentOut } = require('../utils/serializers');
@@ -41,7 +42,7 @@ async function settle(paymentId) {
     );
     // Déjà traité entre-temps (rappel FlexPay et interrogation du site en même temps)
     if (!updated[0]) return (await client.query('SELECT * FROM payments WHERE id = $1', [payment.id])).rows[0];
-    if (status === 'success' && updated[0].user_id) {
+    if (status === 'success' && updated[0].user_id && updated[0].content_id) {
       await client.query(
         `INSERT INTO enrollments (user_id, content_id, source, payment_id)
          VALUES ($1, $2, 'purchase', $3) ON CONFLICT (user_id, content_id) DO NOTHING`,
@@ -52,16 +53,113 @@ async function settle(paymentId) {
   });
 }
 
+const phoneSchema = z
+  .string()
+  .trim()
+  .refine((p) => /^\+?\d{9,15}$/.test(p.replace(/[\s-]/g, '')), 'Numéro de téléphone invalide');
+
+const hashToken = (t) => crypto.createHash('sha256').update(t).digest('hex');
+
+/** Envoie la demande à FlexPay et enregistre la réponse sur le paiement. */
+async function sendToFlexpay(payment) {
+  let result;
+  try {
+    result = await flexpay.startPayment({
+      amount: payment.amount,
+      currency: payment.currency,
+      phone: payment.phone,
+      reference: payment.reference,
+    });
+  } catch (err) {
+    result = { accepted: false, message: 'FlexPay injoignable, réessayez' };
+  }
+  const { rows } = await db.query(
+    `UPDATE payments SET order_number = $1, status = $2, message = $3 WHERE id = $4 RETURNING *`,
+    [result.orderNumber ?? null, result.accepted ? 'pending' : 'failed', result.message ?? null, payment.id],
+  );
+  return { result, payment: rows[0] };
+}
+
+const donationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: config.env === 'test' ? 1000 : 15,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Trop de demandes de don. Réessayez plus tard.' },
+});
+
+/*
+ * Don en ligne (dîme, offrande, projet) : ouvert à tous, compte facultatif.
+ * Le donateur reçoit un jeton pour suivre son paiement ; seul son empreinte est gardée.
+ */
+router.post(
+  '/donation',
+  donationLimiter,
+  optionalAuth,
+  validate({
+    body: z.object({
+      kind: z.enum(['dime', 'offrande', 'projet']),
+      amount: z.coerce.number().min(1, 'Montant minimum : 1').max(10000, 'Montant maximum : 10 000').multipleOf(0.01),
+      phone: phoneSchema,
+      name: z.string().trim().max(120).default(''),
+    }),
+  }),
+  asyncHandler(async (req, res) => {
+    if (!config.flexpay.enabled || !config.flexpay.callbackUrl) {
+      throw HttpError.unavailable("Le don en ligne n'est pas encore configuré");
+    }
+    const b = req.body;
+    const token = crypto.randomBytes(24).toString('hex');
+    const reference = `MAN-DON-${b.kind.toUpperCase()}-${crypto.randomBytes(6).toString('hex')}`;
+    const { rows } = await db.query(
+      `INSERT INTO payments (user_id, payer_email, donation_kind, donor_name, status_token_hash, amount, currency, phone, reference)
+       VALUES ($1, $2, $3, NULLIF($4, ''), $5, $6, $7, $8, $9) RETURNING *`,
+      [
+        req.user?.id ?? null,
+        req.user?.email ?? null,
+        b.kind,
+        b.name || req.user?.name || '',
+        hashToken(token),
+        b.amount,
+        config.currency,
+        flexpay.normalizePhone(b.phone),
+        reference,
+      ],
+    );
+    const { result, payment } = await sendToFlexpay(rows[0]);
+    if (!result.accepted) {
+      return res.status(502).json({ error: result.message || 'Le paiement a été refusé', payment: paymentOut(payment) });
+    }
+    res.status(201).json({ ...paymentOut(payment), token });
+  }),
+);
+
+/* Suivi d'un don par son jeton (sans compte). */
+router.get(
+  '/donation/:id',
+  validate({
+    params: z.object({ id: z.string().trim().min(1).max(64) }),
+    query: z.object({ token: z.string().trim().regex(/^[a-f0-9]{48}$/, 'Jeton invalide') }),
+  }),
+  asyncHandler(async (req, res) => {
+    const { rows } = await db.query(
+      'SELECT * FROM payments WHERE id = $1 AND status_token_hash = $2 AND donation_kind IS NOT NULL',
+      [req.params.id, hashToken(req.validQuery.token)],
+    );
+    if (!rows[0]) throw HttpError.notFound('Don introuvable');
+    let payment = rows[0];
+    if (payment.status === 'pending' && config.flexpay.enabled) payment = (await settle(payment.id)) || payment;
+    res.json(paymentOut(payment));
+  }),
+);
+
 router.post(
   '/flexpay',
   requireAuth,
   validate({
     body: z.object({
       contentId: z.string().trim().min(1).max(64),
-      phone: z
-        .string()
-        .trim()
-        .refine((p) => /^\+?\d{9,15}$/.test(p.replace(/[\s-]/g, '')), 'Numéro de téléphone invalide'),
+      phone: phoneSchema,
     }),
   }),
   asyncHandler(async (req, res) => {
@@ -85,25 +183,7 @@ router.post(
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
       [req.user.id, req.user.email, content.id, content.price, config.currency, flexpay.normalizePhone(req.body.phone), reference],
     );
-    let payment = created[0];
-
-    let result;
-    try {
-      result = await flexpay.startPayment({
-        amount: content.price,
-        currency: config.currency,
-        phone: payment.phone,
-        reference,
-      });
-    } catch (err) {
-      result = { accepted: false, message: 'FlexPay injoignable, réessayez' };
-    }
-
-    const { rows: updated } = await db.query(
-      `UPDATE payments SET order_number = $1, status = $2, message = $3 WHERE id = $4 RETURNING *`,
-      [result.orderNumber ?? null, result.accepted ? 'pending' : 'failed', result.message ?? null, payment.id],
-    );
-    payment = updated[0];
+    const { result, payment } = await sendToFlexpay(created[0]);
     if (!result.accepted) {
       return res.status(502).json({ error: result.message || 'Le paiement a été refusé', payment: paymentOut(payment) });
     }
@@ -131,6 +211,7 @@ router.post(
 /* Suivi des paiements (admin) : ?status=&search=&from=AAAA-MM-JJ&to=AAAA-MM-JJ[&format=csv] */
 const listQuery = z.object({
   status: z.enum(['pending', 'success', 'failed']).optional(),
+  purpose: z.enum(['content', 'donation']).optional(),
   search: z.string().trim().max(100).default(''),
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
@@ -146,12 +227,17 @@ router.get(
     const where = `WHERE ($1::payment_status IS NULL OR p.status = $1)
         AND ($2::date IS NULL OR p.created_at >= $2::date)
         AND ($3::date IS NULL OR p.created_at < $3::date + 1)
-        AND (coalesce(p.payer_email, '') ILIKE $4 OR coalesce(u.name, '') ILIKE $4 OR c.title ILIKE $4 OR p.phone ILIKE $4)`;
-    const params = [q.status ?? null, q.from ?? null, q.to ?? null, `%${q.search.replace(/[%_\\]/g, '\\$&')}%`];
+        AND (coalesce(p.payer_email, '') ILIKE $4 OR coalesce(u.name, '') ILIKE $4 OR coalesce(p.donor_name, '') ILIKE $4
+             OR coalesce(c.title, '') ILIKE $4 OR p.phone ILIKE $4)
+        AND ($5::text IS NULL OR ($5 = 'donation') = (p.donation_kind IS NOT NULL))`;
+    const params = [q.status ?? null, q.from ?? null, q.to ?? null, `%${q.search.replace(/[%_\\]/g, '\\$&')}%`, q.purpose ?? null];
     const { rows } = await db.query(
       `SELECT p.id, p.created_at, p.status, p.amount, p.currency, p.phone, p.reference, p.order_number, p.message,
-              p.payer_email, u.name AS payer_name, c.title AS content_title
-       FROM payments p LEFT JOIN users u ON u.id = p.user_id JOIN contents c ON c.id = p.content_id
+              p.payer_email, coalesce(u.name, p.donor_name) AS payer_name,
+              coalesce(c.title, CASE p.donation_kind WHEN 'dime' THEN 'Don : dîme' WHEN 'offrande' THEN 'Don : offrande'
+                                                     WHEN 'projet' THEN 'Don : projet' END) AS content_title,
+              p.donation_kind
+       FROM payments p LEFT JOIN users u ON u.id = p.user_id LEFT JOIN contents c ON c.id = p.content_id
        ${where} ORDER BY p.created_at DESC LIMIT 1000`,
       params,
     );
@@ -167,7 +253,7 @@ router.get(
           .map(cell)
           .join(';'),
       );
-      const header = ['Date', 'Statut', 'Montant', 'Devise', 'Nom', 'E-mail', 'Téléphone', 'Contenu', 'Référence'];
+      const header = ['Date', 'Statut', 'Montant', 'Devise', 'Nom', 'E-mail', 'Téléphone', 'Contenu ou don', 'Référence'];
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', 'attachment; filename="paiements-man.csv"');
       return res.send(`\uFEFF${[header.map(cell).join(';'), ...lines].join('\r\n')}`);
@@ -177,7 +263,7 @@ router.get(
               coalesce(sum(p.amount) FILTER (WHERE p.status = 'success'), 0) AS total,
               count(*) FILTER (WHERE p.status = 'pending')::int AS pending,
               count(*) FILTER (WHERE p.status = 'failed')::int AS failed
-       FROM payments p LEFT JOIN users u ON u.id = p.user_id JOIN contents c ON c.id = p.content_id
+       FROM payments p LEFT JOIN users u ON u.id = p.user_id LEFT JOIN contents c ON c.id = p.content_id
        ${where} GROUP BY p.currency`,
       params,
     );

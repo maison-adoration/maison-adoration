@@ -530,3 +530,46 @@ body {
 .wrd-container span:nth-child(20) {
   animation: fade-in 2s 2.0s forwards cubic-bezier(0.11, 0, 0.5, 0);
 }
+/* ───────── Charte « La lumière derrière la croix » ───────── */
+:focus-visible { outline: 3px solid #4AB0EB; outline-offset: 3px; }
+.on-light :focus-visible { outline-color: #173E6F; }
+.skip-link { position: absolute; left: 16px; top: -80px; z-index: 100; padding: 12px 18px; border-radius: 10px; background: #E4BE05; color: #0A1B33; font-weight: 800; }
+.skip-link:focus { top: 16px; }
+
+.btn-or, .btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 52px; padding: 0 1.75rem; border-radius: 999px; font-weight: 800; font-size: 15px; transition: transform 160ms cubic-bezier(.23,1,.32,1), background-color 160ms ease, border-color 160ms ease, color 160ms ease; }
+.btn-or { background: #E4BE05; color: #0A1B33; }
+.btn-ghost { border: 1.5px solid #7F9CC0; color: #fff; background: transparent; }
+.btn-or:active, .btn-ghost:active, .press:active { transform: scale(.97); }
+.press { transition: transform 140ms cubic-bezier(.23,1,.32,1); }
+@media (hover: hover) and (pointer: fine) {
+  .btn-or:hover { background: #F0CB12; }
+  .btn-ghost:hover { border-color: #4AB0EB; background: rgba(74,176,235,.12); }
+}
+
+@keyframes man-arc-in { from { opacity: 0; transform: rotate(-32deg); } to { opacity: 1; transform: none; } }
+@keyframes man-halo-in { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes man-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes man-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes man-live { 0% { box-shadow: 0 0 0 0 rgba(249,230,2,.7); } 100% { box-shadow: 0 0 0 10px rgba(249,230,2,0); } }
+@keyframes man-pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes man-draw { from { stroke-dashoffset: 30; } to { stroke-dashoffset: 0; } }
+.man-arc-1 { animation: man-arc-in 1100ms 100ms cubic-bezier(.23,1,.32,1) both; }
+.man-arc-2 { animation: man-arc-in 1100ms 190ms cubic-bezier(.23,1,.32,1) both; }
+.man-arc-3 { animation: man-arc-in 1100ms 280ms cubic-bezier(.23,1,.32,1) both; }
+.man-halo { animation: man-halo-in 1400ms 350ms cubic-bezier(.23,1,.32,1) both; }
+.man-r1 { animation: man-rise 600ms 450ms cubic-bezier(.23,1,.32,1) both; }
+.man-r2 { animation: man-rise 600ms 520ms cubic-bezier(.23,1,.32,1) both; }
+.man-r3 { animation: man-rise 600ms 590ms cubic-bezier(.23,1,.32,1) both; }
+.man-r4 { animation: man-rise 600ms 660ms cubic-bezier(.23,1,.32,1) both; }
+.man-swap { animation: man-rise 420ms cubic-bezier(.23,1,.32,1) both; }
+.man-pop { animation: man-pop 420ms 80ms cubic-bezier(.23,1,.32,1) both; }
+.man-draw { stroke-dasharray: 30; animation: man-draw 380ms 360ms cubic-bezier(.23,1,.32,1) both; }
+.man-live { animation: man-live 1.6s ease-out infinite; }
+.man-xfade { transition: opacity 600ms cubic-bezier(.23,1,.32,1); }
+.man-ind { transition: transform 320ms cubic-bezier(.23,1,.32,1); }
+.man-fuse-x { -webkit-mask-image: linear-gradient(90deg, #000 35%, transparent 96%); mask-image: linear-gradient(90deg, #000 35%, transparent 96%); }
+@media (prefers-reduced-motion: reduce) {
+  .man-arc-1, .man-arc-2, .man-arc-3, .man-halo, .man-r1, .man-r2, .man-r3, .man-r4, .man-swap, .man-pop { animation-name: man-fade; }
+  .man-live { animation: none; }
+  .man-xfade, .man-ind, .btn-or, .btn-ghost, .press { transition: none; }
+}

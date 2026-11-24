@@ -48,6 +48,7 @@ app.use('/payments', require('./routes/payments'));
 app.use('/sections', require('./routes/sections'));
 app.use('/kids-registrations', require('./routes/kids'));
 app.use('/media', require('./routes/media'));
+app.use('/visits', require('./routes/visits'));
 
 app.use(notFound);
 app.use(errorHandler);

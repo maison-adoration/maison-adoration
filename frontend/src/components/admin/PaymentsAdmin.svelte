@@ -7,6 +7,7 @@
 
   const STATUS = { success: "Réussi", pending: "En attente", failed: "Échoué" };
   let status = "";
+  let purpose = "";
   let search = "";
   let from = "";
   let to = "";
@@ -15,6 +16,7 @@
 
   const params = () => ({
     ...(status ? { status } : {}),
+    ...(purpose ? { purpose } : {}),
     ...(search ? { search } : {}),
     ...(from ? { from } : {}),
     ...(to ? { to } : {}),
@@ -50,14 +52,19 @@
   onMount(load);
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-5 gap-2 mb-4">
-  <input class="md:col-span-2" bind:value={search} placeholder="Nom, e-mail, téléphone ou contenu"
+<div class="grid grid-cols-1 md:grid-cols-6 gap-2 mb-4">
+  <input class="md:col-span-2" bind:value={search} placeholder="Nom, e-mail, téléphone, contenu ou donateur"
     on:keydown={(e) => e.key == "Enter" && load()} />
   <select bind:value={status} on:change={load}>
     <option value="">Tous les statuts</option>
     <option value="success">Réussis</option>
     <option value="pending">En attente</option>
     <option value="failed">Échoués</option>
+  </select>
+  <select bind:value={purpose} on:change={load} aria-label="Type de paiement">
+    <option value="">Contenus et dons</option>
+    <option value="content">Achats de contenus</option>
+    <option value="donation">Dons</option>
   </select>
   <label class="text-xs text-gray-500">Du <input type="date" bind:value={from} on:change={load} /></label>
   <label class="text-xs text-gray-500">Au <input type="date" bind:value={to} on:change={load} /></label>
@@ -87,7 +94,7 @@
       <div class="flex flex-col md:flex-row md:items-center gap-2 bg-white rounded-lg border border-gray-200 px-3 py-2 text-sm">
         <div class="flex-1">
           <div class="font-bold text-gray-800">{p.content_title}</div>
-          <div class="text-gray-600">{p.payer_name || "Compte supprimé"} · {p.payer_email || "—"} · {p.phone}</div>
+          <div class="text-gray-600">{p.payer_name || (p.donation_kind ? "Donateur anonyme" : "Compte supprimé")} · {p.payer_email || "—"} · {p.phone}</div>
           <div class="text-xs text-gray-400">{when(p.created_at)} · réf. {p.reference}{p.message ? ` · ${p.message}` : ""}</div>
         </div>
         <div class="text-right">
