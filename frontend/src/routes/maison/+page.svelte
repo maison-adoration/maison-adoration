@@ -4,11 +4,11 @@
 </script>
 
 <svelte:head>
-  <title>La Maison - M.A.N. - Maison D'Adoration Pour les Nations</title>
+  <title>À propos - M.A.N. - Maison D'Adoration Pour les Nations</title>
 </svelte:head>
 
 <PageHero
-  title="Notre Maison"
+  title="À propos de la Maison"
   subtitle="« Ramener les Nations à genoux à la croix par l'Enseignement de la Parole et la Puissance du Saint-Esprit. » — Ésaïe 2 : 2-3"
   image="/images/design/prophete.jpg"
 />

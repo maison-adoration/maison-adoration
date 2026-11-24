@@ -24,13 +24,16 @@
   $: user = get($config, "currentUser");
   $: isStaff = ["media", "admin", "super-admin"].includes(get($config, "currentUser.role"));
 
+  // Ordre conventionnel : accueil, présentation, activités, contenus, contact.
   const LINKS = [
-    { href: "/maison", label: "La Maison" },
+    { href: "/", label: "Accueil" },
+    { href: "/maison", label: "À propos" },
     { href: "/#programme", label: "Programme" },
-    { href: "/mediatheque", label: "Médiathèque" },
     { href: "/ministeres", label: "Ministères" },
     { href: "/extensions", label: "Extensions" },
+    { href: "/mediatheque", label: "Médiathèque" },
     { href: "/live", label: "Direct" },
+    { href: "#contact", label: "Contact" },
   ];
 
   const TABS = [
@@ -92,7 +95,7 @@
       <span class="font-slab font-bold text-[22px] tracking-[.03em]">M.A.N</span>
     </a>
 
-    <nav aria-label="Navigation principale" class="hidden lg:flex items-center gap-7 text-[15px] font-semibold">
+    <nav aria-label="Navigation principale" class="hidden lg:flex items-center gap-4 xl:gap-6 text-[14px] xl:text-[15px] font-semibold whitespace-nowrap">
       {#each LINKS as l}
         <a href={l.href} class="nav-u text-man-texte hover:text-white" aria-current={current(l.href)}>{l.label}</a>
       {/each}
@@ -100,9 +103,9 @@
 
     <div class="flex items-center gap-2">
       {#if user}
-        <a href="/mes-contenus" class="hidden md:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-man-texte hover:text-white">Mon espace</a>
+        <a href="/mes-contenus" class="hidden md:inline-flex lg:hidden xl:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-man-texte hover:text-white">Mon espace</a>
       {:else}
-        <a href="/login" class="hidden md:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-man-texte hover:text-white">Connexion</a>
+        <a href="/login" class="hidden md:inline-flex lg:hidden xl:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-man-texte hover:text-white">Connexion</a>
       {/if}
       <a href="/#don" class="hidden md:inline-flex btn-ghost !min-h-[44px] !px-5 text-sm">Donner</a>
       <button
@@ -161,7 +164,7 @@
       </button>
     </div>
     <nav aria-label="Toutes les pages" class="px-6">
-      {#each [{ href: "/", label: "Accueil" }, ...LINKS, { href: "/#visite", label: "Planifier ma visite" }, { href: "/#don", label: "Donner" }] as l}
+      {#each [...LINKS, { href: "/#visite", label: "Planifier ma visite" }, { href: "/#don", label: "Donner" }] as l}
         <a href={l.href} on:click={closeMenu} class="flex items-center justify-between min-h-[56px] border-b border-man-trait font-slab font-bold text-[21px]">
           {l.label}
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4AB0EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>

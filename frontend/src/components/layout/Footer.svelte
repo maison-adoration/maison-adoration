@@ -3,7 +3,7 @@
   import config from "../../stores/config";
 </script>
 
-<footer id="contact" class="bg-man-nuit text-man-doux border-t border-man-trait px-5 md:px-10 pt-16 pb-10">
+<footer id="contact" class="scroll-mt-16 bg-man-nuit text-man-doux border-t border-man-trait px-5 md:px-10 pt-16 pb-10">
   <div class="max-w-[1240px] mx-auto grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
     <div class="flex items-center gap-4">
       <img src="/images/man-gold.png" alt="Logo M.A.N" class="w-16" width="64" height="64" loading="lazy" />
@@ -23,8 +23,11 @@
     </div>
     <nav aria-label="Pied de page" class="flex flex-col gap-1 text-[15px]">
       <h2 class="font-extrabold text-man-or mb-2 text-[15px]">Explorer</h2>
-      <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/maison">La Maison</a>
+      <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/">Accueil</a>
+      <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/maison">À propos</a>
+      <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/#programme">Programme</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/ministeres">Ministères</a>
+      <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/extensions">Extensions</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/mediatheque">Médiathèque et direct</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/donate">Don en ligne</a>
       {#if get($config, "currentUser.id")}
