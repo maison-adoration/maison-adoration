@@ -6,6 +6,7 @@
   import Hero from "../components/home/Hero.svelte";
   import NextService from "../components/home/NextService.svelte";
   import Maison from "../components/home/Maison.svelte";
+  import EventAnnouncement from "../components/home/EventAnnouncement.svelte";
   import Programme from "../components/home/Programme.svelte";
   import Messages from "../components/home/Messages.svelte";
   import Ministries from "../components/home/Ministries.svelte";
@@ -42,6 +43,7 @@
 
 <Hero {live} />
 <NextService />
+<EventAnnouncement />
 <Maison />
 <Programme on:plan={plan} />
 <Messages />

@@ -6,6 +6,7 @@
   import config from "../../stores/config";
   import AdminShell from "../../components/admin/AdminShell.svelte";
   import OverviewAdmin from "../../components/admin/OverviewAdmin.svelte";
+  import EventsAdmin from "../../components/admin/EventsAdmin.svelte";
   import VisitsAdmin from "../../components/admin/VisitsAdmin.svelte";
   import KidsAdmin from "../../components/admin/KidsAdmin.svelte";
   import MediaAdmin from "../../components/admin/media/MediaAdmin.svelte";
@@ -18,6 +19,7 @@
   const CHURCH = ["admin", "super-admin"];
   const ALL_TABS = [
     { id: "overview", label: "Vue d'ensemble", roles: CHURCH },
+    { id: "events", label: "Événements", roles: CHURCH },
     { id: "visits", label: "Visiteurs", roles: CHURCH },
     { id: "kids", label: "Man Kids", roles: CHURCH },
     { id: "media", label: "Médiathèque", roles: ["media", ...CHURCH] },
@@ -63,6 +65,8 @@
   >
     {#if tab == "overview"}
       <OverviewAdmin on:go={(e) => select(e.detail)} on:counts={(e) => (counts = e.detail)} />
+    {:else if tab == "events"}
+      <EventsAdmin />
     {:else if tab == "visits"}
       <VisitsAdmin />
     {:else if tab == "kids"}

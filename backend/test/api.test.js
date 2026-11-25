@@ -377,3 +377,102 @@ test('CORS : origine inconnue refusée', async () => {
   const ok = await request(app).get('/settings').set('Origin', 'http://localhost:5173');
   assert.equal(ok.headers['access-control-allow-origin'], 'http://localhost:5173');
 });
+
+/* ---------- Événements ---------- */
+
+const binaryParser = (res, cb) => {
+  const chunks = [];
+  res.on('data', (c) => chunks.push(c));
+  res.on('end', () => cb(null, Buffer.concat(chunks)));
+};
+const readXlsx = async (buf) => {
+  const ExcelJS = require('exceljs');
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.load(buf);
+  return wb.worksheets[0];
+};
+
+test('événement sur inscription : capacité, doublons, clôture, export Excel', async () => {
+  const inDays = (d) => new Date(Date.now() + d * 86400000).toISOString();
+  const bad = await request(app).post('/events').set(auth(userToken)).send({ title: 'x' });
+  assert.equal(bad.status, 403);
+
+  const ev = (
+    await request(app).post('/events').set(auth(adminToken)).send({
+      title: 'Nuit de louange', location: 'Sanctuaire M.A.N', startsAt: inDays(10), registrationMode: 'required',
+      capacity: 3, registrationDeadline: inDays(9), isPublished: true, isFeatured: true, imageUrl: '/images/design/adoration.jpg',
+    })
+  ).body;
+  assert.equal(ev.registrationMode, 'required');
+  assert.equal(ev.seatsLeft, 3);
+
+  // Annonce publique (mise en avant)
+  const pub = (await request(app).get('/events?featured=1').expect(200)).body;
+  assert.equal(pub[0].id, ev.id);
+  assert.equal(pub[0].registrationOpen, true);
+  assert.equal(pub[0].isPublished, undefined, 'pas de champ admin en public');
+
+  const reg = (body) => request(app).post(`/events/${ev.id}/registrations`).send(body);
+  assert.equal((await reg({ name: 'Ruth K', phone: '+243 970 111 001', seats: 2 })).status, 201);
+  assert.equal((await reg({ name: 'Ruth K', phone: '+243970111001' })).status, 409, 'même numéro');
+  const over = await reg({ name: 'Paul M', phone: '+243970111002', seats: 2 });
+  assert.equal(over.status, 400);
+  assert.match(over.body.error, /reste que 1 place/);
+  assert.equal((await reg({ name: 'Paul M', phone: '+243970111002' })).status, 201);
+  const full = await reg({ name: 'Eve L', phone: '+243970111003' });
+  assert.match(full.body.error, /complet/);
+
+  // Les inscrits arrivent chez l'admin ; présence ; export Excel mis en forme
+  const list = (await request(app).get(`/events/${ev.id}/registrations`).set(auth(adminToken)).expect(200)).body;
+  assert.equal(list.length, 2);
+  await request(app).put(`/events/${ev.id}/registrations/${list[0].id}`).set(auth(adminToken)).send({ status: 'attended' }).expect(200);
+  const x = await request(app).get(`/events/${ev.id}/registrations.xlsx`).set(auth(adminToken)).buffer().parse(binaryParser).expect(200);
+  assert.match(x.headers['content-type'], /spreadsheetml/);
+  const ws = await readXlsx(x.body);
+  assert.equal(ws.getCell('A2').value, 'Inscrits : Nuit de louange');
+  assert.equal(ws.getCell('A7').value, 'N°');
+  assert.equal(ws.getImages().length, 1, 'logo de l\'église');
+  assert.equal(ws.getCell('B8').value, 'Paul M');
+  assert.equal((await request(app).get(`/events/${ev.id}/registrations.xlsx`).set(auth(userToken))).status, 403);
+
+  // Entrée libre : pas d'inscription possible
+  const libre = (await request(app).post('/events').set(auth(adminToken)).send({ title: 'Culte en plein air', startsAt: inDays(5), registrationMode: 'none', capacity: 50, isPublished: true })).body;
+  assert.equal(libre.capacity, null, 'pas de capacité sans inscription');
+  assert.equal((await request(app).post(`/events/${libre.id}/registrations`).send({ name: 'Ruth K', phone: '+243970111001' })).status, 400);
+
+  // Non publié : invisible et fermé
+  const brouillon = (await request(app).post('/events').set(auth(adminToken)).send({ title: 'Brouillon', startsAt: inDays(3), registrationMode: 'required' })).body;
+  assert.ok(!(await request(app).get('/events')).body.some((e) => e.id === brouillon.id));
+  assert.equal((await request(app).post(`/events/${brouillon.id}/registrations`).send({ name: 'Ruth K', phone: '+243970111009' })).status, 404);
+
+  // Cohérence des dates
+  const incoherent = await request(app).post('/events').set(auth(adminToken)).send({ title: 'Mauvaises dates', startsAt: inDays(3), endsAt: inDays(2), registrationMode: 'none' });
+  assert.equal(incoherent.status, 400);
+  // Un nom saisi comme une formule reste du texte dans l'export
+  const piege = (await request(app).post('/events').set(auth(adminToken)).send({ title: 'Formules', startsAt: inDays(4), registrationMode: 'required', isPublished: true })).body;
+  await request(app).post(`/events/${piege.id}/registrations`).send({ name: '=HYPERLINK("http://x")', phone: '+243970111077' }).expect(201);
+  const xf = await request(app).get(`/events/${piege.id}/registrations.xlsx`).set(auth(adminToken)).buffer().parse(binaryParser);
+  const cellNom = (await readXlsx(xf.body)).getCell('B8');
+  assert.equal(cellNom.value, '=HYPERLINK("http://x")');
+  assert.equal(cellNom.formula, undefined, 'jamais une formule');
+
+  assert.equal((await request(app).post('/events').set(auth(adminToken)).send({ title: 'Image externe', startsAt: inDays(3), registrationMode: 'none', imageUrl: 'https://pirate.example/x.jpg' })).status, 400);
+
+  await request(app).delete(`/events/${ev.id}`).set(auth(adminToken)).expect(200);
+});
+
+test('exports Excel de la gestion : membres, dons, visiteurs, Man Kids', async () => {
+  for (const [url, title] of [
+    ['/users/export.xlsx', 'Membres inscrits sur le site'],
+    ['/payments?format=xlsx&purpose=donation', 'Dons en ligne'],
+    ['/visits/export.xlsx', 'Premières visites annoncées'],
+    ['/kids-registrations/export.xlsx', 'Man Kids : inscriptions'],
+  ]) {
+    const res = await request(app).get(url).set(auth(adminToken)).buffer().parse(binaryParser);
+    assert.equal(res.status, 200, url);
+    const ws = await readXlsx(res.body);
+    assert.equal(ws.getCell('A2').value, title, url);
+    assert.equal(ws.getCell('A1').value, "MAISON D'ADORATION POUR LES NATIONS");
+    assert.equal((await request(app).get(url).set(auth(userToken))).status, 403, url);
+  }
+});

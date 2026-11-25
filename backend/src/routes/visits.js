@@ -7,6 +7,7 @@ const config = require('../config');
 const { optionalAuth, requireAdmin } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
 const { asyncHandler, HttpError } = require('../utils/http-error');
+const { sendWorkbook } = require('../services/excel');
 
 const router = express.Router();
 
@@ -85,6 +86,34 @@ router.delete(
     const r = await db.query('DELETE FROM visits WHERE id = $1', [req.params.id]);
     if (r.rowCount === 0) throw HttpError.notFound('Visite introuvable');
     res.json({ ok: true });
+  }),
+);
+
+const DAY_FR = { mer: 'Mercredi, 16h30', ven: 'Vendredi, 16h30', dim: 'Dimanche, 8h30' };
+const VISIT_FR = { new: 'À accueillir', welcomed: 'Accueilli', archived: 'Archivé' };
+router.get(
+  '/export.xlsx',
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { rows } = await db.query('SELECT * FROM visits ORDER BY created_at DESC LIMIT 5000');
+    await sendWorkbook(res, `visiteurs-${new Date().toISOString().slice(0, 10)}.xlsx`, {
+      sheet: 'Visiteurs',
+      title: 'Premières visites annoncées',
+      subtitle: "Demandes envoyées depuis l'accueil du site",
+      summary: [
+        { label: 'À accueillir', value: rows.filter((r) => r.status === 'new').length },
+        { label: 'Accueillis', value: rows.filter((r) => r.status === 'welcomed').length },
+        { label: 'Total', value: rows.length },
+      ],
+      columns: [
+        { header: 'Prénom', key: 'name', width: 26 },
+        { header: 'Téléphone', key: 'phone', width: 18 },
+        { header: 'Vient', key: 'day', width: 20 },
+        { header: 'Suivi', key: 'status', width: 15 },
+        { header: 'Annoncé le', key: 'created_at', width: 18, type: 'datetime' },
+      ],
+      rows: rows.map((r) => ({ ...r, day: DAY_FR[r.day], status: VISIT_FR[r.status] })),
+    });
   }),
 );
 

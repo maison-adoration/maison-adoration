@@ -6,6 +6,7 @@ const config = require('../config');
 const crypto = require('crypto');
 const { requireAuth, requireAdmin, requireSuperAdmin, ROLE_LEVEL, signToken } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
+const { sendWorkbook } = require('../services/excel');
 const { asyncHandler, HttpError } = require('../utils/http-error');
 const { userOut } = require('../utils/serializers');
 
@@ -45,6 +46,48 @@ router.get(
       [role ?? null, like, config.pageSize, (page - 1) * config.pageSize],
     );
     res.json(rows.map(userOut));
+  }),
+);
+
+/* Export Excel des inscrits (gestion de l'église) */
+const ROLE_FR = { user: 'Membre', media: 'Équipe média', admin: 'Administrateur', 'super-admin': 'Super-administrateur' };
+router.get(
+  '/export.xlsx',
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { rows } = await db.query(
+      `SELECT u.created_at, u.name, u.email, u.tel, u.country, u.role, u.email_opt_in, u.sms_opt_in,
+              (SELECT count(*) FROM enrollments e WHERE e.user_id = u.id)::int AS contents
+       FROM users u ORDER BY u.name`,
+    );
+    const since = new Date(Date.now() - 30 * 24 * 3600 * 1000);
+    await sendWorkbook(res, `membres-man-${new Date().toISOString().slice(0, 10)}.xlsx`, {
+      sheet: 'Membres',
+      title: 'Membres inscrits sur le site',
+      subtitle: 'Comptes créés sur maison-adoration (classés par nom)',
+      summary: [
+        { label: 'Comptes', value: rows.length },
+        { label: 'Nouveaux (30 derniers jours)', value: rows.filter((r) => r.created_at >= since).length },
+        { label: 'Avec au moins une ressource', value: rows.filter((r) => r.contents > 0).length },
+        { label: 'Équipe', value: rows.filter((r) => r.role !== 'user').length },
+      ],
+      columns: [
+        { header: 'Nom', key: 'name', width: 28 },
+        { header: 'E-mail', key: 'email', width: 30 },
+        { header: 'Téléphone', key: 'tel', width: 17 },
+        { header: 'Pays', key: 'country', width: 22 },
+        { header: 'Rôle', key: 'role', width: 18 },
+        { header: 'Ressources', key: 'contents', width: 11, type: 'number' },
+        { header: 'Annonces', key: 'optin', width: 16 },
+        { header: 'Inscrit le', key: 'created_at', width: 13, type: 'date' },
+      ],
+      rows: rows.map((r) => ({
+        ...r,
+        role: ROLE_FR[r.role],
+        country: r.country === 'Democratic Republic of the Congo' ? 'RD Congo' : r.country,
+        optin: [r.email_opt_in && 'E-mail', r.sms_opt_in && 'SMS'].filter(Boolean).join(' + ') || 'Aucune',
+      })),
+    });
   }),
 );
 

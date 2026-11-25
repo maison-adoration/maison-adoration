@@ -11,7 +11,7 @@
   import { setToken } from "../../utils/api";
 
   // Pages qui commencent par une grande photo sombre : la barre peut y être transparente.
-  const DARK_TOP = ["/", "/maison", "/ministeres", "/extensions", "/mediatheque", "/live", "/donate", "/login", "/register", "/mot-de-passe", "/mes-contenus", "/profile", "/privacy"];
+  const DARK_TOP = ["/", "/maison", "/ministeres", "/extensions", "/mediatheque", "/live", "/donate", "/evenements", "/login", "/register", "/mot-de-passe", "/mes-contenus", "/profile", "/privacy"];
 
   let scrollY = 0;
   let menuOpen = false;
@@ -39,6 +39,7 @@
     { href: "/", label: "Accueil" },
     { href: "/maison", label: "À propos" },
     { href: "/#programme", label: "Programme" },
+    { href: "/evenements", label: "Événements" },
     { href: "/ministeres", label: "Ministères" },
     { href: "/extensions", label: "Extensions" },
     { href: "/mediatheque", label: "Médiathèque" },
@@ -105,7 +106,7 @@
       <span class="font-slab font-bold text-[22px] tracking-[.03em]">M.A.N</span>
     </a>
 
-    <nav aria-label="Navigation principale" class="hidden lg:flex items-center gap-4 xl:gap-6 text-[14px] xl:text-[15px] font-semibold whitespace-nowrap">
+    <nav aria-label="Navigation principale" class="hidden lg:flex items-center gap-3.5 xl:gap-4 2xl:gap-6 text-[14px] 2xl:text-[15px] font-semibold whitespace-nowrap">
       {#each LINKS as l}
         <a href={l.href} class="nav-u text-man-texte hover:text-white inline-flex items-center gap-1.5" aria-current={current(l.href)}>
           {#if l.href === "/live" && live}<span class="man-live w-2 h-2 rounded-full bg-man-lumiere" aria-hidden="true"></span>{/if}{l.label}{#if l.href === "/live" && live}<span class="sr-only"> (en cours)</span>{/if}
@@ -115,9 +116,9 @@
 
     <div class="flex items-center gap-2">
       {#if user}
-        <a href="/mes-contenus" class="hidden md:inline-flex lg:hidden xl:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-man-texte hover:text-white">Mon espace</a>
+        <a href="/mes-contenus" class="hidden md:inline-flex lg:hidden 2xl:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-man-texte hover:text-white whitespace-nowrap">Mon espace</a>
       {:else}
-        <a href="/login" class="hidden md:inline-flex lg:hidden xl:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-man-texte hover:text-white">Connexion</a>
+        <a href="/login" class="hidden md:inline-flex lg:hidden 2xl:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-man-texte hover:text-white whitespace-nowrap">Connexion</a>
       {/if}
       <a href="/#don" class="hidden md:inline-flex btn-ghost !min-h-[44px] !px-5 text-sm">Donner</a>
       <button

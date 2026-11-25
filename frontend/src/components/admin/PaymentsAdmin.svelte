@@ -35,10 +35,10 @@
   const exportCsv = async () => {
     exporting = true;
     try {
-      const res = await api.get("/payments", { params: { ...params(), format: "csv" }, responseType: "blob" });
+      const res = await api.get("/payments", { params: { ...params(), format: "xlsx" }, responseType: "blob" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(res.data);
-      link.download = `paiements-man-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.download = `${purpose === "donation" ? "dons" : purpose === "content" ? "achats" : "dons-et-paiements"}-${new Date().toISOString().slice(0, 10)}.xlsx`;
       link.click();
       URL.revokeObjectURL(link.href);
     } catch (err) {
@@ -71,7 +71,7 @@
 </div>
 <div class="flex flex-wrap gap-2 mb-4">
   <button class="btn btn-secondary" on:click={load}>Rechercher</button>
-  <button class="btn btn-aurora" on:click={exportCsv} disabled={exporting}>{exporting ? "Préparation..." : "Exporter (Excel)"}</button>
+  <button class="btn btn-aurora" on:click={exportCsv} disabled={exporting}>{exporting ? "Préparation..." : "Exporter en Excel"}</button>
 </div>
 
 {#if data == null}

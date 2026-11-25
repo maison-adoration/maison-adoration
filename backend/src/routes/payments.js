@@ -16,6 +16,7 @@ const config = require('../config');
 const { requireAuth, requireAdmin, optionalAuth } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
 const { asyncHandler, HttpError } = require('../utils/http-error');
+const { sendWorkbook } = require('../services/excel');
 const { paymentOut } = require('../utils/serializers');
 const flexpay = require('../services/flexpay');
 
@@ -215,7 +216,7 @@ const listQuery = z.object({
   search: z.string().trim().max(100).default(''),
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  format: z.enum(['json', 'csv']).default('json'),
+  format: z.enum(['json', 'csv', 'xlsx']).default('json'),
 });
 
 router.get(
@@ -267,6 +268,44 @@ router.get(
        ${where} GROUP BY p.currency`,
       params,
     );
+    if (q.format === 'xlsx') {
+      const STATUS = { pending: 'En attente', success: 'Réussi', failed: 'Échoué' };
+      const donations = q.purpose === 'donation';
+      const title = donations ? 'Dons en ligne' : q.purpose === 'content' ? 'Achats de ressources' : 'Dons et paiements';
+      const d = (x) => new Date(`${x}T12:00:00Z`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      const period = q.from && q.to ? `Du ${d(q.from)} au ${d(q.to)}` : q.from ? `Depuis le ${d(q.from)}` : q.to ? `Jusqu'au ${d(q.to)}` : 'Toutes les dates';
+      const filters = [period, q.status && `statut : ${STATUS[q.status].toLowerCase()}`, q.search && `recherche : « ${q.search} »`].filter(Boolean).join(' — ');
+      const money = (n) => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return sendWorkbook(res, `${title}-${new Date().toISOString().slice(0, 10)}.xlsx`, {
+        sheet: title,
+        title,
+        subtitle: filters,
+        summary: [
+          ...totals.map((t) => ({ label: `Total reçu (${t.currency})`, value: money(t.total) })),
+          { label: 'Réussis', value: totals.reduce((n, t) => n + t.successes, 0) },
+          { label: 'En attente', value: totals.reduce((n, t) => n + t.pending, 0) },
+          { label: 'Échoués', value: totals.reduce((n, t) => n + t.failed, 0) },
+        ],
+        columns: [
+          { header: 'Date', key: 'created_at', width: 17, type: 'datetime' },
+          { header: donations ? 'Donateur' : 'Nom', key: 'payer_name', width: 26 },
+          { header: donations ? 'Type de don' : 'Contenu ou don', key: 'content_title', width: 30 },
+          { header: 'Montant', key: 'amount', width: 12, type: 'money' },
+          { header: 'Devise', key: 'currency', width: 8 },
+          { header: 'Statut', key: 'status', width: 12 },
+          { header: 'Téléphone', key: 'phone', width: 16 },
+          { header: 'E-mail', key: 'payer_email', width: 26 },
+          { header: 'Référence', key: 'reference', width: 24 },
+        ],
+        rows: rows.map((r) => ({
+          ...r,
+          amount: Number(r.amount),
+          status: STATUS[r.status],
+          payer_name: r.payer_name || (r.donation_kind ? 'Anonyme' : ''),
+          content_title: r.content_title ? r.content_title.replace(/^Don : /, donations ? '' : 'Don : ').replace(/^./, (c) => c.toUpperCase()) : '',
+        })),
+      });
+    }
     res.json({ payments: rows, totals });
   }),
 );

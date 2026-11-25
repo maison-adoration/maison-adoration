@@ -6,6 +6,7 @@ const db = require('../db');
 const config = require('../config');
 const { optionalAuth, requireAdmin } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
+const { sendWorkbook } = require('../services/excel');
 const { asyncHandler, HttpError } = require('../utils/http-error');
 
 const router = express.Router();
@@ -103,6 +104,37 @@ router.delete(
     const result = await db.query('DELETE FROM kids_registrations WHERE id = $1', [req.params.id]);
     if (result.rowCount === 0) throw HttpError.notFound('Inscription introuvable');
     res.json({ ok: true });
+  }),
+);
+
+const KIDS_FR = { new: 'Nouvelle', contacted: 'Parent contacté', enrolled: 'Inscrit', archived: 'Archivée' };
+router.get(
+  '/export.xlsx',
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const { rows } = await db.query("SELECT * FROM kids_registrations WHERE status <> 'archived' ORDER BY child_age, child_name");
+    const ages = rows.map((r) => r.child_age);
+    await sendWorkbook(res, `man-kids-${new Date().toISOString().slice(0, 10)}.xlsx`, {
+      sheet: 'Man Kids',
+      title: 'Man Kids : inscriptions',
+      subtitle: "Enfants inscrits par leurs parents (classés par âge)",
+      summary: [
+        { label: 'Enfants', value: rows.length },
+        { label: 'Nouvelles demandes', value: rows.filter((r) => r.status === 'new').length },
+        ...(ages.length ? [{ label: 'Âges', value: `${Math.min(...ages)} à ${Math.max(...ages)} ans` }] : []),
+      ],
+      columns: [
+        { header: 'Enfant', key: 'child_name', width: 22 },
+        { header: 'Âge', key: 'child_age', width: 7, type: 'number' },
+        { header: 'Parent', key: 'parent_name', width: 24 },
+        { header: 'Téléphone', key: 'parent_phone', width: 17 },
+        { header: 'E-mail', key: 'parent_email', width: 26 },
+        { header: 'Informations utiles', key: 'notes', width: 34 },
+        { header: 'Suivi', key: 'status', width: 15 },
+        { header: 'Demande du', key: 'created_at', width: 13, type: 'date' },
+      ],
+      rows: rows.map((r) => ({ ...r, status: KIDS_FR[r.status] })),
+    });
   }),
 );
 

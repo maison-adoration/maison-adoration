@@ -2,6 +2,7 @@
   // Vue d'ensemble de la gestion : ce qui attend une action, et les dons du mois.
   import { createEventDispatcher, onMount } from "svelte";
   import api from "../../utils/api";
+  import { when } from "../../utils/events";
 
   const dispatch = createEventDispatcher();
   const DAY = { mer: "mercredi", ven: "vendredi", dim: "dimanche" };
@@ -9,6 +10,7 @@
   let visits = null;
   let kids = null;
   let pay = null;
+  let nextEvent = undefined;
   let failed = false;
 
   const monthStart = () => {
@@ -20,11 +22,13 @@
 
   onMount(async () => {
     try {
-      const [v, k, d] = await Promise.all([
+      const [v, k, d, ev] = await Promise.all([
         api.get("/visits", { params: { status: "new" } }),
         api.get("/kids-registrations", { params: { status: "new" } }),
         api.get("/payments", { params: { purpose: "donation", from: monthStart() } }),
+        api.get("/events/admin/all"),
       ]);
+      nextEvent = ev.data.find((e) => new Date(e.endsAt || e.startsAt) >= new Date()) || null;
       visits = v.data;
       kids = k.data;
       pay = d.data;
@@ -40,11 +44,28 @@
     <p class="text-man-nuit">La vue d'ensemble n'a pas pu être chargée. Vérifiez la connexion, puis rechargez la page.</p>
   </div>
 {:else if visits === null}
-  <div class="grid md:grid-cols-3 gap-5" aria-busy="true" aria-label="Chargement">
-    {#each [0, 1, 2] as _}<div class="h-[220px] rounded-[22px] bg-white animate-pulse"></div>{/each}
+  <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5" aria-busy="true" aria-label="Chargement">
+    {#each [0, 1, 2, 3] as _}<div class="h-[220px] rounded-[22px] bg-white animate-pulse"></div>{/each}
   </div>
 {:else}
-  <div class="grid md:grid-cols-3 gap-5">
+  <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+    <section class="rounded-[22px] bg-white p-6 flex flex-col" aria-labelledby="ov-event">
+      <h2 id="ov-event" class="font-bold text-man-marine">Prochain événement</h2>
+      {#if nextEvent}
+        <p class="font-slab font-bold text-[24px] leading-tight text-man-nuit mt-2">{nextEvent.title}</p>
+        <p class="text-[15px] text-[#2B3F5C] mt-1 first-letter:uppercase">{when(nextEvent)}</p>
+        <p class="text-[15px] text-[#2B3F5C] mt-3">
+          {#if nextEvent.registrationMode === "required"}
+            <strong class="text-man-nuit">{nextEvent.seatsTaken}</strong> personne{nextEvent.seatsTaken > 1 ? "s" : ""} inscrite{nextEvent.seatsTaken > 1 ? "s" : ""}{nextEvent.capacity ? ` sur ${nextEvent.capacity}` : ""}
+          {:else}Entrée libre{/if}
+          {#if !nextEvent.isPublished}<span class="block text-[#7A5600] font-bold">Brouillon, pas encore publié</span>{/if}
+        </p>
+      {:else}
+        <p class="text-[15px] text-[#2B3F5C] mt-2">Aucun événement à venir.</p>
+      {/if}
+      <button type="button" class="btn-line mt-auto self-start !min-h-[44px] pt-0" on:click={() => dispatch("go", "events")}>{nextEvent ? "Gérer les événements" : "Créer un événement"}</button>
+    </section>
+
     <section class="rounded-[22px] bg-white p-6 flex flex-col" aria-labelledby="ov-visits">
       <h2 id="ov-visits" class="font-bold text-man-marine">Visiteurs à accueillir</h2>
       <p class="font-slab font-bold text-[44px] leading-none text-man-nuit mt-2">{visits.length}</p>

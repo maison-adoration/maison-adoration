@@ -50,6 +50,7 @@ app.use('/kids-registrations', require('./routes/kids'));
 app.use('/media', require('./routes/media'));
 app.use('/visits', require('./routes/visits'));
 app.use('/system', require('./routes/system'));
+app.use('/events', require('./routes/events'));
 
 app.use(notFound);
 app.use(errorHandler);

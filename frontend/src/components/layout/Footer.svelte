@@ -26,6 +26,7 @@
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/">Accueil</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/maison">À propos</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/#programme">Programme</a>
+      <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/evenements">Événements</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/ministeres">Ministères</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/extensions">Extensions</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/mediatheque">Médiathèque et direct</a>
