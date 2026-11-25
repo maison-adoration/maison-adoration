@@ -31,9 +31,9 @@
   <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
     {#each cards as c}
       <div class="bg-white rounded-xl border border-gray-200 px-4 py-3">
-        <div class="text-xs uppercase tracking-wider text-gray-500">{c.label}</div>
+        <div class="text-xs uppercase tracking-wider text-gray-600">{c.label}</div>
         <div class="text-3xl text-brand-primary h-font">{c.value}</div>
-        {#if c.sub}<div class="text-xs text-gray-500">{c.sub}</div>{/if}
+        {#if c.sub}<div class="text-xs text-gray-600">{c.sub}</div>{/if}
       </div>
     {/each}
   </div>
@@ -46,17 +46,17 @@
     <div>
       <div class="font-bold text-gray-700 mb-2">Derniers sermons</div>
       {#each data.recentSermons as s}
-        <div class="text-sm py-1 border-b border-gray-200">{s.title} <span class="text-gray-500">· {formatDate(s.sermon_date)}</span></div>
-      {:else}<div class="text-sm text-gray-500">Aucun sermon.</div>{/each}
+        <div class="text-sm py-1 border-b border-gray-200">{s.title} <span class="text-gray-600">· {formatDate(s.sermon_date)}</span></div>
+      {:else}<div class="text-sm text-gray-600">Aucun sermon.</div>{/each}
     </div>
     <div>
       <div class="font-bold text-gray-700 mb-2">Directs à venir</div>
       {#each data.upcomingStreams as s}
         <div class="text-sm py-1 border-b border-gray-200">
           {#if s.is_live}<span class="text-red-600 font-bold">● EN DIRECT</span>{/if}
-          {s.title} <span class="text-gray-500">· {formatDate(s.scheduled_at, true)}</span>
+          {s.title} <span class="text-gray-600">· {formatDate(s.scheduled_at, true)}</span>
         </div>
-      {:else}<div class="text-sm text-gray-500">Aucun direct programmé.</div>{/each}
+      {:else}<div class="text-sm text-gray-600">Aucun direct programmé.</div>{/each}
     </div>
   </div>
 {/if}

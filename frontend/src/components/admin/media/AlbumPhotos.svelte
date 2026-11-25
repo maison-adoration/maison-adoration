@@ -89,7 +89,7 @@
           </div>
         </div>
       {:else}
-        <p class="col-span-full text-gray-500">Aucune photo. Ajoutez-en avec le bouton ci-dessus.</p>
+        <p class="col-span-full text-gray-600">Aucune photo. Ajoutez-en avec le bouton ci-dessus.</p>
       {/each}
     </div>
   {/if}

@@ -147,17 +147,17 @@
 {#if editing}
   <form on:submit|preventDefault={save} class="grid grid-cols-1 gap-3 bg-white rounded-xl border border-gray-200 p-4">
     <div class="h-font text-2xl text-brand-primary">{editing.id ? "Modifier la section" : "Nouvelle section"}</div>
-    <label class="text-sm text-gray-500" for="sec-title">Titre *</label>
+    <label class="text-sm text-gray-600" for="sec-title">Titre *</label>
     <input id="sec-title" bind:value={editing.title} maxlength="150" />
     {#if !editing.id}
-      <div class="text-xs text-gray-500">Identifiant (adresse) : <code>{editing.slug || "…"}</code></div>
+      <div class="text-xs text-gray-600">Identifiant (adresse) : <code>{editing.slug || "…"}</code></div>
     {/if}
-    <label class="text-sm text-gray-500" for="sec-sub">Sous-titre</label>
+    <label class="text-sm text-gray-600" for="sec-sub">Sous-titre</label>
     <input id="sec-sub" bind:value={editing.subtitle} maxlength="200" />
-    <label class="text-sm text-gray-500" for="sec-body">Texte (les retours à la ligne sont conservés)</label>
+    <label class="text-sm text-gray-600" for="sec-body">Texte (les retours à la ligne sont conservés)</label>
     <textarea id="sec-body" bind:value={editing.body} rows="10" maxlength="20000"></textarea>
 
-    <div class="text-sm text-gray-500">Informations pratiques (adresse, numéro de compte, horaires…)</div>
+    <div class="text-sm text-gray-600">Informations pratiques (adresse, numéro de compte, horaires…)</div>
     {#each editing.details as d, i}
       <div class="grid grid-cols-5 gap-2">
         <input class="col-span-2" bind:value={d.label} placeholder="Libellé (ex. Adresse)" maxlength="80" />
@@ -170,14 +170,14 @@
     <button type="button" class="btn btn-aurora" on:click={() => (editing.details = [...editing.details, { label: "", value: "" }])}>
       + Ajouter une information
     </button>
-    <p class="text-xs text-gray-500">Les informations sans valeur ne sont pas affichées aux visiteurs.</p>
+    <p class="text-xs text-gray-600">Les informations sans valeur ne sont pas affichées aux visiteurs.</p>
 
     <div class="grid grid-cols-2 gap-3 items-center">
       <label class="flex items-center gap-2">
         <input type="checkbox" bind:checked={editing.published} />
         Publiée (visible sur le site)
       </label>
-      <label class="flex items-center gap-2 text-sm text-gray-500">
+      <label class="flex items-center gap-2 text-sm text-gray-600">
         Ordre
         <input type="number" bind:value={editing.position} min="0" class="w-24" />
       </label>
@@ -197,7 +197,7 @@
         {/if}
       </div>
     {:else}
-      <p class="text-xs text-gray-500">L'image pourra être ajoutée après l'enregistrement.</p>
+      <p class="text-xs text-gray-600">L'image pourra être ajoutée après l'enregistrement.</p>
     {/if}
 
     <div class="flex gap-3">
@@ -214,7 +214,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center gap-2 bg-white rounded-lg border border-gray-200 px-3 py-2">
         <div class="flex-1">
           <div class="font-bold text-gray-800">{s.title}</div>
-          <div class="text-xs" class:text-green-700={s.published} class:text-orange-600={!s.published}>
+          <div class="text-xs" class:text-green-700={s.published} class:text-orange-700={!s.published}>
             {s.published ? "Publiée" : "Brouillon — non visible"}
             {#if !s.body && !(s.details || []).some((d) => d.value)} · à compléter{/if}
           </div>

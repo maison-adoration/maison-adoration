@@ -123,7 +123,7 @@
       {#if f.type === "checkbox"}
         <label class="flex items-center gap-2"><input type="checkbox" bind:checked={editing.values[f.key]} /> {f.label}</label>
       {:else}
-        <label class="text-sm text-gray-500" for="mf-{f.key}">{f.label}{f.required ? " *" : ""}</label>
+        <label class="text-sm text-gray-600" for="mf-{f.key}">{f.label}{f.required ? " *" : ""}</label>
         {#if f.type === "textarea"}
           <textarea id="mf-{f.key}" rows={f.rows || 6} bind:value={editing.values[f.key]}></textarea>
         {:else if f.type === "select"}
@@ -150,7 +150,7 @@
         {:else}
           <input id="mf-{f.key}" type="text" bind:value={editing.values[f.key]} placeholder={f.placeholder || ""} />
         {/if}
-        {#if f.help}<div class="text-xs text-gray-500 -mt-2">{f.help}</div>{/if}
+        {#if f.help}<div class="text-xs text-gray-600 -mt-2">{f.help}</div>{/if}
       {/if}
     {/each}
     <div class="flex gap-3">
@@ -170,9 +170,9 @@
         {#if itemImage(it)}<img src={cdn(itemImage(it), 120)} alt="" class="w-20 h-12 rounded object-cover" loading="lazy" />{/if}
         <div class="flex-1">
           <div class="font-bold text-gray-800">{itemTitle(it)}</div>
-          <div class="text-xs text-gray-500">
+          <div class="text-xs text-gray-600">
             {#if publishable}
-              <span class:text-green-700={it.is_published} class:text-orange-600={!it.is_published}>
+              <span class:text-green-700={it.is_published} class:text-orange-700={!it.is_published}>
                 {it.is_published ? "Publié" : "Brouillon"}
               </span> ·
             {/if}

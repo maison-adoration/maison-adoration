@@ -222,7 +222,11 @@ router.delete(
   asyncHandler(async (req, res) => {
     const target = await findUser(req.params.id);
     if (target.role === 'super-admin') throw HttpError.forbidden('Un super-admin ne peut pas être supprimé');
-    if (!canManage(req.user, target)) throw HttpError.forbidden('Vous ne pouvez pas supprimer ce compte');
+    // Chacun peut supprimer son propre compte ; supprimer le compte d'un autre relève
+    // de l'administration du système (super-admin uniquement).
+    if (target.id !== req.user.id && req.user.role !== 'super-admin') {
+      throw HttpError.forbidden("Seule l'administration du système peut supprimer un compte");
+    }
     await db.query('DELETE FROM users WHERE id = $1', [target.id]);
     res.json({ ok: true });
   }),

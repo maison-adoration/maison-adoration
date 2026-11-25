@@ -297,11 +297,35 @@ test('supprimer un compte garde son historique de paiement', async () => {
   assert.equal(rows[0].status, 'success');
 });
 
-test('suppression de comptes : règles de rôles', async () => {
+test('suppression de comptes : réservée à l\'administration du système', async () => {
   assert.equal((await request(app).delete(`/users/${user2.id}`).set(auth(userToken))).status, 403);
+  // Un administrateur de l'église ne supprime pas de comptes
+  await request(app).post('/auth/register').send({ email: 'gestion@man.test', name: 'Gestion', password: 'motdepasse-gestion' });
+  await db.query("UPDATE users SET role = 'admin' WHERE email = 'gestion@man.test'");
+  const churchToken = (await request(app).post('/auth/login').send({ email: 'gestion@man.test', password: 'motdepasse-gestion' })).body.token;
+  assert.equal((await request(app).delete(`/users/${user2.id}`).set(auth(churchToken))).status, 403);
+  // … mais garde la gestion des membres (liste) et n'a pas accès à l'état du système
+  assert.equal((await request(app).get('/users').set(auth(churchToken))).status, 200);
+  assert.equal((await request(app).get('/system/status').set(auth(churchToken))).status, 403);
   const { rows } = await db.query("SELECT id FROM users WHERE role = 'super-admin'");
   assert.equal((await request(app).delete(`/users/${rows[0].id}`).set(auth(adminToken))).status, 403);
   assert.equal((await request(app).delete(`/users/${user2.id}`).set(auth(adminToken))).status, 200);
+  const { rows: g } = await db.query("SELECT id FROM users WHERE email = 'gestion@man.test'");
+  assert.equal((await request(app).delete(`/users/${g[0].id}`).set(auth(adminToken))).status, 200);
+});
+
+test('état du système : indicateurs seulement, aucun secret', async () => {
+  const res = await request(app).get('/system/status').set(auth(adminToken)).expect(200);
+  assert.ok(Array.isArray(res.body.services));
+  const db_ = res.body.services.find((s) => s.key === 'database');
+  assert.equal(db_.enabled, true);
+  for (const s of res.body.services) {
+    assert.equal(typeof s.enabled, 'boolean');
+    assert.ok(s.settings.every((n) => /^[A-Z_]+$/.test(n)), 'seulement des noms de réglages');
+  }
+  const text = JSON.stringify(res.body);
+  assert.ok(!/postgres(ql)?:\/\//.test(text), "pas d'adresse de base de données");
+  assert.equal((await request(app).get('/system/status')).status, 401);
 });
 
 test('don en ligne sans compte : jeton de suivi, montant contrôlé, visible par les admins', async () => {

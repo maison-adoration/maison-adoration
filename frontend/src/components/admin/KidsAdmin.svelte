@@ -78,7 +78,7 @@
         <div><a class="underline" href="tel:{r.parentPhone}">{r.parentPhone}</a>
           {#if r.parentEmail} · <a class="underline" href="mailto:{r.parentEmail}">{r.parentEmail}</a>{/if}</div>
         {#if r.notes}<div class="text-gray-600 whitespace-pre-line">📝 {r.notes}</div>{/if}
-        <div class="text-xs text-gray-500">Reçue le {new Date(r.createdAt).toLocaleDateString("fr-FR")}</div>
+        <div class="text-xs text-gray-600">Reçue le {new Date(r.createdAt).toLocaleDateString("fr-FR")}</div>
         <div class="flex flex-wrap gap-2 mt-1">
           {#if r.status != "contacted"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => setStatus(r, "contacted")}>Contacté</button>{/if}
           {#if r.status != "enrolled"}<button class="btn btn-secondary !py-1 !text-xs" on:click={() => setStatus(r, "enrolled")}>Inscrit</button>{/if}

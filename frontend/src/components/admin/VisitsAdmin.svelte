@@ -78,7 +78,7 @@
         {#if v.phone}
           <div><a class="underline" href="tel:{v.phone}">{v.phone}</a> · <a class="underline" href={wa(v.phone)} target="_blank" rel="noopener">WhatsApp</a></div>
         {/if}
-        <div class="text-xs text-gray-500">Annoncée le {new Date(v.createdAt).toLocaleDateString("fr-FR")}</div>
+        <div class="text-xs text-gray-600">Annoncée le {new Date(v.createdAt).toLocaleDateString("fr-FR")}</div>
         <div class="flex flex-wrap gap-2 mt-1">
           {#if v.status != "welcomed"}<button class="btn btn-secondary !py-1 !text-xs" on:click={() => setStatus(v, "welcomed")}>Accueillie</button>{/if}
           {#if v.status != "archived"}<button class="btn btn-aurora !py-1 !text-xs" on:click={() => setStatus(v, "archived")}>Archiver</button>{/if}

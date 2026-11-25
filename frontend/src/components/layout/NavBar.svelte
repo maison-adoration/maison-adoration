@@ -191,7 +191,10 @@
         <a href="/mes-contenus" on:click={closeMenu} class="rounded-2xl bg-man-nuit3 px-4 min-h-[52px] flex items-center">Mes contenus</a>
         <a href="/profile" on:click={closeMenu} class="rounded-2xl bg-man-nuit3 px-4 min-h-[52px] flex items-center">Mon profil</a>
         {#if isStaff}
-          <a href="/adm" on:click={closeMenu} class="rounded-2xl bg-man-nuit3 px-4 min-h-[52px] flex items-center">Administration</a>
+          <a href="/adm" on:click={closeMenu} class="rounded-2xl bg-man-nuit3 px-4 min-h-[52px] flex items-center">{get($config, "currentUser.role") === "media" ? "Médiathèque (équipe)" : "Gestion de l'église"}</a>
+        {/if}
+        {#if get($config, "currentUser.role") === "super-admin"}
+          <a href="/systeme" on:click={closeMenu} class="rounded-2xl bg-man-nuit3 px-4 min-h-[52px] flex items-center">Administration du système</a>
         {/if}
         <button type="button" on:click={handleLogout} class="rounded-2xl bg-man-nuit3 px-4 min-h-[52px] flex items-center text-left">Se déconnecter</button>
       {:else}
