@@ -39,6 +39,8 @@ const schema = z.object({
   FLEXPAY_CHECK_URL: z.string().url().optional(),
   // URL publique de ce serveur, à laquelle FlexPay envoie sa confirmation
   API_PUBLIC_URL: z.string().url().optional(),
+  // Import YouTube : date et durée automatiques (sinon titre et miniature seulement)
+  YOUTUBE_API_KEY: z.string().optional(),
 
   // E-mail (SMTP : Gmail avec mot de passe d'application, ou autre)
   SMTP_HOST: z.string().optional(),
@@ -79,6 +81,8 @@ module.exports = {
   jwt: { secret: env.JWT_SECRET, expiresIn: env.JWT_EXPIRES_IN },
   corsOrigins: env.CORS_ORIGINS.split(',').map((s) => s.trim()).filter(Boolean),
   siteUrl: env.SITE_URL.replace(/\/$/, ''),
+  apiPublicUrl: env.API_PUBLIC_URL ? env.API_PUBLIC_URL.replace(/\/$/, '') : null,
+  youtube: { apiKey: env.YOUTUBE_API_KEY || null, enabled: Boolean(env.YOUTUBE_API_KEY) },
   currency: env.CURRENCY,
   pageSize: env.PAGE_SIZE,
   cloudinary: {

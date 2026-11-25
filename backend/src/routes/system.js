@@ -41,6 +41,7 @@ router.get(
         { key: 'email', label: 'E-mails (mot de passe oublié, annonces)', enabled: config.smtp.enabled, settings: ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM'] },
         { key: 'sms', label: 'SMS (Twilio)', enabled: config.twilio.enabled, settings: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_MESSAGING_SERVICE_SID'] },
         { key: 'push', label: 'Notifications sur les appareils', enabled: config.vapid.enabled, settings: ['VAPID_PUBLIC_KEY', 'VAPID_PRIVATE_KEY', 'VAPID_SUBJECT'] },
+        { key: 'youtube', label: 'YouTube (import des vidéos et durées)', enabled: config.youtube.enabled, detail: config.youtube.enabled ? null : 'Sans clé, l\'import récupère seulement le titre et la miniature', settings: ['YOUTUBE_API_KEY'] },
         { key: 'storage', label: 'Stockage des images et fichiers (Cloudinary)', enabled: config.cloudinary.enabled, settings: ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'] },
       ],
     });
