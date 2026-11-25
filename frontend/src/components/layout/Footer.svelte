@@ -31,6 +31,7 @@
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/extensions">Extensions</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/mediatheque">Médiathèque et direct</a>
       <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/donate">Don en ligne</a>
+      <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/priere">Demander la prière</a>
       {#if get($config, "currentUser.id")}
         <a class="min-h-[32px] flex items-center text-man-texte hover:text-white" href="/mes-contenus">Mon espace membre</a>
       {:else}

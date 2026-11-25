@@ -96,7 +96,7 @@
         >
           {#each sermons as s, i}
             <a
-              href="/mediatheque?message={encodeURIComponent(s.id)}"
+              href="/message?m={encodeURIComponent(s.slug || s.id)}"
               on:click={(e) => cardClick(e, i)}
               draggable="false"
               class="rowcard relative flex-none h-[380px] md:h-[440px] rounded-[26px] overflow-hidden"

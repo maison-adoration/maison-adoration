@@ -20,6 +20,8 @@
   const monthName = new Date().toLocaleDateString("fr-FR", { month: "long" });
   const money = (t) => `${Number(t.total).toLocaleString("fr-FR", { maximumFractionDigits: 2 })} ${t.currency}`;
 
+  let prayerNew = 0;
+  let decisionsNew = 0;
   onMount(async () => {
     try {
       const [v, k, d, ev] = await Promise.all([
@@ -33,6 +35,14 @@
       kids = k.data;
       pay = d.data;
       dispatch("counts", { visits: visits.length, kids: kids.length });
+      // Prière : nouvelles demandes et décisions à suivre (badge de l'onglet).
+      Promise.all([api.get("/prayer-requests", { params: { status: "new" } }), api.get("/faith-decisions")])
+        .then(([p, f]) => {
+          prayerNew = p.data.items.length;
+          decisionsNew = f.data.filter((x) => x.status === "new").length;
+          dispatch("counts", { visits: visits.length, kids: kids.length, prayer: prayerNew + decisionsNew });
+        })
+        .catch(() => {});
     } catch {
       failed = true;
     }

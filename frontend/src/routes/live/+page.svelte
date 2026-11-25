@@ -5,6 +5,7 @@
   import PageHero from "../../components/pages/PageHero.svelte";
   import { nextService, splitCountdown } from "../../utils/schedule";
   import VideoEmbed from "../../components/media/VideoEmbed.svelte";
+  import LiveRoom from "../../components/media/LiveRoom.svelte";
   import { formatDate } from "../../components/admin/media/upload";
 
   const TYPE = { culte: "Culte", conference: "Conférence", prayer: "Prière", cours: "Cours" };
@@ -50,6 +51,7 @@
           <p class="inline-flex items-center gap-2 font-extrabold text-[#B3261E] mb-2"><span class="man-live w-2.5 h-2.5 rounded-full bg-[#D93025]" aria-hidden="true"></span>En direct{TYPE[data.live.type] ? `, ${TYPE[data.live.type].toLowerCase()}` : ""}</p>
           <h2 id="t-live" class="font-slab font-bold text-[30px] md:text-[40px] leading-tight text-man-nuit mb-5">{data.live.title}</h2>
           <div class="rounded-[22px] overflow-hidden"><VideoEmbed url={data.live.stream_url} title={data.live.title} /></div>
+          {#key data.live.id}<LiveRoom stream={data.live} />{/key}
           {#if data.live.description}<p class="mt-5 text-[17px] text-[#2B3F5C] whitespace-pre-line">{data.live.description}</p>{/if}
         </section>
       {:else}
@@ -78,7 +80,10 @@
               </div>
             {/if}
             <p class="text-man-doux">La diffusion apparaîtra ici automatiquement, sans recharger la page.</p>
-            <a href="https://www.youtube.com/@mantv6688" target="_blank" rel="noopener" class="btn-ghost self-start mt-1">Revoir les cultes sur MAN TV</a>
+            <div class="flex flex-wrap gap-3 mt-1">
+              <a href="/mediatheque#sermons" class="btn-ghost">Revoir les messages</a>
+              <a href="/priere" class="btn-ghost">Demander la prière</a>
+            </div>
           </div>
           <img src="/images/design/sanctuaire-800.jpg" alt="" class="hidden md:block w-full h-full object-cover opacity-70" loading="lazy" />
         </section>

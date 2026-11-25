@@ -129,6 +129,8 @@ router.get(
       SELECT
         (SELECT count(*) FROM sermons)::int AS "totalSermons",
         (SELECT count(*) FROM sermons WHERE is_published)::int AS "publishedSermons",
+        (SELECT count(*) FROM sermons WHERE is_published AND published_at > now())::int AS "scheduledSermons",
+        (SELECT count(*) FROM sermons WHERE is_published AND coalesce(audio_url, '') = '')::int AS "sermonsWithoutAudio",
         (SELECT coalesce(sum(views_count), 0) FROM sermons)::int AS "totalViews",
         (SELECT count(*) FROM sermons WHERE coalesce(thumbnail_url, '') = ''
             OR (coalesce(video_url, '') = '' AND coalesce(audio_url, '') = ''))::int AS "incompleteSermons",
@@ -350,9 +352,22 @@ lifecycle('/sermons', 'sermons', {
 router.get(
   '/youtube',
   requireMedia,
-  validate({ query: z.object({ url: z.string().trim().min(5).max(500) }) }),
+  validate({ query: z.object({ url: z.string().trim().min(5, 'Collez le lien de la vidéo YouTube').max(500) }) }),
   asyncHandler(async (req, res) => {
     res.json({ ...(await youtube.lookup(req.validQuery.url)), apiKey: config.youtube.enabled });
+  }),
+);
+
+/* Événements proposés pour relier un album ou un appel à l'action pendant le direct. */
+router.get(
+  '/events-options',
+  requireMedia,
+  asyncHandler(async (req, res) => {
+    const { rows } = await db.query(
+      `SELECT id, title, starts_at, registration_mode FROM events
+       WHERE starts_at > now() - interval '1 year' ORDER BY starts_at DESC LIMIT 100`,
+    );
+    res.json(rows);
   }),
 );
 
@@ -1101,7 +1116,7 @@ const respondLimiter = rateLimit({
 
 const publicMoment = (m) => (m ? {
   id: m.id, kind: m.kind, title: m.title, body: m.body, buttonLabel: m.button_label,
-  url: m.kind === 'give' ? m.url || '/#donner' : m.kind === 'event' ? `/evenements?e=${m.event_id}` : m.url,
+  url: m.kind === 'give' ? m.url || '/#don' : m.kind === 'event' ? `/evenements#${m.event_id}` : m.url,
 } : null);
 
 router.get(

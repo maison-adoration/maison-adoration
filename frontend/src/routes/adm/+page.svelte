@@ -9,6 +9,7 @@
   import EventsAdmin from "../../components/admin/EventsAdmin.svelte";
   import VisitsAdmin from "../../components/admin/VisitsAdmin.svelte";
   import KidsAdmin from "../../components/admin/KidsAdmin.svelte";
+  import PrayerAdmin from "../../components/admin/PrayerAdmin.svelte";
   import MediaAdmin from "../../components/admin/media/MediaAdmin.svelte";
   import AsAdmin from "../../components/index/AsAdmin.svelte";
   import SectionsAdmin from "../../components/admin/SectionsAdmin.svelte";
@@ -22,6 +23,7 @@
     { id: "events", label: "Événements", roles: CHURCH },
     { id: "visits", label: "Visiteurs", roles: CHURCH },
     { id: "kids", label: "Man Kids", roles: CHURCH },
+    { id: "prayer", label: "Prière", roles: CHURCH },
     { id: "media", label: "Médiathèque", roles: ["media", ...CHURCH] },
     { id: "contenus", label: "Ressources", roles: CHURCH },
     { id: "pages", label: "Pages du site", roles: CHURCH },
@@ -33,7 +35,7 @@
   let counts = {};
   $: TABS = ALL_TABS.filter((t) => t.roles.includes(role)).map((t) => ({
     ...t,
-    badge: t.id === "visits" ? counts.visits : t.id === "kids" ? counts.kids : 0,
+    badge: t.id === "visits" ? counts.visits : t.id === "kids" ? counts.kids : t.id === "prayer" ? counts.prayer : 0,
   }));
   let tab = (typeof location !== "undefined" && location.hash.slice(1)) || "";
   $: if (TABS.length && !TABS.some((t) => t.id == tab)) tab = TABS[0].id;
@@ -71,6 +73,8 @@
       <VisitsAdmin />
     {:else if tab == "kids"}
       <KidsAdmin />
+    {:else if tab == "prayer"}
+      <PrayerAdmin on:counts={(e) => (counts = { ...counts, prayer: e.detail.prayers + e.detail.decisions })} />
     {:else if tab == "media"}
       <MediaAdmin />
     {:else if tab == "contenus"}
