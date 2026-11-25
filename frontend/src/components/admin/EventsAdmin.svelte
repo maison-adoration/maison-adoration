@@ -4,11 +4,11 @@
   import config from "../../stores/config";
   import api, { errorMessage } from "../../utils/api";
   import { cdn } from "../../utils/cdn";
-  import { download, today } from "../../utils/download";
   import { when, dayNum, monthShort, FALLBACK_IMAGE } from "../../utils/events";
   import Field from "../auth/Field.svelte";
   import FormAlert from "../auth/FormAlert.svelte";
   import Modal from "../utils/Modal.svelte";
+  import ExportButtons from "./ExportButtons.svelte";
 
   const TZ = "Africa/Lubumbashi";
   const PHOTOS = ["assemblee-large", "adoration", "predication", "fideles", "enseignement", "sanctuaire"].map((n) => `/images/design/${n}.jpg`);
@@ -148,7 +148,6 @@
   let people = null;
   let search = "";
   let typing;
-  let exporting = false;
 
   async function loadPeople() {
     try {
@@ -185,16 +184,6 @@
     } catch (err) {
       notice = { text: errorMessage(err), kind: "error" };
       removing = null;
-    }
-  }
-  async function exportPeople() {
-    exporting = true;
-    try {
-      await download(`/events/${current.id}/registrations.xlsx`, `inscrits-${current.title.toLowerCase().replace(/[^a-z0-9]+/gi, "-")}-${today()}.xlsx`);
-    } catch (err) {
-      notice = { text: errorMessage(err, "L'export n'a pas pu être préparé."), kind: "error" };
-    } finally {
-      exporting = false;
     }
   }
 
@@ -363,7 +352,7 @@
         </dl>
       {/if}
     </div>
-    <button type="button" class="btn-or shrink-0" on:click={exportPeople} disabled={exporting} aria-busy={exporting}>{exporting ? "Préparation…" : "Exporter en Excel"}</button>
+    <div class="shrink-0"><ExportButtons dark url={(f) => `/events/${current.id}/registrations.${f}`} filename={`inscrits-${current.title}`} pdfLabel="PDF d'émargement" /></div>
   </section>
 
   <div class="relative md:w-[340px] mt-5 mb-4">

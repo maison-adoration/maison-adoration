@@ -11,6 +11,7 @@
   import Modal from "../utils/Modal.svelte";
   import Field from "../auth/Field.svelte";
   import FormAlert from "../auth/FormAlert.svelte";
+  import ExportButtons from "./ExportButtons.svelte";
   import countries from "../../stores/countries";
   import { countryOptions } from "../../utils/countryOptions";
 
@@ -169,23 +170,6 @@
     }
   };
 
-  // --- Export (membres) --------------------------------------------------
-  let exporting = false;
-  const exportMembers = async () => {
-    exporting = true;
-    try {
-      const res = await api.get("/users/export.xlsx", { responseType: "blob" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(res.data);
-      link.download = `membres-man-${new Date().toISOString().slice(0, 10)}.xlsx`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-    } catch (err) {
-      notice = { text: errorMessage(err), kind: "error" };
-    } finally {
-      exporting = false;
-    }
-  };
 
   const date = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   onMount(load);
@@ -205,9 +189,9 @@
       {#each Object.entries(ROLE_LABEL) as [k, l]}<option value={k}>{l}</option>{/each}
     </select>
   {/if}
-  <div class="md:ml-auto flex flex-wrap gap-2">
+  <div class="md:ml-auto flex flex-wrap items-center gap-3">
     {#if mode === "members"}
-      <button type="button" class="btn-line !min-h-[44px]" on:click={exportMembers} disabled={exporting} aria-busy={exporting}>{exporting ? "Préparation…" : "Exporter en Excel"}</button>
+      <ExportButtons url={(f) => `/users/export.${f}`} filename="membres-man" />
       <button type="button" class="btn-or !min-h-[44px]" on:click={() => (createOpen = true)}>Créer un compte membre</button>
     {:else if mode === "team"}
       <button type="button" class="btn-line !min-h-[44px]" on:click={() => ((addOpen = true), (addSearch = ""), (addResults = []))}>Ajouter un membre existant</button>

@@ -1,4 +1,5 @@
 <script>
+  import ExportButtons from "./ExportButtons.svelte";
   // Suivi des paiements Mobile Money : liste, filtres, totaux, export Excel.
   import { onMount } from "svelte";
   import api, { errorMessage } from "../../utils/api";
@@ -12,7 +13,6 @@
   let from = "";
   let to = "";
   let data = null;
-  let exporting = false;
 
   const params = () => ({
     ...(status ? { status } : {}),
@@ -32,21 +32,6 @@
     }
   };
 
-  const exportCsv = async () => {
-    exporting = true;
-    try {
-      const res = await api.get("/payments", { params: { ...params(), format: "xlsx" }, responseType: "blob" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(res.data);
-      link.download = `${purpose === "donation" ? "dons" : purpose === "content" ? "achats" : "dons-et-paiements"}-${new Date().toISOString().slice(0, 10)}.xlsx`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-    } catch (err) {
-      alert(errorMessage(err));
-    } finally {
-      exporting = false;
-    }
-  };
 
   const when = (d) => new Date(d).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
   onMount(load);
@@ -69,9 +54,9 @@
   <label class="text-xs text-gray-600">Du <input type="date" bind:value={from} on:change={load} /></label>
   <label class="text-xs text-gray-600">Au <input type="date" bind:value={to} on:change={load} /></label>
 </div>
-<div class="flex flex-wrap gap-2 mb-4">
+<div class="flex flex-wrap items-center gap-3 mb-4">
   <button class="btn btn-secondary" on:click={load}>Rechercher</button>
-  <button class="btn btn-aurora" on:click={exportCsv} disabled={exporting}>{exporting ? "Préparation..." : "Exporter en Excel"}</button>
+  <div class="md:ml-auto"><ExportButtons url={(f) => `/payments?format=${f}`} {params} filename={purpose === "donation" ? "dons" : purpose === "content" ? "achats" : "dons-et-paiements"} /></div>
 </div>
 
 {#if data == null}

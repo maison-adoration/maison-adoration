@@ -8,7 +8,7 @@ const { optionalAuth, requireAdmin } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
 const { asyncHandler, HttpError } = require('../utils/http-error');
 const { upload, storage } = require('../services/storage');
-const { sendWorkbook } = require('../services/excel');
+const { sendReport } = require('../services/report');
 
 const router = express.Router();
 
@@ -294,45 +294,56 @@ router.delete(
 
 const STATUS_FR = { registered: 'Inscrit', attended: 'Présent', cancelled: 'Annulé' };
 const fmtDate = (d) =>
-  new Date(d).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lubumbashi' });
+  new Date(d)
+    .toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lubumbashi' })
+    .replace(/(\d{2}):(\d{2})/, '$1h$2');
 
+// Export des inscrits : Excel (liste de travail, annulés à part) ou PDF (liste d'émargement).
 router.get(
-  '/:id/registrations.xlsx',
+  '/:id/registrations.:format(xlsx|pdf)',
   requireAdmin,
-  validate({ params: idParam }),
+  validate({ params: z.object({ id: z.string().min(1).max(64), format: z.enum(['xlsx', 'pdf']) }) }),
   asyncHandler(async (req, res) => {
     const { rows: ev } = await db.query(`SELECT e.*, ${SEATS} AS seats_taken FROM events e WHERE e.id = $1`, [req.params.id]);
     const e = ev[0];
     if (!e) throw HttpError.notFound('Événement introuvable');
-    const regs = await loadRegistrations(e.id);
+    const regs = (await loadRegistrations(e.id)).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
     const active = regs.filter((r) => r.status !== 'cancelled');
-    const attended = regs.filter((r) => r.status === 'attended');
+    const cancelled = regs.filter((r) => r.status === 'cancelled');
     const seats = (list) => list.reduce((n, r) => n + r.seats, 0);
-    await sendWorkbook(res, `inscrits-${e.title}-${new Date().toISOString().slice(0, 10)}.xlsx`, {
+    const attended = seats(regs.filter((r) => r.status === 'attended'));
+    const pdf = req.params.format === 'pdf';
+    const columns = [
+      { header: 'N°', key: 'n', width: 6, pdf: 4, type: 'number', muted: true },
+      { header: 'Nom', key: 'name', width: 28, pdf: 24, bold: true },
+      { header: 'Téléphone', key: 'phone', width: 18, pdf: 15 },
+      { header: 'E-mail', key: 'email', width: 30, pdf: false },
+      { header: 'Personnes', key: 'seats', width: 11, pdf: 8, type: 'number' },
+      { header: pdf ? 'Présent' : 'Présence', key: 'present', width: 11, pdf: 7, type: 'check' },
+      { header: 'Statut', key: 'status', width: 11, pdf: false },
+      { header: 'Inscrit le', key: 'createdAt', width: 17, pdf: false, type: 'datetime' },
+      { header: 'Signature', key: 'sign', pdf: 22, type: 'signature', xlsx: false },
+    ];
+    const toRow = (r, i) => ({
+      n: i + 1, name: r.name, phone: r.phone, email: r.email, seats: r.seats,
+      present: r.status === 'attended', status: STATUS_FR[r.status], createdAt: r.created_at,
+    });
+    await sendReport(res, req.params.format, {
       sheet: 'Inscrits',
-      title: `Inscrits : ${e.title}`,
-      subtitle: [fmtDate(e.starts_at), e.location].filter(Boolean).join(' — '),
-      summary: [
+      filename: `inscrits-${e.title}`,
+      docLabel: pdf ? "LISTE D'ÉMARGEMENT" : 'LISTE DES INSCRITS',
+      title: pdf ? e.title : `Inscrits : ${e.title}`,
+      subtitle: [fmtDate(e.starts_at).replace(/^./, (c) => c.toUpperCase()), e.location].filter(Boolean).join(' — '),
+      kpis: [
         { label: 'Inscriptions', value: active.length },
-        { label: 'Personnes attendues', value: seats(active) },
-        ...(e.capacity ? [{ label: 'Places', value: `${seats(active)} / ${e.capacity}` }] : []),
-        { label: 'Présents', value: seats(attended) },
-        ...(regs.length - active.length ? [{ label: 'Annulées', value: regs.length - active.length }] : []),
+        { label: 'Personnes attendues', value: seats(active), note: e.capacity ? `/ ${e.capacity}` : '' },
+        ...(e.capacity && !pdf ? [{ label: 'Places restantes', value: Math.max(0, e.capacity - seats(active)) }] : []),
+        pdf && !attended ? { label: 'Présents (à remplir)', value: '_____', fill: true } : { label: 'Présents', value: attended, fill: pdf },
       ],
-      columns: [
-        { header: 'N°', key: 'n', width: 6, type: 'number' },
-        { header: 'Nom', key: 'name', width: 30 },
-        { header: 'Téléphone', key: 'phone', width: 18 },
-        { header: 'E-mail', key: 'email', width: 30 },
-        { header: 'Personnes', key: 'seats', width: 12, type: 'number' },
-        { header: 'Statut', key: 'status', width: 12 },
-        { header: 'Présence (à cocher)', key: 'check', width: 18, align: 'center' },
-        { header: 'Inscrit le', key: 'createdAt', width: 18, type: 'datetime' },
-      ],
-      rows: regs.map((r, i) => ({
-        n: i + 1, name: r.name, phone: r.phone, email: r.email, seats: r.seats,
-        status: STATUS_FR[r.status], check: r.status === 'attended' ? '✔' : '☐', createdAt: r.created_at,
-      })),
+      columns,
+      rows: active.map(toRow),
+      total: { label: 'Total', values: { seats: seats(active) } },
+      extraSheets: cancelled.length ? [{ name: 'Annulés', title: `Annulés : ${e.title}`, rows: cancelled.map(toRow) }] : [],
     });
   }),
 );

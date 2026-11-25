@@ -7,7 +7,7 @@ const config = require('../config');
 const { optionalAuth, requireAdmin } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
 const { asyncHandler, HttpError } = require('../utils/http-error');
-const { sendWorkbook } = require('../services/excel');
+const { sendReport } = require('../services/report');
 
 const router = express.Router();
 
@@ -92,25 +92,27 @@ router.delete(
 const DAY_FR = { mer: 'Mercredi, 16h30', ven: 'Vendredi, 16h30', dim: 'Dimanche, 8h30' };
 const VISIT_FR = { new: 'À accueillir', welcomed: 'Accueilli', archived: 'Archivé' };
 router.get(
-  '/export.xlsx',
+  '/export.:format(xlsx|pdf)',
   requireAdmin,
   asyncHandler(async (req, res) => {
-    const { rows } = await db.query('SELECT * FROM visits ORDER BY created_at DESC LIMIT 5000');
-    await sendWorkbook(res, `visiteurs-${new Date().toISOString().slice(0, 10)}.xlsx`, {
+    const { rows } = await db.query("SELECT * FROM visits WHERE status <> 'archived' ORDER BY (status <> 'new'), created_at DESC LIMIT 5000");
+    await sendReport(res, req.params.format, {
       sheet: 'Visiteurs',
+      filename: 'visiteurs',
+      docLabel: 'ACCUEIL',
       title: 'Premières visites annoncées',
-      subtitle: "Demandes envoyées depuis l'accueil du site",
-      summary: [
+      subtitle: "Demandes envoyées depuis l'accueil du site (à accueillir en premier)",
+      kpis: [
         { label: 'À accueillir', value: rows.filter((r) => r.status === 'new').length },
         { label: 'Accueillis', value: rows.filter((r) => r.status === 'welcomed').length },
         { label: 'Total', value: rows.length },
       ],
       columns: [
-        { header: 'Prénom', key: 'name', width: 26 },
-        { header: 'Téléphone', key: 'phone', width: 18 },
-        { header: 'Vient', key: 'day', width: 20 },
-        { header: 'Suivi', key: 'status', width: 15 },
-        { header: 'Annoncé le', key: 'created_at', width: 18, type: 'datetime' },
+        { header: 'Prénom', key: 'name', width: 26, pdf: 22, bold: true },
+        { header: 'Téléphone', key: 'phone', width: 18, pdf: 16 },
+        { header: 'Vient', key: 'day', width: 20, pdf: 18 },
+        { header: 'Suivi', key: 'status', width: 15, pdf: 14 },
+        { header: 'Annoncé le', key: 'created_at', width: 18, pdf: 16, type: 'datetime' },
       ],
       rows: rows.map((r) => ({ ...r, day: DAY_FR[r.day], status: VISIT_FR[r.status] })),
     });

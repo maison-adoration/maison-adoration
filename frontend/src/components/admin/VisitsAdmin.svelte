@@ -2,7 +2,7 @@
   // Premières visites annoncées depuis l'accueil : l'équipe d'accueil les suit ici.
   import { onMount } from "svelte";
   import api, { errorMessage } from "../../utils/api";
-  import { download, today } from "../../utils/download";
+  import ExportButtons from "./ExportButtons.svelte";
   import Loading from "../utils/Loading.svelte";
   import Empty from "../utils/Empty.svelte";
 
@@ -49,17 +49,6 @@
 
   const wa = (phone) => `https://wa.me/${phone.replace(/[^\d]/g, "")}`;
   onMount(load);
-  let exporting = false;
-  const exportXlsx = async () => {
-    exporting = true;
-    try {
-      await download("/visits/export.xlsx", `visiteurs-${today()}.xlsx`);
-    } catch (err) {
-      alert(errorMessage(err, "L'export n'a pas pu être préparé."));
-    } finally {
-      exporting = false;
-    }
-  };
 </script>
 
 <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -74,7 +63,7 @@
       }}>{s.label}</button
     >
   {/each}
-  <button type="button" class="btn-line !min-h-[40px] !text-[14px] md:ml-auto" on:click={exportXlsx} disabled={exporting} aria-busy={exporting}>{exporting ? "Préparation…" : "Exporter en Excel"}</button>
+  <div class="md:ml-auto"><ExportButtons url={(f) => `/visits/export.${f}`} filename="visiteurs" /></div>
 </div>
 
 {#if list == null}

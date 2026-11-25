@@ -6,7 +6,7 @@ const config = require('../config');
 const crypto = require('crypto');
 const { requireAuth, requireAdmin, requireSuperAdmin, ROLE_LEVEL, signToken } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validate');
-const { sendWorkbook } = require('../services/excel');
+const { sendReport } = require('../services/report');
 const { asyncHandler, HttpError } = require('../utils/http-error');
 const { userOut } = require('../utils/serializers');
 
@@ -52,7 +52,7 @@ router.get(
 /* Export Excel des inscrits (gestion de l'église) */
 const ROLE_FR = { user: 'Membre', media: 'Équipe média', admin: 'Administrateur', 'super-admin': 'Super-administrateur' };
 router.get(
-  '/export.xlsx',
+  '/export.:format(xlsx|pdf)',
   requireAdmin,
   asyncHandler(async (req, res) => {
     const { rows } = await db.query(
@@ -61,25 +61,27 @@ router.get(
        FROM users u ORDER BY u.name`,
     );
     const since = new Date(Date.now() - 30 * 24 * 3600 * 1000);
-    await sendWorkbook(res, `membres-man-${new Date().toISOString().slice(0, 10)}.xlsx`, {
+    await sendReport(res, req.params.format, {
       sheet: 'Membres',
+      filename: 'membres-man',
+      docLabel: 'MEMBRES',
       title: 'Membres inscrits sur le site',
-      subtitle: 'Comptes créés sur maison-adoration (classés par nom)',
-      summary: [
+      subtitle: 'Comptes créés sur le site, classés par nom',
+      kpis: [
         { label: 'Comptes', value: rows.length },
-        { label: 'Nouveaux (30 derniers jours)', value: rows.filter((r) => r.created_at >= since).length },
-        { label: 'Avec au moins une ressource', value: rows.filter((r) => r.contents > 0).length },
+        { label: 'Nouveaux (30 jours)', value: rows.filter((r) => r.created_at >= since).length },
+        { label: 'Avec une ressource', value: rows.filter((r) => r.contents > 0).length },
         { label: 'Équipe', value: rows.filter((r) => r.role !== 'user').length },
       ],
       columns: [
-        { header: 'Nom', key: 'name', width: 28 },
-        { header: 'E-mail', key: 'email', width: 30 },
-        { header: 'Téléphone', key: 'tel', width: 17 },
-        { header: 'Pays', key: 'country', width: 22 },
-        { header: 'Rôle', key: 'role', width: 18 },
-        { header: 'Ressources', key: 'contents', width: 11, type: 'number' },
-        { header: 'Annonces', key: 'optin', width: 16 },
-        { header: 'Inscrit le', key: 'created_at', width: 13, type: 'date' },
+        { header: 'Nom', key: 'name', width: 28, pdf: 20, bold: true },
+        { header: 'E-mail', key: 'email', width: 30, pdf: 24 },
+        { header: 'Téléphone', key: 'tel', width: 17, pdf: 14 },
+        { header: 'Pays', key: 'country', width: 18, pdf: 12 },
+        { header: 'Rôle', key: 'role', width: 18, pdf: 14 },
+        { header: 'Ressources', key: 'contents', width: 11, pdf: false, type: 'number' },
+        { header: 'Annonces', key: 'optin', width: 15, pdf: false },
+        { header: 'Inscrit le', key: 'created_at', width: 12, pdf: 10, type: 'date' },
       ],
       rows: rows.map((r) => ({
         ...r,

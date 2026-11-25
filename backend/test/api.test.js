@@ -429,11 +429,14 @@ test('événement sur inscription : capacité, doublons, clôture, export Excel'
   const x = await request(app).get(`/events/${ev.id}/registrations.xlsx`).set(auth(adminToken)).buffer().parse(binaryParser).expect(200);
   assert.match(x.headers['content-type'], /spreadsheetml/);
   const ws = await readXlsx(x.body);
-  assert.equal(ws.getCell('A2').value, 'Inscrits : Nuit de louange');
-  assert.equal(ws.getCell('A7').value, 'N°');
+  assert.equal(ws.getCell('B2').value, 'Inscrits : Nuit de louange');
+  assert.equal(ws.getCell('B8').value, 'N°');
   assert.equal(ws.getImages().length, 1, 'logo de l\'église');
-  assert.equal(ws.getCell('B8').value, 'Paul M');
+  assert.equal(ws.getCell('C9').value, 'Paul M');
   assert.equal((await request(app).get(`/events/${ev.id}/registrations.xlsx`).set(auth(userToken))).status, 403);
+  const emargement = await request(app).get(`/events/${ev.id}/registrations.pdf`).set(auth(adminToken)).buffer().parse(binaryParser).expect(200);
+  assert.equal(emargement.body.subarray(0, 4).toString(), '%PDF');
+  assert.equal((await request(app).get(`/events/${ev.id}/registrations.pdf`).set(auth(userToken))).status, 403);
 
   // Entrée libre : pas d'inscription possible
   const libre = (await request(app).post('/events').set(auth(adminToken)).send({ title: 'Culte en plein air', startsAt: inDays(5), registrationMode: 'none', capacity: 50, isPublished: true })).body;
@@ -452,7 +455,7 @@ test('événement sur inscription : capacité, doublons, clôture, export Excel'
   const piege = (await request(app).post('/events').set(auth(adminToken)).send({ title: 'Formules', startsAt: inDays(4), registrationMode: 'required', isPublished: true })).body;
   await request(app).post(`/events/${piege.id}/registrations`).send({ name: '=HYPERLINK("http://x")', phone: '+243970111077' }).expect(201);
   const xf = await request(app).get(`/events/${piege.id}/registrations.xlsx`).set(auth(adminToken)).buffer().parse(binaryParser);
-  const cellNom = (await readXlsx(xf.body)).getCell('B8');
+  const cellNom = (await readXlsx(xf.body)).getCell('C9');
   assert.equal(cellNom.value, '=HYPERLINK("http://x")');
   assert.equal(cellNom.formula, undefined, 'jamais une formule');
 
@@ -471,8 +474,14 @@ test('exports Excel de la gestion : membres, dons, visiteurs, Man Kids', async (
     const res = await request(app).get(url).set(auth(adminToken)).buffer().parse(binaryParser);
     assert.equal(res.status, 200, url);
     const ws = await readXlsx(res.body);
-    assert.equal(ws.getCell('A2').value, title, url);
-    assert.equal(ws.getCell('A1').value, "MAISON D'ADORATION POUR LES NATIONS");
+    assert.equal(ws.getCell('B2').value, title, url);
+    assert.equal(ws.getCell('B1').value, "MAISON D'ADORATION POUR LES NATIONS");
+    assert.equal(ws.getImages().length, 1, `logo dans ${url}`);
+    const pdfUrl = url.replace('.xlsx', '.pdf').replace('format=xlsx', 'format=pdf');
+    const pdf = await request(app).get(pdfUrl).set(auth(adminToken)).buffer().parse(binaryParser);
+    assert.equal(pdf.status, 200, pdfUrl);
+    assert.match(pdf.headers['content-type'], /application\/pdf/);
+    assert.equal(pdf.body.subarray(0, 4).toString(), '%PDF', pdfUrl);
     assert.equal((await request(app).get(url).set(auth(userToken))).status, 403, url);
   }
 });
