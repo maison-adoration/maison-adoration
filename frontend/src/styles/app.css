@@ -609,3 +609,15 @@ body {
   .man-tick, .man-settle { animation: none; }
   .man-pill.is-ready { transition: none; }
 }
+
+/* Champs de la charte : échappent à l'ancien style global des formulaires */
+.man-input::placeholder { color: #7F9CC0 !important; font-size: 15px !important; }
+.on-light .man-input::placeholder { color: #8A9BB5 !important; }
+.man-input { font-size: 16px; } /* 16 px : pas de zoom automatique sur iPhone */
+
+/* Bouton secondaire sur fond clair (espace membre) */
+.btn-line { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 1.4rem; border-radius: 999px; font-weight: 800; font-size: 15px; color: #173E6F; border: 1.5px solid #173E6F; background: transparent; transition: transform 160ms cubic-bezier(.23,1,.32,1), background-color 160ms ease, color 160ms ease; }
+.btn-line:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) { .btn-line:hover { background: #173E6F; color: #fff; } }
+.btn-or:disabled, .btn-line:disabled, .btn-ghost:disabled { opacity: .6; cursor: progress; }
+@media (prefers-reduced-motion: reduce) { .btn-line { transition: none; } }

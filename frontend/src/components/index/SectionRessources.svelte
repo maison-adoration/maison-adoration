@@ -1,9 +1,5 @@
 <script>
-  import { reveal } from "../../utils/motion";
-  import Select from "svelte-select";
-  import config from "../../stores/config";
-  import Loading from "../utils/Loading.svelte";
-  import Empty from "../utils/Empty.svelte";
+  import { reveal, slidePill } from "../../utils/motion";
   import { onMount } from "svelte";
   import api, { CONTENT_TYPES } from "../../utils/api";
   import ConferenceCardForUsers from "../shared/ConferenceCardForUsers.svelte";
@@ -16,10 +12,14 @@
   let sType = "";
   let contents = null;
 
-  // Titres proposés dans la recherche (filtrés par catégorie si choisie)
-  $: titles = ($config.titles || [])
-    .filter((t) => !sType || t.type == sType)
-    .map((t) => t.title);
+  const CATS = [{ value: "", label: "Tout" }, ...CONTENT_TYPES.map((t) => ({ ...t, label: { video: "Vidéos", podcast: "Podcasts", pdf: "Livres", activity: "Activités" }[t.value] || t.label }))];
+
+  // Recherche au fil de la frappe, après une courte pause.
+  let typing;
+  const onSearch = () => {
+    clearTimeout(typing);
+    typing = setTimeout(fetchContents, 350);
+  };
 
   // Numéro de la dernière recherche : une réponse plus ancienne qui arriverait
   // après une plus récente (réseau lent) n'écrase pas les bons résultats.
@@ -36,18 +36,8 @@
     }
   };
 
-  // Les titres ne servent qu'à cette recherche : chargés ici, une seule fois,
-  // plutôt que sur toutes les pages du site.
-  const fetchTitles = () => {
-    if ($config.titles?.length) return;
-    api.get("/contents/titles")
-      .then((r) => config.update((p) => ({ ...p, titles: r.data })))
-      .catch(() => {});
-  };
-
   onMount(() => {
     fetchContents();
-    fetchTitles();
   });
 </script>
 
@@ -62,61 +52,50 @@
     </p>
   </div>
 
-  <div
-    class="mx-auto max-w-[60rem] py-5 px-4 shadow-sm rounded-xl bg-white grid grid-cols-1 md:grid-cols-3 gap-4"
-  >
-    <div class="select-item-1">
-      <Select
-        items={CONTENT_TYPES}
-        on:select={(e) => {
-          sType = e.detail.value;
-          fetchContents();
-        }}
-        on:clear={() => {
-          sType = "";
-          fetchContents();
-        }}
-        placeholder="Catégorie"
-      />
+  <div class="max-w-[60rem] mx-auto flex flex-col md:flex-row md:items-center gap-4">
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Catégorie" use:slidePill={sType}>
+      {#each CATS as c}
+        <button
+          type="button"
+          data-on={sType === c.value}
+          aria-pressed={sType === c.value}
+          class="press min-h-[44px] px-4 rounded-full border-[1.5px] font-bold text-[15px] transition-colors duration-200 {sType === c.value ? 'border-man-or bg-man-or text-man-nuit' : 'border-[#C9D6E8] text-man-marine hover:border-man-marine'}"
+          on:click={() => { sType = c.value; fetchContents(); }}
+        >{c.label}</button>
+      {/each}
     </div>
-
-    <Select
-      items={titles}
-      on:select={(e) => {
-        searchkey = e.detail.value;
-        fetchContents();
-      }}
-      placeholder="Que cherchez-vous ?"
-    />
-
-    <div class="flex items-center justify-center">
-      <input
-        type="text"
-        bind:value={searchkey}
-        placeholder="Terme de recherche"
-        on:keydown={(e) => e.key === "Enter" && fetchContents()}
-      />
-      <button class="ml-1 btn btn-secondary !px-3" on:click={fetchContents} aria-label="Rechercher">
-        <ion-icon name="search-outline" class="text-xl"></ion-icon>
-      </button>
+    <div class="md:ml-auto md:w-[280px] relative">
+      <label for="r-search" class="sr-only">Rechercher une ressource</label>
+      <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-[#4A6285] pointer-events-none" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+      <input id="r-search" type="search" bind:value={searchkey} on:input={onSearch} placeholder="Rechercher un titre" autocomplete="off" class="man-input w-full h-12 rounded-full bg-white border-[1.5px] border-[#C9D6E8] pl-11 pr-4 text-man-nuit focus:border-man-marine focus:outline-none" />
     </div>
   </div>
 
-  {#if contents == null}
-    <Loading text="Veuillez Patienter" />
-  {:else}
-    <div class="my-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {#each contents as content (content.id)}
-        {#if content.type == "pdf"}
-          <PdfCard {...content} on:update={fetchContents} {isLoggedIn} />
+  <div class="max-w-[60rem] mx-auto my-8 pb-16 md:pb-24" aria-live="polite">
+    {#if contents == null}
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" aria-busy="true">
+        {#each [0, 1, 2] as _}<div class="h-[340px] rounded-[22px] bg-[#EEF2F8] animate-pulse"></div>{/each}
+      </div>
+    {:else if contents.length === 0}
+      <div class="rounded-[22px] border-[1.5px] border-dashed border-[#C9D6E8] p-8 text-center">
+        {#if searchkey || sType}
+          <p class="text-lg text-man-nuit">Aucune ressource ne correspond à cette recherche.</p>
+          <button type="button" class="btn-line mt-4" on:click={() => { searchkey = ""; sType = ""; fetchContents(); }}>Voir toutes les ressources</button>
         {:else}
-          <ConferenceCardForUsers {...content} on:update={fetchContents} {isLoggedIn} />
+          <p class="text-lg text-man-nuit">Les premières ressources arrivent bientôt.</p>
+          <p class="mt-1 text-[#4A6285]">Enseignements, livres et podcasts seront proposés ici.</p>
         {/if}
-      {:else}
-        <div class="col-span-full">
-          <Empty text="Aucun contenu pour le moment" />
-        </div>
-      {/each}
-    </div>
-  {/if}
+      </div>
+    {:else}
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {#each contents as content (content.id)}
+          {#if content.type == "pdf"}
+            <PdfCard {...content} on:update={fetchContents} {isLoggedIn} />
+          {:else}
+            <ConferenceCardForUsers {...content} on:update={fetchContents} {isLoggedIn} />
+          {/if}
+        {/each}
+      </div>
+    {/if}
+  </div>
 </Container>

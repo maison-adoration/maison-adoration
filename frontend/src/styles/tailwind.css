@@ -32,7 +32,7 @@ ion-icon {
 }
 
 .btn-primary {
-  @apply text-brand-primary border border-brand-primary/80;
+  @apply text-man-marine border border-man-marine/80;
 }
 
 .btn-coffee {
@@ -44,23 +44,23 @@ ion-icon {
 } */
 
 .btn-secondary {
-  @apply bg-brand-primary/90 text-brand-white;
+  @apply bg-man-or text-man-nuit font-bold;
 }
 
 .btn-third {
-  @apply bg-brand-primary shadow-brand-primary/20;
+  @apply bg-man-or text-man-nuit font-bold;
 }
 
 .btn-aurora {
-  @apply text-brand-primary bg-brand-black-light text-sm;
+  @apply text-man-marine bg-[#EEF2F8] text-sm;
 }
 
 .btn-black {
-  @apply text-brand-primary bg-brand-black text-sm;
+  @apply text-man-marine bg-white border border-man-marine/40 text-sm;
 }
 
 .btn-green {
-  @apply bg-teal-600 text-white text-sm;
+  @apply bg-teal-700 text-white text-sm;
 }
 
 .btn-menu {
@@ -71,15 +71,16 @@ ion-icon {
   FORMS CUSTOMIZATION 
 ***********************************************************************************************/
 
-select, input[type="file"], input[type="text"], input[type="date"], input[type="datetime-local"], input[type="time"], input[type="email"], input[type="password"], input[type="number"], textarea, .selectContainer {
+/* Ancien style des formulaires (administration) ; les champs de la nouvelle charte portent .man-input. */
+select:not(.man-input), input[type="file"]:not(.man-input), input[type="text"]:not(.man-input), input[type="date"]:not(.man-input), input[type="datetime-local"]:not(.man-input), input[type="time"]:not(.man-input), input[type="email"]:not(.man-input), input[type="password"]:not(.man-input), input[type="number"]:not(.man-input), textarea:not(.man-input), .selectContainer {
   @apply border border-gray-800/5 text-sm rounded-lg cursor-pointer bg-brand-black-light text-gray-800 !important;
 }
 
-select, input[type="file"], input[type="text"], input[type="date"], input[type="datetime-local"], input[type="time"], input[type="email"], input[type="password"], input[type="number"], textarea {
+select:not(.man-input), input[type="file"]:not(.man-input), input[type="text"]:not(.man-input), input[type="date"]:not(.man-input), input[type="datetime-local"]:not(.man-input), input[type="time"]:not(.man-input), input[type="email"]:not(.man-input), input[type="password"]:not(.man-input), input[type="number"]:not(.man-input), textarea:not(.man-input) {
   @apply inline-block px-4 py-2 w-full cursor-text !important;
 }
 
-select:focus, input[type="datetime-local"]:focus, input[type="text"]:focus, input[type="file"]:focus, input[type="date"]:focus, input[type="time"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="number"]:focus, textarea:focus, .selectContainer input:focus {
+select:not(.man-input):focus, input[type="datetime-local"]:not(.man-input):focus, input[type="text"]:not(.man-input):focus, input[type="file"]:not(.man-input):focus, input[type="date"]:not(.man-input):focus, input[type="time"]:not(.man-input):focus, input[type="email"]:not(.man-input):focus, input[type="password"]:not(.man-input):focus, input[type="number"]:not(.man-input):focus, textarea:not(.man-input):focus, .selectContainer input:focus {
   @apply outline-none ring-0 !important;
 }
 

@@ -62,7 +62,7 @@
                 class="btn btn-secondary h-font !text-xl !px-10 tracking-widest"
               >
                 Voir En Direct
-                <ion-icon name="logo-youtube" class="text-3xl ml-2"
+                <ion-icon aria-hidden="true" name="logo-youtube" class="text-3xl ml-2"
                 ></ion-icon>
               </a>
             </span>

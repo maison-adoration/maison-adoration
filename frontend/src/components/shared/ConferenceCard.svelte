@@ -141,7 +141,7 @@
 
     <input bind:value={edit.title} type="text" placeholder="Titre" />
 
-    <label class="text-gray-400 text-sm" for="price-{id}">
+    <label class="text-gray-600 text-sm" for="price-{id}">
       Prix en {$config.settings.currency} (0 = gratuit)
     </label>
     <input id="price-{id}" bind:value={edit.price} type="number" min="0" step="0.01" />
@@ -155,7 +155,7 @@
       </div>
     {:else}
       <button class="!w-full btn btn-third" on:click={handleUpdate}>
-        <ion-icon name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
+        <ion-icon aria-hidden="true" name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
         Enregistrer
       </button>
     {/if}
@@ -206,7 +206,7 @@
         class="btn btn-green !w-full !py-[0.4rem] !text-xs"
         title="Voir les acheteurs"
       >
-        <ion-icon name="wallet" class="text-base mr-2"></ion-icon>
+        <ion-icon aria-hidden="true" name="wallet" class="text-base mr-2"></ion-icon>
         Acheteurs
       </button>
       <button
@@ -214,7 +214,7 @@
         class="btn btn-green !w-full !py-[0.4rem] !text-xs"
         title="Donner l'accès à quelqu'un via son e-mail"
       >
-        <ion-icon name="add-circle" class="text-base mr-2"></ion-icon>
+        <ion-icon aria-hidden="true" name="add-circle" class="text-base mr-2"></ion-icon>
         Donner l'accès
       </button>
     </div>
@@ -225,14 +225,14 @@
       on:click={openEdit}
       class="btn bg-brand-black !text-gray-800 border border-gray-500/25 !w-full !py-[0.4rem] !text-xs"
     >
-      <ion-icon name="pencil" class="text-base mr-2"></ion-icon>
+      <ion-icon aria-hidden="true" name="pencil" class="text-base mr-2"></ion-icon>
       Modifier
     </button>
     <button
       on:click={handleDelete}
       class="btn bg-brand-black !text-gray-800 border border-gray-500/25 !w-full !py-[0.4rem] !text-xs"
     >
-      <ion-icon name="close-circle" class="text-base mr-2"></ion-icon>
+      <ion-icon aria-hidden="true" name="close-circle" class="text-base mr-2"></ion-icon>
       Supprimer
     </button>
   </div>
@@ -255,11 +255,11 @@
         for="new-poster-{id}"
         class:border-brand-primary={newPoster}
         class:text-brand-primary={newPoster}
-        class:text-gray-400={!newPoster}
+        class:text-gray-600={!newPoster}
         class="text-xs shadow-sm py-1 px-4 flex items-center justify-center cursor-pointer h-full bg-brand-black rounded-md border border-gray-500/25"
       >
         {#if newPoster}
-          <ion-icon name="checkmark-circle-outline" class="mr-2 text-xl"></ion-icon>
+          <ion-icon aria-hidden="true" name="checkmark-circle-outline" class="mr-2 text-xl"></ion-icon>
           Affiche sélectionnée
         {:else}
           <img class="w-10 h-8 object-cover mr-2" src={cdn(posterUrl, 80)} alt="affiche" />
@@ -271,7 +271,7 @@
     {#if newPoster}
       <button on:click={handleEditPoster} class="btn btn-secondary !w-full !py-[0.4rem] !text-xs">
         {posterLoading ? "Veuillez patienter..." : "Enregistrer"}
-        <ion-icon name="send" class="ml-2 text-xl"></ion-icon>
+        <ion-icon aria-hidden="true" name="send" class="ml-2 text-xl"></ion-icon>
       </button>
     {/if}
   </div>

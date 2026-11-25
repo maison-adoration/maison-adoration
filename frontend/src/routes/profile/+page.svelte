@@ -1,245 +1,145 @@
 <script>
-  import MyProfileHeading from "../../components/MyProfileHeading.svelte";
-  import Select from "svelte-select";
   import config from "../../stores/config";
   import api, { errorMessage, setToken, getToken } from "../../utils/api";
   import { onMount } from "svelte";
-  import { Circle } from "svelte-loading-spinners";
-  import Container from "../../components/utils/Container.svelte";
   import countries from "../../stores/countries";
+  import { countryOptions } from "../../utils/countryOptions";
+  import MemberHeader from "../../components/member/MemberHeader.svelte";
+  import Field from "../../components/auth/Field.svelte";
+  import FormAlert from "../../components/auth/FormAlert.svelte";
   import PushToggle from "../../components/shared/PushToggle.svelte";
 
-  let loading = true;
   let profile = null;
-  let uploading = false;
-  let uploadingPwd = false;
-  let currentPassword;
-  let newPassword;
-  let confirmNewPassword;
+  let saving = false;
+  let infoMsg = { text: "", kind: "success" };
+  let infoErrors = {};
 
-  const loadProfile = async () => {
+  let currentPassword = "";
+  let newPassword = "";
+  let pwdSaving = false;
+  let pwdMsg = { text: "", kind: "success" };
+  let pwdErrors = {};
+
+  $: options = countryOptions($countries);
+
+  onMount(async () => {
+    // Sans jeton, inutile d'interroger l'API : direction la connexion.
+    if (!getToken()) return (window.location = "/login");
     try {
-      const res = await api.get("/auth/me");
-      profile = res.data;
-      loading = false;
-    } catch (err) {
+      const me = (await api.get("/auth/me")).data;
+      profile = { ...me, tel: me.tel || "", country: typeof me.country === "object" && me.country ? me.country.value : me.country || "" };
+    } catch {
       window.location = "/login";
     }
-  };
+  });
 
-  const handleSubmit = async () => {
-    uploading = true;
-    const country =
-      profile.country && typeof profile.country === "object"
-        ? profile.country.value
-        : profile.country;
+  const saveInfo = async () => {
+    infoMsg = { text: "" };
+    infoErrors = { name: profile.name.trim().length >= 2 ? "" : "Saisissez votre nom complet." };
+    if (infoErrors.name) return;
+    saving = true;
     try {
       // Seuls ces champs peuvent être modifiés.
       await api.put(`/users/${profile.id}`, {
-        name: profile.name,
-        tel: profile.tel || "",
-        country: country || "",
+        name: profile.name.trim(),
+        tel: profile.tel.trim(),
+        country: profile.country || "",
         emailOptIn: profile.emailOptIn,
         smsOptIn: profile.smsOptIn,
       });
-      alert("✅ Fait !");
-      window.location.reload();
+      config.update((c) => ({ ...c, currentUser: { ...c.currentUser, name: profile.name.trim() } }));
+      infoMsg = { text: "Modifications enregistrées.", kind: "success" };
     } catch (err) {
-      uploading = false;
-      alert(errorMessage(err));
+      infoMsg = { text: errorMessage(err, "Les modifications n'ont pas été enregistrées. Réessayez."), kind: "error" };
+    } finally {
+      saving = false;
     }
   };
 
-  const handleSubmitNewPwd = async () => {
-    if (newPassword != confirmNewPassword) {
-      alert("Le nouveau mot de passe et sa confirmation ne sont pas identiques.");
-      return;
-    }
-    if (!newPassword || newPassword.length < 8) {
-      alert("Le nouveau mot de passe doit contenir au moins 8 caractères.");
-      return;
-    }
-    uploadingPwd = true;
+  const savePassword = async () => {
+    pwdMsg = { text: "" };
+    pwdErrors = {
+      current: currentPassword ? "" : "Saisissez votre mot de passe actuel.",
+      next: newPassword.length >= 8 ? "" : "Choisissez un mot de passe d'au moins 8 caractères.",
+    };
+    if (pwdErrors.current || pwdErrors.next) return;
+    pwdSaving = true;
     try {
       const res = await api.put(`/users/${profile.id}/password`, { currentPassword, newPassword });
       setToken(res.data.token); // cet appareil reste connecté ; les autres sont déconnectés
-      alert("✅ Mot de passe changé ! Vos autres appareils ont été déconnectés.");
-      window.location.reload();
+      currentPassword = newPassword = "";
+      pwdMsg = { text: "Mot de passe changé. Vos autres appareils ont été déconnectés.", kind: "success" };
     } catch (err) {
-      uploadingPwd = false;
-      alert(errorMessage(err, "Vérifiez que votre mot de passe actuel est correct."));
+      pwdMsg = { text: errorMessage(err, "Mot de passe actuel incorrect. Vérifiez-le et réessayez."), kind: "error" };
+    } finally {
+      pwdSaving = false;
     }
   };
-
-  onMount(() => {
-    // Sans jeton, inutile d'interroger l'API : direction la connexion.
-    if (!getToken()) {
-      window.location = "/login";
-      return;
-    }
-    loadProfile();
-  });
 </script>
 
 <svelte:head>
-  <title>Votre Profil - M.A.N. - Maison D'Adoration Pour les Nations</title>
+  <title>Mon profil - M.A.N. - Maison D'Adoration Pour les Nations</title>
 </svelte:head>
 
-<MyProfileHeading />
+<MemberHeader />
 
-<div class="mt-6 min-h-screen">
-  <Container>
-    {#if loading}
-      <div class="h-52 w-full flex items-center justify-center">
-        <Circle size="50" color="#3695cb" unit="px" />
+<div class="on-light bg-[#F3F6FA] min-h-[60vh] py-10 md:py-14">
+  <div class="max-w-[1040px] mx-auto px-5 md:px-10 grid gap-6">
+    {#if profile === null}
+      <div class="grid gap-6" aria-busy="true" aria-label="Chargement du profil">
+        {#each [0, 1] as _}<div class="h-[320px] rounded-[26px] bg-white animate-pulse"></div>{/each}
       </div>
     {:else}
-      <form
-        on:submit|preventDefault={handleSubmit}
-        class="grid grid-cols-1 gap-y-4 text-gray-500 pb-8"
-      >
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
-            <div>Votre Region:</div>
-            <div class="lg:col-span-2 select-item-1">
-              <Select
-                placeholder="Votre Region"
-                bind:value={profile.country}
-                items={$countries.map(({ name }) => name)}
-              />
+      <section class="rounded-[26px] bg-white p-6 md:p-9" aria-labelledby="t-infos">
+        <h2 id="t-infos" class="font-slab font-bold text-[26px] text-man-nuit">Mes informations</h2>
+        <form on:submit|preventDefault={saveInfo} novalidate class="mt-6 grid gap-5">
+          <div class="grid md:grid-cols-2 gap-5 [&>*]:min-w-0">
+            <Field light label="Nom complet" name="p-name" autocomplete="name" bind:value={profile.name} error={infoErrors.name} required maxlength={120} />
+            <Field light label="Téléphone" name="p-tel" type="tel" autocomplete="tel" inputmode="tel" bind:value={profile.tel} maxlength={30} />
+            <div class="flex flex-col gap-2">
+              <label for="p-country" class="text-sm font-bold text-man-nuit">Pays</label>
+              <div class="relative">
+                <select id="p-country" bind:value={profile.country} autocomplete="country-name" class="man-input appearance-none w-full h-[52px] rounded-2xl bg-white border-[1.5px] border-[#C9D6E8] px-4 pr-10 text-man-nuit focus:border-man-marine focus:outline-none">
+                  <option value="">Choisir un pays</option>
+                  {#each options as o (o.value)}<option value={o.value}>{o.label}</option>{/each}
+                </select>
+                <svg class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#4A6285]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+              </div>
+            </div>
+            <div class="flex flex-col gap-2">
+              <span class="text-sm font-bold text-man-nuit">E-mail</span>
+              <p class="h-[52px] flex items-center px-4 rounded-2xl bg-[#EEF2F8] text-[#2B3F5C] truncate">{profile.email}</p>
             </div>
           </div>
-        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
-            <div>Nom Complet:</div>
-            <input
-              class="lg:col-span-2 shadow-sm placeholder-gray-300"
-              type="text"
-              bind:value={profile.name}
-              placeholder="Nom Complet"
-              required
-            />
+          <fieldset class="mt-2">
+            <legend class="text-sm font-bold text-man-nuit mb-1">Recevoir les annonces de la Maison</legend>
+            <label class="flex items-center gap-3 py-2 cursor-pointer text-[#2B3F5C]">
+              <input type="checkbox" bind:checked={profile.emailOptIn} class="w-5 h-5 accent-[#173E6F]" /> Par e-mail
+            </label>
+            <label class="flex items-center gap-3 py-2 cursor-pointer text-[#2B3F5C]">
+              <input type="checkbox" bind:checked={profile.smsOptIn} class="w-5 h-5 accent-[#173E6F]" /> Par SMS
+            </label>
+          </fieldset>
+          <PushToggle />
+
+          <FormAlert light message={infoMsg.text} kind={infoMsg.kind} />
+          <button type="submit" class="btn-or self-start" disabled={saving} aria-busy={saving}>{saving ? "Enregistrement…" : "Enregistrer les modifications"}</button>
+        </form>
+      </section>
+
+      <section class="rounded-[26px] bg-white p-6 md:p-9" aria-labelledby="t-mdp">
+        <h2 id="t-mdp" class="font-slab font-bold text-[26px] text-man-nuit">Mot de passe</h2>
+        <p class="mt-1 text-[#4A6285]">Le changer déconnecte vos autres appareils.</p>
+        <form on:submit|preventDefault={savePassword} novalidate class="mt-6 grid gap-5">
+          <div class="grid md:grid-cols-2 gap-5 [&>*]:min-w-0">
+            <Field light label="Mot de passe actuel" name="p-current" type="password" autocomplete="current-password" bind:value={currentPassword} error={pwdErrors.current} required maxlength={128} />
+            <Field light label="Nouveau mot de passe" name="p-new" type="password" autocomplete="new-password" bind:value={newPassword} error={pwdErrors.next} hint="8 caractères minimum." required maxlength={128} />
           </div>
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
-            <div>Telephone:</div>
-            <input
-              class="lg:col-span-2 shadow-sm placeholder-gray-300"
-              type="text"
-              bind:value={profile.tel}
-              placeholder="telephone"
-              required
-            />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
-            <div>E-mail :</div>
-            <input
-              class="lg:col-span-2 shadow-sm placeholder-gray-300"
-              type="text"
-              bind:value={profile.email}
-              placeholder="email"
-              required
-              readonly
-            />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" bind:checked={profile.emailOptIn} />
-            Recevoir les annonces par e-mail
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" bind:checked={profile.smsOptIn} />
-            Recevoir les annonces par SMS
-          </label>
-        </div>
-
-        <PushToggle />
-
-        {#if uploading}
-          <div class="grid grid-cols-1 gap-8">
-            <div
-              class="flex items-center justify-center btn btn-aurora"
-              style="width: 100%;"
-            >
-              <Circle size="25" color="#3695cb" unit="px" />
-              <span class="ml-4 py-2">Veuillez Patienter</span>
-            </div>
-          </div>
-        {:else}
-          <button class="btn btn-aurora" style="width: 100%;">
-            <ion-icon name="checkmark-circle" class="text-xl mr-2"></ion-icon>
-            Sauvegarder
-          </button>
-        {/if}
-      </form>
-
-      <!-- Change Password -->
-      <!-- Change Password -->
-
-      <h1 class="mt-12 text-gray-500 text-xl uppercase">
-        CHANGER LE MOT DE PASSE
-      </h1>
-
-      <form
-        on:submit|preventDefault={handleSubmitNewPwd}
-        class="mt-8 grid grid-cols-1 gap-y-4 text-gray-500 pb-8"
-      >
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
-            <div>Mot de passe actuel:</div>
-            <input
-              class="lg:col-span-2 shadow-sm placeholder-gray-300"
-              type="password"
-              bind:value={currentPassword}
-              placeholder="Mot de passe actuel"
-              required
-            />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
-            <div>Nouveau mot de passe:</div>
-            <input
-              class="lg:col-span-2 shadow-sm placeholder-gray-300"
-              type="password"
-              bind:value={newPassword}
-              placeholder="Nouveau mot de passe"
-              required
-            />
-          </div>
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
-            <div>Confirmer:</div>
-            <input
-              class="lg:col-span-2 shadow-sm placeholder-gray-300"
-              type="password"
-              bind:value={confirmNewPassword}
-              placeholder="Confirmer nouveau mot de passe"
-              required
-            />
-          </div>
-        </div>
-
-        {#if uploadingPwd}
-          <div class="grid grid-cols-1 gap-8">
-            <div class="flex items-center justify-center btn btn-aurora">
-              <Circle size="25" color="#3695cb" unit="px" />
-              <span class="ml-4 py-2">Veuillez Patienter</span>
-            </div>
-          </div>
-        {:else}
-          <button class="btn btn-aurora" style="width: 100%;">
-            <ion-icon name="checkmark-circle" class="text-xl mr-2"></ion-icon>
-            Changer mot de passe
-          </button>
-        {/if}
-      </form>
+          <FormAlert light message={pwdMsg.text} kind={pwdMsg.kind} />
+          <button type="submit" class="btn-line self-start" disabled={pwdSaving} aria-busy={pwdSaving}>{pwdSaving ? "Changement…" : "Changer le mot de passe"}</button>
+        </form>
+      </section>
     {/if}
-  </Container>
+  </div>
 </div>

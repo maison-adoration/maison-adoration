@@ -11,7 +11,7 @@
   import { setToken } from "../../utils/api";
 
   // Pages qui commencent par une grande photo sombre : la barre peut y être transparente.
-  const DARK_TOP = ["/", "/maison", "/ministeres", "/extensions", "/mediatheque", "/live", "/donate"];
+  const DARK_TOP = ["/", "/maison", "/ministeres", "/extensions", "/mediatheque", "/live", "/donate", "/login", "/register", "/mot-de-passe", "/mes-contenus", "/profile", "/privacy"];
 
   let scrollY = 0;
   let menuOpen = false;
@@ -100,7 +100,7 @@
   class:shadow-header={solid}
 >
   <div class="max-w-[1320px] mx-auto h-16 md:h-[76px] px-5 md:px-10 flex items-center justify-between gap-6">
-    <a href="/" class="flex items-center gap-3 min-h-[44px]" aria-label="Maison d'Adoration pour les Nations, accueil">
+    <a href="/" class="flex items-center gap-3 min-h-[44px]" aria-label="M.A.N, accueil">
       <img src="/images/man-gold.png" alt="" class="w-10 md:w-11" width="44" height="44" />
       <span class="font-slab font-bold text-[22px] tracking-[.03em]">M.A.N</span>
     </a>
@@ -200,10 +200,10 @@
       {/if}
     </div>
     <div class="px-6 pb-8 pt-2 flex items-center gap-1 text-man-doux">
-      <a class="w-11 h-11 flex items-center justify-center hover:text-white" target="_blank" rel="noopener" href="https://www.youtube.com/@mantv6688" aria-label="Chaîne YouTube MAN TV"><ion-icon name="logo-youtube" class="text-xl"></ion-icon></a>
-      <a class="w-11 h-11 flex items-center justify-center hover:text-white" target="_blank" rel="noopener" href="https://www.instagram.com/maisondadoration_man" aria-label="Instagram"><ion-icon name="logo-instagram" class="text-xl"></ion-icon></a>
-      <a class="w-11 h-11 flex items-center justify-center hover:text-white" target="_blank" rel="noopener" href="https://web.facebook.com/Maisondadorationpourlesnations" aria-label="Facebook"><ion-icon name="logo-facebook" class="text-xl"></ion-icon></a>
-      <a class="w-11 h-11 flex items-center justify-center hover:text-white" target="_blank" rel="noopener" href="https://coachisraelkayembe.com" aria-label="Site du Prophète Israël Kayembe"><ion-icon name="globe-outline" class="text-xl"></ion-icon></a>
+      <a class="w-11 h-11 flex items-center justify-center hover:text-white" target="_blank" rel="noopener" href="https://www.youtube.com/@mantv6688" aria-label="Chaîne YouTube MAN TV"><ion-icon aria-hidden="true" name="logo-youtube" class="text-xl"></ion-icon></a>
+      <a class="w-11 h-11 flex items-center justify-center hover:text-white" target="_blank" rel="noopener" href="https://www.instagram.com/maisondadoration_man" aria-label="Instagram"><ion-icon aria-hidden="true" name="logo-instagram" class="text-xl"></ion-icon></a>
+      <a class="w-11 h-11 flex items-center justify-center hover:text-white" target="_blank" rel="noopener" href="https://web.facebook.com/Maisondadorationpourlesnations" aria-label="Facebook"><ion-icon aria-hidden="true" name="logo-facebook" class="text-xl"></ion-icon></a>
+      <a class="w-11 h-11 flex items-center justify-center hover:text-white" target="_blank" rel="noopener" href="https://coachisraelkayembe.com" aria-label="Site du Prophète Israël Kayembe"><ion-icon aria-hidden="true" name="globe-outline" class="text-xl"></ion-icon></a>
     </div>
   </div>
 {/if}

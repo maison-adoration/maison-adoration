@@ -24,7 +24,7 @@
       title="Fermer"
       on:click={() => onClose()}
     >
-      <ion-icon name="close-outline" class="text-3xl"></ion-icon>
+      <ion-icon aria-hidden="true" name="close-outline" class="text-3xl"></ion-icon>
     </button>
 
     <div class="w-full">

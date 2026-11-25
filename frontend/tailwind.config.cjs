@@ -12,8 +12,8 @@ module.exports = {
         "brand-blue-second": "#133b6e",
         "brand-blue-primary": "#3695cb",
         // ....................
-        "brand-second": "#C68101",
-        "brand-primary": "#C68101",
+        "brand-second": "#7A5600", // ancien doré #C68101, assombri pour le contraste AA
+        "brand-primary": "#7A5600", // ancien doré #C68101, assombri pour le contraste AA
         // ....................
         "brand-coffee": "#cb6c36",
         "brand-black": "#fcfcfc",

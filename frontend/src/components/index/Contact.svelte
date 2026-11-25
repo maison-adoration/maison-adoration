@@ -50,14 +50,14 @@
         <div class="flex justify-center relative z-10">
           <div class="text-gray-200 text-sm md:text-base text-center">
             <a href="tel:+243 970 679 649" class="contact-box !text-gray-300">
-              <ion-icon name="call" class="text-2xl mr-2"></ion-icon>
+              <ion-icon aria-hidden="true" name="call" class="text-2xl mr-2"></ion-icon>
               +243 970 679 649
             </a>
             <a
               href="mailto:maisondadoration@gmail.com"
               class="mt-2 contact-box !text-gray-300"
             >
-              <ion-icon name="mail" class="text-2xl mr-2"></ion-icon>
+              <ion-icon aria-hidden="true" name="mail" class="text-2xl mr-2"></ion-icon>
               Envoyer un e-mail
             </a>
 
@@ -66,7 +66,7 @@
               about="_blank"
               class="mt-4 btn btn-aurora !px-12 !py-1 h-[2.75rem] !text-white bg-gradient-to-r to-[#25D366] from-brand-primary"
             >
-              <ion-icon name="logo-whatsapp" class="text-xl mr-2"></ion-icon>
+              <ion-icon aria-hidden="true" name="logo-whatsapp" class="text-xl mr-2"></ion-icon>
               Whatsapp
             </a>
           </div>

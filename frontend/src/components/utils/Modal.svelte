@@ -1,17 +1,40 @@
 <script>
-  import { scale } from "svelte/transition";
-  import { createEventDispatcher } from "svelte";
+  // Fenêtre modale de la charte : fond clair, titre, bouton Fermer ; le focus
+  // entre dans la fenêtre à l'ouverture, y reste, puis revient d'où il venait.
+  import { fade, scale } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
+  import { createEventDispatcher, tick } from "svelte";
 
   export let show = false;
   export let title = ""; // titre affiché en haut de la fenêtre (facultatif)
   export let withHeight = false;
 
   const dispatch = createEventDispatcher();
+  let dialog;
+  let opener = null;
 
-  const onClose = () => {
-    dispatch("modalClose");
+  const onClose = () => dispatch("modalClose");
+
+  $: if (show) open();
+  async function open() {
+    opener = document.activeElement;
+    await tick();
+    const first = dialog && dialog.querySelector("input, select, textarea, button, a[href]");
+    (first || dialog)?.focus();
+  }
+  $: if (!show && opener) { opener.focus?.(); opener = null; }
+
+  const onKey = (e) => {
+    if (!show) return;
+    if (e.key === "Escape") return onClose();
+    if (e.key !== "Tab" || !dialog) return;
+    const items = [...dialog.querySelectorAll('a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])')];
+    if (!items.length) return;
+    const [first, last] = [items[0], items[items.length - 1]];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   };
-  const onKey = (e) => show && e.key === "Escape" && onClose();
+  const reduce = () => typeof window !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 </script>
 
 <svelte:window on:keydown={onKey} />
@@ -20,35 +43,24 @@
   <div
     role="presentation"
     on:click|self={onClose}
-    class="fixed top-0 left-0 bottom-0 right-0 flex items-center justify-center z-[999] bg-black/50"
+    transition:fade={{ duration: reduce() ? 0 : 160 }}
+    class="on-light fixed inset-0 z-[999] flex items-end sm:items-center justify-center bg-man-nuit/70 p-0 sm:p-5"
   >
     <div
-      transition:scale
-      class="w-11/12 md:w-[28rem] bg-brand-black patterns rounded-lg shadow-lg py-4 px-5
-      border border-gray-600/50 overflow-auto"
+      bind:this={dialog}
+      tabindex="-1"
+      transition:scale={{ start: 0.96, duration: reduce() ? 0 : 200, easing: cubicOut }}
+      class="w-full sm:w-[30rem] max-h-[92svh] overflow-auto bg-white text-man-nuit rounded-t-[26px] sm:rounded-[26px] p-6 md:p-7 outline-none"
       style={withHeight ? "height: 75vh !important;" : ""}
       role="dialog"
       aria-modal="true"
       aria-label={title || "Fenêtre"}
     >
-      {#if title}<div class="h-font text-xl text-brand-primary mb-3">{title}</div>{/if}
-      <div class="mb-4">
-        <slot><!-- optional fallback --></slot>
+      {#if title}<h2 class="font-slab font-bold text-[24px] leading-tight mb-4">{title}</h2>{/if}
+      <div class="mb-5">
+        <slot />
       </div>
-
-      <div class="flex items-center justify-center">
-        <button class="btn btn-secondary !py-1" on:click={onClose}>
-          <ion-icon name="close-circle-outline" class="text-base mr-2"
-          ></ion-icon>
-          Annuler
-        </button>
-      </div>
+      <button type="button" class="btn-line w-full" on:click={onClose}>Fermer</button>
     </div>
   </div>
 {/if}
-
-<style>
-  .patterns {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23000000' fill-opacity='0.025' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
-</style>

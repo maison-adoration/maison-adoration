@@ -43,7 +43,7 @@
             data-aos-duration="750"
             data-aos-delay="1000"
           >
-            <ion-icon name="logo-youtube" class="translate-y-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="logo-youtube" class="translate-y-2"></ion-icon>
             Suivre MAN TV sur Youtube.
           </h1>
           <p
@@ -78,7 +78,7 @@
               data-aos-delay="1500"
             >
               Suivre notre Chaine
-              <ion-icon name="play-circle" class="text-2xl ml-2"></ion-icon>
+              <ion-icon aria-hidden="true" name="play-circle" class="text-2xl ml-2"></ion-icon>
             </a>
           </div>
         </div>

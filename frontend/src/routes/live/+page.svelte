@@ -3,14 +3,17 @@
   import { onMount, onDestroy } from "svelte";
   import api from "../../utils/api";
   import PageHero from "../../components/pages/PageHero.svelte";
-  import Container from "../../components/utils/Container.svelte";
-  import Loading from "../../components/utils/Loading.svelte";
+  import { nextService, splitCountdown } from "../../utils/schedule";
   import VideoEmbed from "../../components/media/VideoEmbed.svelte";
   import { formatDate } from "../../components/admin/media/upload";
 
   const TYPE = { culte: "Culte", conference: "Conférence", prayer: "Prière", cours: "Cours" };
   let data = null;
   let timer;
+  // Compte à rebours vers le prochain culte, quand rien n'est diffusé.
+  let next = nextService();
+  let tick;
+  $: cd = splitCountdown(next.seconds);
 
   const load = async () => {
     try {
@@ -21,67 +24,91 @@
   };
 
   onMount(() => {
+    tick = setInterval(() => (next = nextService()), 1000);
     load();
     // Le direct apparaît sans recharger la page (pas de requête si l'onglet est en arrière-plan).
     timer = setInterval(() => {
       if (!document.hidden) load();
     }, 60000);
   });
-  onDestroy(() => clearInterval(timer));
+  onDestroy(() => { clearInterval(timer); clearInterval(tick); });
 </script>
 
 <svelte:head>
   <title>Direct - M.A.N. - Maison D'Adoration Pour les Nations</title>
 </svelte:head>
 
-<PageHero title="En direct" subtitle="Cultes tous les dimanches à 8h30, en personne ou en ligne." />
+<PageHero title="En direct" subtitle="Les cultes en direct, le mercredi, le vendredi et le dimanche." />
 
-<div class="bg-white py-10 min-h-[50vh]">
-  <Container>
+<div class="on-light bg-white py-12 md:py-16 min-h-[50vh]">
+  <div class="max-w-[1040px] mx-auto px-5 md:px-10">
     {#if data == null}
-      <Loading text="Veuillez patienter" />
+      <div class="aspect-video rounded-[26px] bg-[#EEF2F8] animate-pulse" aria-busy="true" aria-label="Chargement du direct"></div>
     {:else}
       {#if data.live}
-        <div class="mb-12">
-          <div class="text-red-600 font-bold mb-2">● EN DIRECT · {TYPE[data.live.type] || ""}</div>
-          <h2 use:reveal class="font-slab font-bold text-[32px] md:text-[40px] leading-tight text-man-nuit mb-4">{data.live.title}</h2>
-          <VideoEmbed url={data.live.stream_url} title={data.live.title} />
-          {#if data.live.description}<p class="mt-4 text-gray-600 whitespace-pre-line">{data.live.description}</p>{/if}
-        </div>
+        <section class="mb-14" aria-labelledby="t-live">
+          <p class="inline-flex items-center gap-2 font-extrabold text-[#B3261E] mb-2"><span class="man-live w-2.5 h-2.5 rounded-full bg-[#D93025]" aria-hidden="true"></span>En direct{TYPE[data.live.type] ? `, ${TYPE[data.live.type].toLowerCase()}` : ""}</p>
+          <h2 id="t-live" class="font-slab font-bold text-[30px] md:text-[40px] leading-tight text-man-nuit mb-5">{data.live.title}</h2>
+          <div class="rounded-[22px] overflow-hidden"><VideoEmbed url={data.live.stream_url} title={data.live.title} /></div>
+          {#if data.live.description}<p class="mt-5 text-[17px] text-[#2B3F5C] whitespace-pre-line">{data.live.description}</p>{/if}
+        </section>
       {:else}
-        <div class="mb-12 rounded-xl bg-brand-black-light border border-gray-200 p-6 text-center">
-          <p class="text-gray-700">Aucun direct en ce moment.</p>
-          <a href="https://www.youtube.com/@mantv6688" target="_blank" rel="noopener" class="btn btn-secondary mt-4">
-            Notre chaîne YouTube <ion-icon name="logo-youtube" class="text-xl ml-2"></ion-icon>
-          </a>
+        <section class="mb-14 rounded-[26px] bg-man-nuit text-white overflow-hidden grid md:grid-cols-[1.2fr_1fr]" aria-labelledby="t-next">
+          <div class="p-7 md:p-10 flex flex-col gap-4">
+            {#if next.live}
+              <p class="inline-flex items-center gap-2 font-extrabold text-man-lumiere"><span class="man-live w-2.5 h-2.5 rounded-full bg-man-lumiere" aria-hidden="true"></span>En cours à l'église</p>
+              <div>
+                <h2 id="t-next" class="font-slab font-bold text-[28px] md:text-[34px] leading-tight">{next.service.name}</h2>
+                <p class="text-man-or font-bold mt-1">{next.service.label}</p>
+              </div>
+              <p class="text-man-doux">La diffusion en ligne n'a pas encore commencé.</p>
+            {:else}
+              <p class="text-man-doux">Aucune diffusion en ce moment. Prochain rassemblement :</p>
+              <div>
+                <h2 id="t-next" class="font-slab font-bold text-[28px] md:text-[34px] leading-tight">{next.service.name}</h2>
+                <p class="text-man-or font-bold mt-1">{next.service.label}</p>
+              </div>
+              <div class="flex gap-4 md:gap-6" role="timer" aria-label={cd.label}>
+                {#each cd.parts as part}
+                  <div aria-hidden="true" class="flex flex-col">
+                    <span class="font-slab text-[36px] md:text-[44px] font-bold tabular-nums leading-none">{#key part.v}<span class="man-tick">{part.v}</span>{/key}</span>
+                    <span class="text-[13px] text-man-doux mt-1">{part.l}</span>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+            <p class="text-man-doux">La diffusion apparaîtra ici automatiquement, sans recharger la page.</p>
+            <a href="https://www.youtube.com/@mantv6688" target="_blank" rel="noopener" class="btn-ghost self-start mt-1">Revoir les cultes sur MAN TV</a>
+          </div>
+          <img src="/images/design/sanctuaire-800.jpg" alt="" class="hidden md:block w-full h-full object-cover opacity-70" loading="lazy" />
+        </section>
+      {/if}
+
+      {#if data.upcoming.length}
+        <h2 use:reveal class="font-slab font-bold text-[30px] md:text-[36px] leading-tight text-man-nuit mb-5">Diffusions programmées</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-14">
+          {#each data.upcoming as s (s.id)}
+            <div class="rounded-[22px] bg-[#F3F6FA] p-5">
+              <div class="text-sm font-bold text-man-marine">{[TYPE[s.type], formatDate(s.scheduled_at, true)].filter(Boolean).join(", ")}</div>
+              <div class="font-slab font-bold text-[20px] leading-tight text-man-nuit mt-1">{s.title}</div>
+              {#if s.description}<div class="text-[15px] text-[#4A6285] mt-1 whitespace-pre-line line-clamp-3">{s.description}</div>{/if}
+            </div>
+          {/each}
         </div>
       {/if}
 
-      <h2 use:reveal class="font-slab font-bold text-[30px] md:text-[36px] leading-tight text-man-nuit mb-4">Prochains directs</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-12">
-        {#each data.upcoming as s (s.id)}
-          <div class="rounded-xl border border-gray-200 p-4">
-            <div class="text-xs text-gray-500">{TYPE[s.type] || ""} · {formatDate(s.scheduled_at, true)}</div>
-            <div class="font-bold text-gray-800">{s.title}</div>
-            {#if s.description}<div class="text-sm text-gray-600 mt-1 whitespace-pre-line line-clamp-3">{s.description}</div>{/if}
-          </div>
-        {:else}
-          <p class="text-gray-500">Aucun direct programmé pour le moment.</p>
-        {/each}
-      </div>
-
       {#if data.replays.length}
-        <h2 use:reveal class="font-slab font-bold text-[30px] md:text-[36px] leading-tight text-man-nuit mb-4">Rediffusions</h2>
+        <h2 use:reveal class="font-slab font-bold text-[30px] md:text-[36px] leading-tight text-man-nuit mb-5">Rediffusions</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           {#each data.replays as s (s.id)}
             <div>
-              <VideoEmbed url={s.recording_url} title={s.title} />
-              <div class="mt-2 font-bold text-gray-800">{s.title}</div>
-              <div class="text-xs text-gray-500">{formatDate(s.ended_at)}</div>
+              <div class="rounded-[22px] overflow-hidden"><VideoEmbed url={s.recording_url} title={s.title} /></div>
+              <div class="mt-3 font-slab font-bold text-[19px] text-man-nuit">{s.title}</div>
+              <div class="text-sm text-[#4A6285]">{formatDate(s.ended_at)}</div>
             </div>
           {/each}
         </div>
       {/if}
     {/if}
-  </Container>
+  </div>
 </div>

@@ -81,7 +81,7 @@
           <ul role="list" class="card__bullets flow">
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -89,7 +89,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -97,7 +97,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -105,7 +105,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -122,7 +122,7 @@
           <ul role="list" class="card__bullets flow">
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -130,7 +130,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -138,7 +138,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -146,7 +146,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -163,7 +163,7 @@
           <ul role="list" class="card__bullets flow">
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -171,7 +171,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -179,7 +179,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -187,7 +187,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -195,7 +195,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>
@@ -203,7 +203,7 @@
             </li>
             <li class="flex items-start text-[0.9rem]">
               <span class="mt-[0.08rem] items-center justify-center">
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="checkmark-done-outline"
                   class="text-lg mr-2 text-gray-400"></ion-icon>
               </span>

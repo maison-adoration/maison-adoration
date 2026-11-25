@@ -1,6 +1,5 @@
 <script>
   import Select from "svelte-select";
-  import SectionHeading from "./../utils/SectionHeading.svelte";
   import Modal from "../utils/Modal.svelte";
   import Loading from "../utils/Loading.svelte";
   import Empty from "../utils/Empty.svelte";
@@ -107,7 +106,7 @@
       <input bind:value={newContent.title} type="text" placeholder="Titre" />
 
       {#if typeValue != "activity"}
-        <label class="text-gray-400 text-sm" for="new-price">
+        <label class="text-gray-600 text-sm" for="new-price">
           Prix en {$config.settings.currency} (0 = gratuit)
         </label>
         <input id="new-price" bind:value={newContent.price} type="number" min="0" step="0.01" />
@@ -125,11 +124,11 @@
           class="shadow-sm py-1 px-4 flex items-center justify-start cursor-pointer col-span-2 h-full bg-brand-black-light rounded-md border border-gray-800/50"
         >
           {#if newContent.poster}
-            <ion-icon name="checkmark-circle-outline" class="mr-2 text-xl"
+            <ion-icon aria-hidden="true" name="checkmark-circle-outline" class="mr-2 text-xl"
             ></ion-icon>
             Affiche sélectionnée
           {:else}
-            <ion-icon name="image-outline" class="mr-2 text-xl"></ion-icon>
+            <ion-icon aria-hidden="true" name="image-outline" class="mr-2 text-xl"></ion-icon>
             Affiche (image)
           {/if}
         </label>
@@ -156,10 +155,10 @@
             class="shadow-sm py-1 px-4 flex items-center justify-start cursor-pointer col-span-2 h-full bg-brand-black-light rounded-md border"
           >
             {#if newContent.pdf}
-              <ion-icon name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
+              <ion-icon aria-hidden="true" name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
               PDF sélectionné
             {:else}
-              <ion-icon name="document-attach" class="text-2xl mr-2"></ion-icon>
+              <ion-icon aria-hidden="true" name="document-attach" class="text-2xl mr-2"></ion-icon>
               PDF
             {/if}
           </label>
@@ -187,14 +186,14 @@
         <!-- else content here -->
         <div class="flex">
           <button class=" !w-full btn btn-third" on:click={handleAdd}>
-            <ion-icon name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="checkmark-circle" class="text-2xl mr-2"></ion-icon>
             Fait
           </button>
           <button
             class="ml-4 !w-full btn btn-aurora"
             on:click={() => (showAddForm = false)}
           >
-            <ion-icon name="close-circle" class="text-2xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="close-circle" class="text-2xl mr-2"></ion-icon>
             Fermer
           </button>
         </div>
@@ -208,18 +207,17 @@
 
 <div class="mt-8"></div>
 
-<SectionHeading text1="Contenu" text2="Ajouté..." breakWord />
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
   <button
     class="btn btn-primary !w-full"
     on:click={() => (showAddForm = true)}
   >
-    <ion-icon name="add-circle" class="text-2xl mr-3"></ion-icon>
+    <ion-icon aria-hidden="true" name="add-circle" class="text-2xl mr-3"></ion-icon>
     Ajouter du Contenu
   </button>
   <button class="btn btn-secondary !w-full" on:click={exportMembers} disabled={exporting}>
-    <ion-icon name="download-outline" class="text-2xl mr-3"></ion-icon>
+    <ion-icon aria-hidden="true" name="download-outline" class="text-2xl mr-3"></ion-icon>
     {exporting ? "Préparation..." : "Exporter les inscrits (Excel)"}
   </button>
 </div>

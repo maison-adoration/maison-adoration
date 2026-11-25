@@ -35,25 +35,29 @@
   <title>Administration - M.A.N.</title>
 </svelte:head>
 
-<div class="min-h-screen pt-20 pb-10">
+<div class="min-h-screen bg-[#F3F6FA]">
   {#if ["media", "admin", "super-admin"].includes(role)}
-    <Container>
-      <h1 class="h-font text-4xl text-brand-primary mb-4">{role == "media" ? "Espace média" : "Administration"}</h1>
-      <div class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3">
-        {#each TABS as t}
-          <button
-            class="flex items-center px-3 py-2 rounded-md text-sm"
-            class:bg-brand-primary={tab == t.id}
-            class:text-white={tab == t.id}
-            class:bg-white={tab != t.id}
-            on:click={() => select(t.id)}
-          >
-            <ion-icon name={t.icon} class="text-lg mr-2"></ion-icon>
-            {t.label}
-          </button>
-        {/each}
+    <header class="bg-man-nuit text-white">
+      <div class="max-w-[1240px] mx-auto px-5 md:px-10 pt-28 md:pt-32">
+        <h1 class="font-slab font-bold text-[32px] md:text-[40px] leading-tight">{role == "media" ? "Espace média" : "Administration"}</h1>
+        <nav class="mt-5 -mx-5 px-5 flex gap-1 overflow-x-auto whitespace-nowrap" aria-label="Sections de l'administration">
+          {#each TABS as t}
+            <button
+              type="button"
+              aria-current={tab == t.id ? "page" : undefined}
+              class="relative shrink-0 inline-flex items-center gap-2 px-4 py-3 font-bold text-[15px] transition-colors duration-200 {tab == t.id ? 'text-white' : 'text-man-doux hover:text-white'}"
+              on:click={() => select(t.id)}
+            >
+              <ion-icon name={t.icon} class="text-lg" aria-hidden="true"></ion-icon>
+              {t.label}
+              {#if tab == t.id}<span class="absolute left-4 right-4 bottom-0 h-[3px] rounded-t bg-man-or" aria-hidden="true"></span>{/if}
+            </button>
+          {/each}
+        </nav>
       </div>
-
+    </header>
+    <Container>
+      <div class="py-8">
       {#if tab == "contenus"}
         <AsAdmin />
       {:else if tab == "pages"}
@@ -69,12 +73,15 @@
       {:else if tab == "users"}
         <UsersAdmin />
       {/if}
+      </div>
     </Container>
   {:else if !$config.userLoaded}
-    <Loading text="Veuillez patienter" />
+    <div class="pt-32"><Loading text="Chargement…" /></div>
   {:else}
-    <div class="h-screen w-full flex items-center justify-center">
-      Accès réservé aux administrateurs
+    <div class="min-h-[80vh] flex flex-col items-center justify-center gap-4 px-5 pt-24 text-center">
+      <h1 class="font-slab font-bold text-[30px] text-man-nuit">Accès réservé</h1>
+      <p class="text-[#4A6285] max-w-[420px]">Cet espace est réservé à l'équipe de la Maison. Connectez-vous avec un compte administrateur.</p>
+      <a href="/login" class="btn-or">Se connecter</a>
     </div>
   {/if}
 </div>

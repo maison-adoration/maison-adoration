@@ -99,7 +99,6 @@
               href="/mediatheque?message={encodeURIComponent(s.id)}"
               on:click={(e) => cardClick(e, i)}
               draggable="false"
-              aria-label="{s.title}{i === $ap.index ? '' : ', afficher'}"
               class="rowcard relative flex-none h-[380px] md:h-[440px] rounded-[26px] overflow-hidden"
               style="width: {cardW}px; opacity: {i === $ap.index ? 1 : 0.45}; transform: {i === $ap.index ? 'none' : 'scale(.94)'}; transition: opacity 500ms ease, transform 600ms cubic-bezier(.23,1,.32,1)"
             >

@@ -1,17 +1,18 @@
 <script>
-  import Container from "../../components/utils/Container.svelte";
+  import PageHero from "../../components/pages/PageHero.svelte";
   let appName = "M.A.N. - Maison D'Adoration Pour les Nations";
 </script>
 
 <svelte:head>
-  <title>Privacy Policy - {appName} | Coach Israël Kayembe.</title>
+  <title>Confidentialité - M.A.N. - Maison D'Adoration Pour les Nations</title>
 </svelte:head>
 
-<Container>
-  <div class="">
-    <h1 class="pt-20 font-bold uppercase">
-      Privacy Policy for {appName}
-    </h1>
+<PageHero title="Confidentialité" image="/images/design/assemblee-large.jpg" />
+
+<div class="on-light bg-white py-12 md:py-16">
+  <!-- Texte d'origine en anglais : la langue est signalée aux lecteurs d'écran. -->
+  <div class="legal max-w-[720px] mx-auto px-5" lang="en">
+    <h2 class="mb-4 mt-2 font-bold uppercase">Privacy Policy for {appName}</h2>
 
     <p class="mb-4">
       At {appName}, accessible from https://www.maison-adoration.net, one of our main
@@ -63,7 +64,6 @@
     </p>
 
     <h2 class="mb-4 mt-2 font-bold uppercase">How we use your information</h2>
-    class="mb-4"
 
     <p>We use the information we collect in various ways, including to:</p>
 
@@ -214,4 +214,12 @@
       from our records.
     </p>
   </div>
-</Container>
+</div>
+
+<style>
+  .legal { color: #2B3F5C; font-size: 17px; line-height: 1.7; }
+  .legal :global(h2) { font-family: "Zilla Slab", Georgia, serif; font-weight: 700; text-transform: none; font-size: 24px; line-height: 1.2; color: #0A1B33; margin-top: 2.2rem; }
+  .legal :global(ul) { list-style: disc; padding-left: 1.4rem; margin-bottom: 1rem; }
+  .legal :global(li) { margin: .3rem 0; }
+  .legal :global(a) { color: #173E6F; text-decoration: underline; }
+</style>

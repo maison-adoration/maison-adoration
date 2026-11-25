@@ -39,7 +39,7 @@
       <h1
         class="bg-brand-black text-gray-700 w-full h-full text-sm uppercase tracking-wider flex items-center shadow-md text-center px-2 py-2"
       >
-        <ion-icon name="logo-youtube" class="text-xl mr-2"></ion-icon>
+        <ion-icon aria-hidden="true" name="logo-youtube" class="text-xl mr-2"></ion-icon>
         <div class="block sm:hidden text-gray-700 text-xs">
           {title.length < 25 ? title : title.substring(0, 45) + "..."}
         </div>
@@ -88,10 +88,10 @@
   <div class="px-3">
     Bienvenue sur le webinar <span class="text-brand-primary">{title}</span>,
     appuyez sur le bouton play
-    <ion-icon
+    <ion-icon aria-hidden="true"
       name="play-circle"
       class="text-brand-primary text-base translate-y-1"></ion-icon>
     pour lancer la video. Pour ouvrir la video en plein ecran, cliquez sur ce bouton
-    <ion-icon name="scan" class="text-brand-primary text-base translate-y-1"></ion-icon>.
+    <ion-icon aria-hidden="true" name="scan" class="text-brand-primary text-base translate-y-1"></ion-icon>.
   </div>
 </div>

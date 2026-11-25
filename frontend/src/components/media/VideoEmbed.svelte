@@ -13,6 +13,6 @@
   </div>
 {:else if url}
   <a href={url} target="_blank" rel="noopener" class="btn btn-secondary">
-    Ouvrir la vidéo <ion-icon name="open-outline" class="text-xl ml-2"></ion-icon>
+    Ouvrir la vidéo <ion-icon aria-hidden="true" name="open-outline" class="text-xl ml-2"></ion-icon>
   </a>
 {/if}

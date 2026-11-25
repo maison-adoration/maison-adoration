@@ -61,26 +61,23 @@
 </script>
 
 {#if supported && $config.settings && $config.settings.vapidPublicKey}
-  <div class="rounded-lg border border-gray-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4 border-t border-[#E1E8F1]">
     <div>
-      <div class="text-gray-700">Notifications sur cet appareil</div>
-      <div class="text-xs text-gray-500">
+      <div class="font-bold text-man-nuit">Notifications sur cet appareil</div>
+      <div class="text-[15px] text-[#4A6285]">
         {#if state === "on"}
-          Activées : vous serez prévenu des nouveaux contenus.
+          Activées : vous serez prévenu des nouveaux enseignements.
         {:else if state === "denied"}
-          Bloquées dans votre navigateur. Autorisez-les dans les réglages du site pour les activer.
+          Bloquées par votre navigateur. Autorisez-les dans les réglages du site.
         {:else}
-          Recevez une alerte quand un nouvel enseignement est publié.
+          Recevez une alerte quand un enseignement est publié.
         {/if}
       </div>
     </div>
     {#if state === "on"}
-      <button type="button" class="btn btn-aurora" on:click={disable} disabled={busy}>Désactiver</button>
+      <button type="button" class="btn-line" on:click={disable} disabled={busy}>Désactiver</button>
     {:else if state !== "denied"}
-      <button type="button" class="btn btn-secondary" on:click={enable} disabled={busy}>
-        {busy ? "Activation..." : "Activer"}
-        <ion-icon name="notifications-outline" class="text-xl ml-2"></ion-icon>
-      </button>
+      <button type="button" class="btn-line" on:click={enable} disabled={busy} aria-busy={busy}>{busy ? "Activation…" : "Activer"}</button>
     {/if}
   </div>
 {/if}

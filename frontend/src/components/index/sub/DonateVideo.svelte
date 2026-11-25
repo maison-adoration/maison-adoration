@@ -67,7 +67,7 @@
               data-aos-delay="1500"
             >
               Comment Procéder
-              <ion-icon name="heart-circle-outline" class="text-2xl ml-2"></ion-icon>
+              <ion-icon aria-hidden="true" name="heart-circle-outline" class="text-2xl ml-2"></ion-icon>
             </a>
           </div>
         </div>

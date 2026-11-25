@@ -11,7 +11,7 @@
       <!--  -->
       <div class="">
         <div class="text-[#111] flex flex-col items-center justify-center">
-          <ion-icon name="time-outline" class="text-5xl"></ion-icon>
+          <ion-icon aria-hidden="true" name="time-outline" class="text-5xl"></ion-icon>
           <div class="mt-3 h-font text-3xl text-center">Culte Dominicaux</div>
           <div class="mt-3 text-center manrope text-sm">
             Rejoignez-nous en personne ou en ligne tous les dimanches à 8h30
@@ -26,7 +26,7 @@
           target="_blank"
           class="text-[#111] flex flex-col items-center justify-center"
         >
-          <ion-icon name="logo-youtube" class="text-5xl"></ion-icon>
+          <ion-icon aria-hidden="true" name="logo-youtube" class="text-5xl"></ion-icon>
           <div class="mt-3 h-font text-3xl text-center">
             Nous suivre en ligne
           </div>
@@ -41,7 +41,7 @@
       <!--  -->
       <div class="">
         <div class="text-[#111] flex flex-col items-center justify-center">
-          <ion-icon name="location-outline" class="text-5xl"></ion-icon>
+          <ion-icon aria-hidden="true" name="location-outline" class="text-5xl"></ion-icon>
           <div class="mt-3 h-font text-3xl text-center">Adresse physique</div>
           <div class="mt-3 text-center manrope text-sm">
             2094, Av. Kapenda, Coin Kimbangu, à côté de l'hôpital chinois
@@ -108,7 +108,7 @@
               <div
                 class="k-font uppercase tracking-wide font-light flex items-center text-brand-primary"
               >
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="navigate-circle-outline"
                   class="text-2xl mr-2 !text-brand-primary"
                 ></ion-icon>
@@ -118,7 +118,7 @@
               <div
                 class="k-font uppercase tracking-wide font-light mt-1 flex items-center text-brand-primary"
               >
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="navigate-circle-outline"
                   class="text-2xl mr-2 !text-brand-primary"
                 ></ion-icon>
@@ -128,7 +128,7 @@
               <div
                 class="k-font uppercase tracking-wide font-light mt-1 flex items-center text-brand-primary"
               >
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="navigate-circle-outline"
                   class="text-2xl mr-2 !text-brand-primary"
                 ></ion-icon>
@@ -138,7 +138,7 @@
               <div
                 class="k-font uppercase tracking-wide font-light mt-1 flex items-center text-brand-primary"
               >
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="navigate-circle-outline"
                   class="text-2xl mr-2 !text-brand-primary"
                 ></ion-icon>
@@ -165,7 +165,7 @@
                 class="mt-4 btn btn-secondary !py-2 !px-10 relative z-[11] !text-sm !bg-black !text-brand-primary"
               >
                 En savoir plus
-                <ion-icon
+                <ion-icon aria-hidden="true"
                   name="arrow-forward-circle-outline"
                   class="text-2xl ml-2"
                 ></ion-icon>
@@ -220,13 +220,13 @@
           <div
             class="font-light k-font tracking-widest flex items-center text-brand-primary"
           >
-            <ion-icon name="calendar-outline" class="text-xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="calendar-outline" class="text-xl mr-2"></ion-icon>
             MERCREDI :
           </div>
           <div
             class="mt-2 text-gray-400 tracking-widest text-sm flex items-center"
           >
-            <ion-icon name="time-outline" class="text-xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="time-outline" class="text-xl mr-2"></ion-icon>
             16H30 À 18H30
           </div>
           <div
@@ -244,13 +244,13 @@
           <div
             class="font-light k-font tracking-widest flex items-center text-brand-primary"
           >
-            <ion-icon name="calendar-outline" class="text-xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="calendar-outline" class="text-xl mr-2"></ion-icon>
             VENDREDI :
           </div>
           <div
             class="mt-2 text-gray-400 tracking-widest text-sm flex items-center"
           >
-            <ion-icon name="time-outline" class="text-xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="time-outline" class="text-xl mr-2"></ion-icon>
             16H30 À 19H00
           </div>
           <div
@@ -268,13 +268,13 @@
           <div
             class="font-light k-font tracking-widest flex items-center text-brand-primary"
           >
-            <ion-icon name="calendar-outline" class="text-xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="calendar-outline" class="text-xl mr-2"></ion-icon>
             DIMANCHE :
           </div>
           <div
             class="mt-2 text-gray-400 tracking-widest text-sm flex items-center"
           >
-            <ion-icon name="time-outline" class="text-xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="time-outline" class="text-xl mr-2"></ion-icon>
             08H30 À 11H00
           </div>
           <div
@@ -292,13 +292,13 @@
           <div
             class="font-light k-font tracking-widest flex items-center text-brand-primary"
           >
-            <ion-icon name="calendar-outline" class="text-xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="calendar-outline" class="text-xl mr-2"></ion-icon>
             LUNDI AU VENDREDI :
           </div>
           <div
             class="mt-2 text-gray-400 tracking-widest text-sm flex items-center"
           >
-            <ion-icon name="time-outline" class="text-xl mr-2"></ion-icon>
+            <ion-icon aria-hidden="true" name="time-outline" class="text-xl mr-2"></ion-icon>
             06H30 À 08H00
           </div>
           <div
