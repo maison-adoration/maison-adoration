@@ -13,7 +13,8 @@
     "db:migrate": "node scripts/db-migrate.js",
     "create-super-admin": "node scripts/create-super-admin.js",
     "migrate-from-mongo": "node scripts/migrate-from-mongo.js",
-    "test": "node --test --test-concurrency=1 test/*.test.js"
+    "test": "node --test --test-concurrency=1 test/*.test.js",
+    "demo:accounts": "node scripts/demo-accounts.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
