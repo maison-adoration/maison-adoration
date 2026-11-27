@@ -12,12 +12,20 @@ const app = express();
 if (config.isProd) app.set('trust proxy', 1);
 app.disable('x-powered-by');
 
+const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
+const refused = new Set();
 app.use(helmet());
 app.use(
   cors({
     origin(origin, cb) {
       // Pas d'origine = appel serveur-à-serveur (ex. FlexPay) : autorisé.
       if (!origin || config.corsOrigins.includes(origin)) return cb(null, true);
+      // En développement, tout site local est accepté (localhost, 127.0.0.1, n'importe quel port).
+      if (config.env === 'development' && LOCAL_ORIGIN.test(origin)) return cb(null, true);
+      if (!refused.has(origin)) {
+        refused.add(origin);
+        console.warn(`⚠️  CORS : origine refusée « ${origin} ». Ajoutez-la à CORS_ORIGINS dans .env, puis redémarrez le serveur.`);
+      }
       return cb(new Error(`CORS : origine non autorisée (${origin})`));
     },
     // Le navigateur garde la réponse « preflight » 24 h au lieu de refaire
